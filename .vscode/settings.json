@@ -1,0 +1,25 @@
+{
+    "Lingma.cloudModelAutoTriggerGenerateLength": "long",
+    "Lingma.cloudModelManualTriggerGenerateLength": "long",
+    "Lingma.localMachineModelMaxCandidateNum": 5,
+    "Lingma.aI Chat.webToolsInAsk/AgentMode": "Auto-execute",
+    "Lingma.aI Chat.mcpToolsInAgentMode": true,
+    "Lingma.DisplayLanguage": "简体中文",
+    "Lingma.PreferredLanguage for AI Chat": "简体中文",
+    "Lingma.PreferredLanguage forCommitMessage": "简体中文",
+    "omnisharp.useModernNet": true,
+    "code-runner.executorMap": {
+        "csharp": "cd $dir && if (Test-Path '*.csproj') { dotnet run } else { Write-Host '错误：当前目录不是.NET项目。请使用 create_csharp_project.ps1 创建项目。' -ForegroundColor Red }"
+    },
+    "code-runner.runInTerminal": true,
+    "code-runner.saveFileBeforeRun": true,
+    "code-runner.clearPreviousOutput": true,
+    "code-runner.ignoreSelection": true,
+    "files.associations": {
+        "*.cs": "csharp"
+    },
+    "csharp.semanticHighlighting.enabled": true,
+    "dotnet.completion.showCompletionItemsFromUnimportedNamespaces": true,
+    "omnisharp.enableEditorConfigSupport": true,
+    "omnisharp.enableImportCompletion": true
+}
