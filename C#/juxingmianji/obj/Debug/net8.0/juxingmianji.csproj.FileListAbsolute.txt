@@ -1,0 +1,14 @@
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\juxingmianji\bin\Debug\net8.0\juxingmianji.exe
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\juxingmianji\bin\Debug\net8.0\juxingmianji.deps.json
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\juxingmianji\bin\Debug\net8.0\juxingmianji.runtimeconfig.json
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\juxingmianji\bin\Debug\net8.0\juxingmianji.dll
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\juxingmianji\bin\Debug\net8.0\juxingmianji.pdb
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\juxingmianji\obj\Debug\net8.0\juxingmianji.GeneratedMSBuildEditorConfig.editorconfig
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\juxingmianji\obj\Debug\net8.0\juxingmianji.AssemblyInfoInputs.cache
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\juxingmianji\obj\Debug\net8.0\juxingmianji.AssemblyInfo.cs
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\juxingmianji\obj\Debug\net8.0\juxingmianji.csproj.CoreCompileInputs.cache
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\juxingmianji\obj\Debug\net8.0\juxingmianji.dll
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\juxingmianji\obj\Debug\net8.0\refint\juxingmianji.dll
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\juxingmianji\obj\Debug\net8.0\juxingmianji.pdb
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\juxingmianji\obj\Debug\net8.0\juxingmianji.genruntimeconfig.cache
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\juxingmianji\obj\Debug\net8.0\ref\juxingmianji.dll

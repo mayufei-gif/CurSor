@@ -1,0 +1,14 @@
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\RectangleCalc\bin\Debug\net8.0\RectangleCalc.exe
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\RectangleCalc\bin\Debug\net8.0\RectangleCalc.deps.json
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\RectangleCalc\bin\Debug\net8.0\RectangleCalc.runtimeconfig.json
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\RectangleCalc\bin\Debug\net8.0\RectangleCalc.dll
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\RectangleCalc\bin\Debug\net8.0\RectangleCalc.pdb
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\RectangleCalc\obj\Debug\net8.0\RectangleCalc.GeneratedMSBuildEditorConfig.editorconfig
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\RectangleCalc\obj\Debug\net8.0\RectangleCalc.AssemblyInfoInputs.cache
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\RectangleCalc\obj\Debug\net8.0\RectangleCalc.AssemblyInfo.cs
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\RectangleCalc\obj\Debug\net8.0\RectangleCalc.csproj.CoreCompileInputs.cache
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\RectangleCalc\obj\Debug\net8.0\RectangleCalc.dll
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\RectangleCalc\obj\Debug\net8.0\refint\RectangleCalc.dll
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\RectangleCalc\obj\Debug\net8.0\RectangleCalc.pdb
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\RectangleCalc\obj\Debug\net8.0\RectangleCalc.genruntimeconfig.cache
+G:\E盘\工作项目文件\AI_Agent\Trae_Abroad\C#\RectangleCalc\obj\Debug\net8.0\ref\RectangleCalc.dll

@@ -1,0 +1,105 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "G:\\E\u76D8\\\u5DE5\u4F5C\u9879\u76EE\u6587\u4EF6\\A\u5B66\u6821\u5404\u79CD\u6BD4\u8D5B\u9879\u76EE\u6587\u4EF6\u5939\\\u6570\u5B66\u5EFA\u6A21\u5927\u8D5B\\2025\u6570\u5B66\u5EFA\u6A21\u7ADE\u8D5B\u51C6\u5907\u9636\u6BB5\\Python\u4EE3\u7801\u7F16\u5199\u6559\u7A0B\\2025\u4E2D\u9752\u676F\\Python\\\u4ECE\u89C6\u9891\u6587\u4EF6\u4E2D\u6279\u91CF\u63D0\u53D6\u89C6\u89C9\uFF08LBP\uFF09\u548C\u97F3\u9891\uFF08MFCC\uFF09\u7279\u5F81\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A18C3218-8B23-48F4-BA03-79742E3A420E}|PythonApplication1\u30011.pyproj|G:\\E\u76D8\\\u5DE5\u4F5C\u9879\u76EE\u6587\u4EF6\\A\u5B66\u6821\u5404\u79CD\u6BD4\u8D5B\u9879\u76EE\u6587\u4EF6\u5939\\\u6570\u5B66\u5EFA\u6A21\u5927\u8D5B\\2025\u6570\u5B66\u5EFA\u6A21\u7ADE\u8D5B\u51C6\u5907\u9636\u6BB5\\Python\u4EE3\u7801\u7F16\u5199\u6559\u7A0B\\2025\u4E2D\u9752\u676F\\Python\\\u4ECE\u89C6\u9891\u6587\u4EF6\u4E2D\u6279\u91CF\u63D0\u53D6\u89C6\u89C9\uFF08LBP\uFF09\u548C\u97F3\u9891\uFF08MFCC\uFF09\u7279\u5F81\\PythonApplication1_1.py||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A18C3218-8B23-48F4-BA03-79742E3A420E}|PythonApplication1\u30011.pyproj|solutionrelative:PythonApplication1_1.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 293,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 17,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:1:0:{08a1bf1d-7967-4afc-8253-1790862ab8c9}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:2:0:{08a1bf1d-7967-4afc-8253-1790862ab8c9}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:8:0:{e8034f19-ab72-4f06-83fd-f6832b41aa63}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:9:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:10:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:11:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:2:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:8:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:7:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{4a9b7e51-aa16-11d0-a8c5-00a0c921a4d2}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{0ad07096-bba9-4900-a651-0598d26f6d24}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:1:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "PythonApplication1_1.py",
+              "DocumentMoniker": "G:\\E\u76D8\\\u5DE5\u4F5C\u9879\u76EE\u6587\u4EF6\\A\u5B66\u6821\u5404\u79CD\u6BD4\u8D5B\u9879\u76EE\u6587\u4EF6\u5939\\\u6570\u5B66\u5EFA\u6A21\u5927\u8D5B\\2025\u6570\u5B66\u5EFA\u6A21\u7ADE\u8D5B\u51C6\u5907\u9636\u6BB5\\Python\u4EE3\u7801\u7F16\u5199\u6559\u7A0B\\2025\u4E2D\u9752\u676F\\Python\\\u4ECE\u89C6\u9891\u6587\u4EF6\u4E2D\u6279\u91CF\u63D0\u53D6\u89C6\u89C9\uFF08LBP\uFF09\u548C\u97F3\u9891\uFF08MFCC\uFF09\u7279\u5F81\\PythonApplication1_1.py",
+              "RelativeDocumentMoniker": "PythonApplication1_1.py",
+              "ToolTip": "G:\\E\u76D8\\\u5DE5\u4F5C\u9879\u76EE\u6587\u4EF6\\A\u5B66\u6821\u5404\u79CD\u6BD4\u8D5B\u9879\u76EE\u6587\u4EF6\u5939\\\u6570\u5B66\u5EFA\u6A21\u5927\u8D5B\\2025\u6570\u5B66\u5EFA\u6A21\u7ADE\u8D5B\u51C6\u5907\u9636\u6BB5\\Python\u4EE3\u7801\u7F16\u5199\u6559\u7A0B\\2025\u4E2D\u9752\u676F\\Python\\\u4ECE\u89C6\u9891\u6587\u4EF6\u4E2D\u6279\u91CF\u63D0\u53D6\u89C6\u89C9\uFF08LBP\uFF09\u548C\u97F3\u9891\uFF08MFCC\uFF09\u7279\u5F81\\PythonApplication1_1.py",
+              "RelativeToolTip": "PythonApplication1_1.py",
+              "ViewState": "AgIAAKgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002457|",
+              "WhenOpened": "2025-05-23T06:19:46.783Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
