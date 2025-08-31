@@ -1,13 +1,15 @@
-function fh_SL = SLfilter(N,d)
-% S-L filter function
-% ----------------------
-% ���������
-% N:ͼ���С��̽����ͨ��������
-% d:ƽ�Ʋ���
-% ���������
-%fh_SL:S-L�˲�����
-fh_SL = zeros(1,N);
-for k1 = 1:N
-    fh_SL(k1) = -2/(pi^2*d^2*(4*(k1-N/2-1)^2-1));
-end
+﻿% 文件: SLfilter.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
+
+function fh_SL = SLfilter(N,d)  % 详解: 执行语句
+fh_SL = zeros(1,N);  % 详解: 赋值：将 zeros(...) 的结果保存到 fh_SL
+for k1 = 1:N  % 详解: for 循环：迭代变量 k1 遍历 1:N
+    fh_SL(k1) = -2/(pi^2*d^2*(4*(k1-N/2-1)^2-1));  % 详解: 调用函数：fh_SL(k1) = -2/(pi^2*d^2*(4*(k1-N/2-1)^2-1))
+end  % 详解: 执行语句
+
+
+
+
 

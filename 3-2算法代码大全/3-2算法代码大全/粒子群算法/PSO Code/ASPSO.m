@@ -1,122 +1,102 @@
-function fbestval = PSO()
-%clear;
-fname =@f1;  %���������ļ���
-NDim = 30;   % ���߱�����ά��
-MaxIter =6000;  % PSO���ܵ�������
-Bound = fname(); % ȷ�����߱�����������
+﻿% 文件: ASPSO.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
+
+function fbestval = PSO()  % 详解: 执行语句
+fname =@f1;  % 详解: 赋值：计算表达式并保存到 fname
+NDim = 30;  % 详解: 赋值：计算表达式并保存到 NDim
+MaxIter =6000;  % 详解: 赋值：计算表达式并保存到 MaxIter
+Bound = fname();  % 详解: 赋值：将 fname(...) 的结果保存到 Bound
 
 
-%function [fbestval,bestparticle,phis] = PSOconstriction(fname,bound,vmax,NDim,MaxIter)    
-%   Run a PSO algorithm
-%   
-%Input Arguments:
-%   fname       - the name of the evaluation .m function
-%   bounds      - a matrix of upper and lower bounds on the variables
-%   vmax        - maximum velocity
-%   NDim        - dimension of the evalation function
-%   MaxIter     - maximum iteration
 
 
-% Modified Particle Swarm Optimization for Matlab  
-% Copyright (C) 2002 Shan He, the University of Liverpool
-% Intelligence Engineering & Automation Group
 
-iteration = 0;
-PopSize=48;     % population of particles
-w=1;
-c1=2.05;
-c2=2.05;
-gbest = zeros(NDim,PopSize);
-% Defined lower bound and upper bound.
-LowerBound = zeros(NDim,PopSize);
-UpperBound = zeros(NDim,PopSize);
-for i=1:PopSize
-    LowerBound(:,i)=Bound(:,1);
-    UpperBound(:,i)=Bound(:,2);
-end
+iteration = 0;  % 详解: 赋值：计算表达式并保存到 iteration
+PopSize=48;  % 详解: 赋值：计算表达式并保存到 PopSize
+w=1;  % 详解: 赋值：计算表达式并保存到 w
+c1=2.05;  % 详解: 赋值：计算表达式并保存到 c1
+c2=2.05;  % 详解: 赋值：计算表达式并保存到 c2
+gbest = zeros(NDim,PopSize);  % 详解: 赋值：将 zeros(...) 的结果保存到 gbest
+LowerBound = zeros(NDim,PopSize);  % 详解: 赋值：将 zeros(...) 的结果保存到 LowerBound
+UpperBound = zeros(NDim,PopSize);  % 详解: 赋值：将 zeros(...) 的结果保存到 UpperBound
+for i=1:PopSize  % 详解: for 循环：迭代变量 i 遍历 1:PopSize
+    LowerBound(:,i)=Bound(:,1);  % 详解: 调用函数：LowerBound(:,i)=Bound(:,1)
+    UpperBound(:,i)=Bound(:,2);  % 详解: 调用函数：UpperBound(:,i)=Bound(:,2)
+end  % 详解: 执行语句
 
-population =  rand(NDim, PopSize).*(UpperBound-LowerBound) + LowerBound;     % Initialize swarm population
-vmax = ones(NDim,PopSize);
+population =  rand(NDim, PopSize).*(UpperBound-LowerBound) + LowerBound;  % 详解: 赋值：将 rand(...) 的结果保存到 population
+vmax = ones(NDim,PopSize);  % 详解: 赋值：将 ones(...) 的结果保存到 vmax
 
-for i=1:NDim
-    vmax(i,:)=(UpperBound(i,:)-LowerBound(i,:))/10;
-end
-velocity = vmax.*rand(1);      % Initialize velocity
+for i=1:NDim  % 详解: for 循环：迭代变量 i 遍历 1:NDim
+    vmax(i,:)=(UpperBound(i,:)-LowerBound(i,:))/10;  % 详解: 执行语句
+end  % 详解: 执行语句
+velocity = vmax.*rand(1);  % 详解: 赋值：计算表达式并保存到 velocity
 
 
-% Evaluate initial population
-for i = 1:PopSize,
-    fvalue(i) = fname(population(:,i));
-end
+for i = 1:PopSize,  % 详解: for 循环：迭代变量 i 遍历 1:PopSize,
+    fvalue(i) = fname(population(:,i));  % 详解: 调用函数：fvalue(i) = fname(population(:,i))
+end  % 详解: 执行语句
 
-pbest = population;   % Initializing Best positions�� matrix
-fpbest = fvalue;      % Initializing the corresponding function values
-% Finding best particle in initial population
-[fbestval,index] = min(fvalue);    % Find the globe best   
+pbest = population;  % 详解: 赋值：计算表达式并保存到 pbest
+fpbest = fvalue;  % 详解: 赋值：计算表达式并保存到 fpbest
+[fbestval,index] = min(fvalue);  % 详解: 统计：最大/最小值
 
-%population = population + velocity;
-while(iteration < MaxIter)
-    iteration = iteration +1;
+while(iteration < MaxIter)  % 详解: 调用函数：while(iteration < MaxIter)
+    iteration = iteration +1;  % 详解: 赋值：计算表达式并保存到 iteration
        
 
-    R1 = rand(NDim, PopSize);
-    R2 = rand(NDim, PopSize);
+    R1 = rand(NDim, PopSize);  % 详解: 赋值：将 rand(...) 的结果保存到 R1
+    R2 = rand(NDim, PopSize);  % 详解: 赋值：将 rand(...) 的结果保存到 R2
 
     
-    % Evaluate the new swarm
-    for i = 1:PopSize,
-        fvalue(i) = fname(population(:,i));
-        %fprintf('%d',i);
-    end
-    % Updating the pbest for each particle
+    for i = 1:PopSize,  % 详解: for 循环：迭代变量 i 遍历 1:PopSize,
+        fvalue(i) = fname(population(:,i));  % 详解: 调用函数：fvalue(i) = fname(population(:,i))
+    end  % 详解: 执行语句
 
-    % Updating the pbest for each particle
-    changeColumns = fvalue < fpbest;
-    pbest(:, find(changeColumns)) = population(:, find(changeColumns));% find(changeColumns) find the columns which the values are 1
-    changeColumns = fvalue > fpbest;
-    diff=abs(fvalue-fpbest);
-    if rand(1)<exp(      -diff(find(changeColumns))  /fvalue(find(changeColumns)        )         )
-        pbest(:, find(changeColumns)) = population(:, find(changeColumns));
-    end
-    for i = 1:PopSize,
-    fpbest(i) = fname(population(:,i));
-    end    
+    changeColumns = fvalue < fpbest;  % 详解: 赋值：计算表达式并保存到 changeColumns
+    pbest(:, find(changeColumns)) = population(:, find(changeColumns));  % 详解: 调用函数：pbest(:, find(changeColumns)) = population(:, find(changeColumns))
+    changeColumns = fvalue > fpbest;  % 详解: 赋值：计算表达式并保存到 changeColumns
+    diff=abs(fvalue-fpbest);  % 详解: 赋值：将 abs(...) 的结果保存到 diff
+    if rand(1)<exp(      -diff(find(changeColumns))  /fvalue(find(changeColumns)        )         )  % 详解: 条件判断：if (rand(1)<exp(      -diff(find(changeColumns))  /fvalue(find(changeColumns)        )         ))
+        pbest(:, find(changeColumns)) = population(:, find(changeColumns));  % 详解: 调用函数：pbest(:, find(changeColumns)) = population(:, find(changeColumns))
+    end  % 详解: 执行语句
+    for i = 1:PopSize,  % 详解: for 循环：迭代变量 i 遍历 1:PopSize,
+    fpbest(i) = fname(population(:,i));  % 详解: 调用函数：fpbest(i) = fname(population(:,i))
+    end  % 详解: 执行语句
     
     
     
     
     
     
-     % Updating index 
-    [fbestval, index] = min(fpbest);
+    [fbestval, index] = min(fpbest);  % 详解: 统计：最大/最小值
     
 
-    for i=1:PopSize
-        gbest(:,i) = population(:,index);
-    end
+    for i=1:PopSize  % 详解: for 循环：迭代变量 i 遍历 1:PopSize
+        gbest(:,i) = population(:,index);  % 详解: 调用函数：gbest(:,i) = population(:,index)
+    end  % 详解: 执行语句
 
-    velocity = w*velocity + c1*R1.*(pbest-population) + c2*R2.*(gbest-population);
+    velocity = w*velocity + c1*R1.*(pbest-population) + c2*R2.*(gbest-population);  % 详解: 赋值：计算表达式并保存到 velocity
     
-    velocity=(velocity<-vmax).*(-vmax)+(velocity>vmax).*(vmax)+(velocity>-vmax & velocity<vmax).*velocity;
+    velocity=(velocity<-vmax).*(-vmax)+(velocity>vmax).*(vmax)+(velocity>-vmax & velocity<vmax).*velocity;  % 详解: 赋值：计算表达式并保存到 velocity
     
     
-    % Update the swarm particle
-    population = population + velocity;
+    population = population + velocity;  % 详解: 赋值：计算表达式并保存到 population
     
-    % Prevent particles from flying outside search space
-    population(population>UpperBound)=UpperBound(population>UpperBound);                % crop to upper range
-    population(population<LowerBound)=LowerBound(population<LowerBound);                % crop to lower range   
+    population(population>UpperBound)=UpperBound(population>UpperBound);  % 详解: 调用函数：population(population>UpperBound)=UpperBound(population>UpperBound)
+    population(population<LowerBound)=LowerBound(population<LowerBound);  % 详解: 调用函数：population(population<LowerBound)=LowerBound(population<LowerBound)
     
-     % plot best fitness
-%      Best(iteration) =fbestval;
-%      plot(log10(Best),'ro');xlabel('generation'); ylabel('log10(f(x))');
-%      text(0.5,0.95,['Best = ', num2str(Best(iteration))],'Units','normalized');   
-%      drawnow;    
-   fprintf('%d\t%i\n',iteration,fbestval);
-   his(iteration) = fbestval;
-end  
-   plot(his,'b');
-   xlabel('Iteration');
-   ylabel('Fvalue');
-   hold on;
-end
+   fprintf('%d\t%i\n',iteration,fbestval);  % 详解: 调用函数：fprintf('%d\t%i\n',iteration,fbestval)
+   his(iteration) = fbestval;  % 详解: 执行语句
+end  % 详解: 执行语句
+   plot(his,'b');  % 详解: 调用函数：plot(his,'b')
+   xlabel('Iteration');  % 详解: 调用函数：xlabel('Iteration')
+   ylabel('Fvalue');  % 详解: 调用函数：ylabel('Fvalue')
+   hold on;  % 详解: 执行语句
+end  % 详解: 执行语句
+
+
+
+

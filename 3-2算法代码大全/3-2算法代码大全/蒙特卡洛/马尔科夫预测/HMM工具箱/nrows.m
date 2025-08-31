@@ -1,4 +1,11 @@
-function r = rows(x)
-% ROWS      The number of rows.
-% ROWS is a more readable alternative to size(x,1).
-r = size(x,1);
+﻿% 文件: nrows.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
+
+function r = rows(x)  % 详解: 执行语句
+r = size(x,1);  % 详解: 赋值：将 size(...) 的结果保存到 r
+
+
+
+

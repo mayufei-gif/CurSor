@@ -1,16 +1,17 @@
-function fh_RL=RLfilter(N,d)
-% R-L filter function
-% ----------------------
-% ���������
-% N:ͼ���С��̽����ͨ��������
-% d:ƽ�Ʋ���
-% ���������
-%fh_RL:R-L�˲�����
-fh_RL = zeros(1,N);
-for k1 = 1:N
-    fh_RL(k1) = -1/(pi*pi*((k1-N/2-1)*d)^2);
-    if mod(k1-N/2-1,2) ==0
-        fh_RL(k1) = 0;
-    end
-end
-fh_RL(N/2+1) = 1/(4*d^2);
+﻿% 文件: RLfilter.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
+
+function fh_RL=RLfilter(N,d)  % 详解: 执行语句
+fh_RL = zeros(1,N);  % 详解: 赋值：将 zeros(...) 的结果保存到 fh_RL
+for k1 = 1:N  % 详解: for 循环：迭代变量 k1 遍历 1:N
+    fh_RL(k1) = -1/(pi*pi*((k1-N/2-1)*d)^2);  % 详解: 调用函数：fh_RL(k1) = -1/(pi*pi*((k1-N/2-1)*d)^2)
+    if mod(k1-N/2-1,2) ==0  % 详解: 条件判断：if (mod(k1-N/2-1,2) ==0)
+        fh_RL(k1) = 0;  % 详解: 执行语句
+    end  % 详解: 执行语句
+end  % 详解: 执行语句
+fh_RL(N/2+1) = 1/(4*d^2);  % 详解: 调用函数：fh_RL(N/2+1) = 1/(4*d^2)
+
+
+

@@ -1,24 +1,21 @@
-function p = find_equiv_posns(vsmall, vlarge)
-% FIND_EQUIV_POSNS p[i] = the place where vsmall[i] occurs in vlarge.
-% p = find_equiv_posns(vsmall, vlarge)
-% THE VECTORS ARE ASSUMED TO BE SORTED.
-%
-% e.g., vsmall=[2,8], vlarge=[2,7,8,4], p=[1,3]
-%
-% In R/S, this function is called 'match'
+﻿% 文件: find_equiv_posns.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
+
+function p = find_equiv_posns(vsmall, vlarge)  % 详解: 执行语句
  
-%if ~mysubset(vsmall, vlarge)
-%  error('small domain must occur in large domain');
-%end
 
-if isempty(vsmall) | isempty(vlarge)
-  p = [];
-  return;
-end
+if isempty(vsmall) | isempty(vlarge)  % 详解: 条件判断：if (isempty(vsmall) | isempty(vlarge))
+  p = [];  % 详解: 赋值：计算表达式并保存到 p
+  return;  % 详解: 返回：从当前函数返回
+end  % 详解: 执行语句
   
-bitvec = sparse(1, max(vlarge)); 
-%bitvec = zeros(1, max(vlarge));
-bitvec(vsmall) = 1;
-p = find(bitvec(vlarge));
+bitvec = sparse(1, max(vlarge));  % 详解: 赋值：将 sparse(...) 的结果保存到 bitvec
+bitvec(vsmall) = 1;  % 详解: 执行语句
+p = find(bitvec(vlarge));  % 详解: 赋值：将 find(...) 的结果保存到 p
 
-%p = find(ismember(vlarge, vsmall)); % slower
+
+
+
+

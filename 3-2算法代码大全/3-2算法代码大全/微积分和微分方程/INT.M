@@ -1,78 +1,43 @@
-function r = int(f,x,a,b)
-%���Ż��ַ�
-%  int(s)���ű���ʽs�Ĳ�������.
-%  int(s,v)���ű���ʽs���ڱ���v�Ĳ�������.
-%  int(s,a,b)���ű���ʽs�Ķ�����, a,b�ֱ�Ϊ�ϩp����.
-%  int(s,v,a,b)���ű���ʽs���ڱ���v�� a��b�Ķ�����.
-%  ��int�󲻳����Ž�,���Զ�ת����ֵ��.
-%���� �󲻳����Ž�,���Զ�ת����ֵ�⣩
-%    syms x;t=int(exp(-x^sin(x)),0,1),vpa(t,5)
-%  ���Ϊ
-%    Warning: Explicit integral could not be found.
-%    > In D:\MATLAB5\toolbox\symbolic\@sym\int.m at line 58
-%    t =
-%    int(exp(-x^sin(x)),x = 0 .. 1)%��ʾ�޽�����
-%    ans =
-%      .45491                      %��ֵ��
-%��������Ӽ�����Ӣ�Ĳ���
-%
-%INT    Integrate.
-%   INT(S) is the indefinite integral of S with respect to its symbolic
-%     variable as defined by FINDSYM. S is a SYM (matrix or scalar).
-%     If S is a constant, the integral is with respect to 'x'.
-%   INT(S,v) is the indefinite integral of S with respect to v. v is a
-%     scalar SYM.
-%   INT(S,a,b) is the definite integral of S with respect to its
-%     symbolic variable from a to b. a and b are each double or
-%     symbolic scalars.
-%   INT(S,v,a,b) is the definite integral of S with respect to v
-%     from a to b.
-%
-%   Examples:
-%     syms x x1 alpha u t;
-%     A = [cos(x*t),sin(x*t);-sin(x*t),cos(x*t)];
-%     int(1/(1+x^2))           returns     atan(x)
-%     int(sin(alpha*u),alpha)  returns     -cos(alpha*u)/u
-%     int(besselj(1,x),x)      returns     -besselj(0,x)
-%     int(x1*log(1+x1),0,1)    returns      1/4
-%     int(4*x*t,x,2,sin(t))    returns      2*sin(t)^2*t-8*t
-%     int([exp(t),exp(alpha*t)])  returns  [exp(t), 1/alpha*exp(alpha*t)]
-%     int(A,t)                 returns      [sin(x*t)/x, -cos(x*t)/x]
-%                                           [cos(x*t)/x,  sin(x*t)/x]
+﻿% 文件: INT.M
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-%   Copyright (c) 1993-98 by The MathWorks, Inc.
-%   $Revision: 1.15 $  $Date: 1997/11/29 01:05:44 $pj costa
+function r = int(f,x,a,b)  % 详解: 执行语句
 
-f = sym(f);
 
-if nargin <= 2
-   % Indefinite integral
-   if nargin < 2
-      x = findsym(f,1);
-      if isempty(x), x = 'x'; end
-   else
-      x = char(sym(x));
-   end
-   r = maple('map','int',f,x);
-else
-   % Definite integral
-   if nargin < 4
-      b = a;
-      a = x;
-      x = findsym(f,1);
-      if isempty(x), x = 'x'; end
-   end
-   x = sym(x);
-   b = sym(b);
-   a = sym(a);
-   r = maple('map','int',f,[x.s '=' a.s '..' b.s]);
-end
+f = sym(f);  % 详解: 赋值：将 sym(...) 的结果保存到 f
 
-if ~isempty(findstr('int(',char(r)))
-   for k = 1:prod(size(r));
-      rc = char(r(k));
-      if length(rc) >= 4 & isequal(rc(1:4),'int(')
-         warning('Explicit integral could not be found.')
-      end
-   end
-end
+if nargin <= 2  % 详解: 条件判断：if (nargin <= 2)
+   if nargin < 2  % 详解: 条件判断：if (nargin < 2)
+      x = findsym(f,1);  % 详解: 赋值：将 findsym(...) 的结果保存到 x
+      if isempty(x), x = 'x'; end  % 详解: 条件判断：if (isempty(x), x = 'x'; end)
+   else  % 详解: 条件判断：else 分支
+      x = char(sym(x));  % 详解: 赋值：将 char(...) 的结果保存到 x
+   end  % 详解: 执行语句
+   r = maple('map','int',f,x);  % 详解: 赋值：将 maple(...) 的结果保存到 r
+else  % 详解: 条件判断：else 分支
+   if nargin < 4  % 详解: 条件判断：if (nargin < 4)
+      b = a;  % 详解: 赋值：计算表达式并保存到 b
+      a = x;  % 详解: 赋值：计算表达式并保存到 a
+      x = findsym(f,1);  % 详解: 赋值：将 findsym(...) 的结果保存到 x
+      if isempty(x), x = 'x'; end  % 详解: 条件判断：if (isempty(x), x = 'x'; end)
+   end  % 详解: 执行语句
+   x = sym(x);  % 详解: 赋值：将 sym(...) 的结果保存到 x
+   b = sym(b);  % 详解: 赋值：将 sym(...) 的结果保存到 b
+   a = sym(a);  % 详解: 赋值：将 sym(...) 的结果保存到 a
+   r = maple('map','int',f,[x.s '=' a.s '..' b.s]);  % 详解: 赋值：将 maple(...) 的结果保存到 r
+end  % 详解: 执行语句
+
+if ~isempty(findstr('int(',char(r)))  % 详解: 条件判断：if (~isempty(findstr('int(',char(r))))
+   for k = 1:prod(size(r));  % 详解: for 循环：迭代变量 k 遍历 1:prod(size(r));
+      rc = char(r(k));  % 详解: 赋值：将 char(...) 的结果保存到 rc
+      if length(rc) >= 4 & isequal(rc(1:4),'int(')  % 详解: 条件判断：if (length(rc) >= 4 & isequal(rc(1:4),'int('))
+         warning('Explicit integral could not be found.')  % 详解: 调用函数：warning('Explicit integral could not be found.')
+      end  % 详解: 执行语句
+   end  % 详解: 执行语句
+end  % 详解: 执行语句
+
+
+
+

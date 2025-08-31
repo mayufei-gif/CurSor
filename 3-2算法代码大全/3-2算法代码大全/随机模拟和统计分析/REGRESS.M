@@ -1,112 +1,73 @@
-function [b,bint,r,rint,stats] = regress(y,X,alpha)
-% ��Ԫ���Իع�  y = b1*x1+b2*x2+��+bp*xp
-%[b,bint,r,rint,stats] = regress(y,x,alpha)
-%   ����
-%		y��y������n*1����
-%		x��x������n*p����
-%		b��b�Ĺ���ֵ
-%		bint��b����������
-%		r���в�r =Y-X 
-%		rint��r����������
-%		stats������ͳ��������һֵ�ǻع鷽�̵����Ŷ�,
-%           �ڶ�ֵ��Fͳ����ֵ������ֵ����Fͳ������Ӧ��pֵ,
-%           F�ܴ��p��С˵���ع鷽��ϵ����Ϊ0��
-%���� 
-%   load moore   %Matlabһ���ڲ�����,ǰ5����5������x1~x5,
-%                %��6������ Ӧ y=a0+a1*x1+a2*x2+��+a5*x5+epsilon
-%   x=[ones(size(moore,1),1),moore(:,1:5)];
-%   y=moore(:,6);
-%   [b,bint,r,rint,stats]=regress(y,x);
-%   b                 % �������Ϊa0,a1,...,a5
-%
-%REGRESS Multiple linear regression using least squares.
-%   b = REGRESS(y,X) returns the vector of regression coefficients, B.
-%   Given the linear model: y = Xb, 
-%   (X is an nxp matrix, y is the nx1 vector of observations.) 
-%   [B,BINT,R,RINT,STATS] = REGRESS(y,X,alpha) uses the input, ALPHA
-%   to calculate 100(1 - ALPHA) confidence intervals for B and the 
-%   residual vector, R, in BINT and RINT respectively. 
-%   The vector STATS contains the R-square statistic along with the F 
-%   and p values for the regression.
+﻿% 文件: REGRESS.M
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-%   References:
-%      [1] Samprit Chatterjee and Ali S. Hadi, "Influential Observations,
-%      High Leverage Points, and Outliers in Linear Regression",
-%      Statistical Science 1986 Vol. 1 No. 3 pp. 379-416. 
-%      [2] N. Draper and H. Smith, "Applied Regression Analysis, Second
-%      Edition", Wiley, 1981.
+function [b,bint,r,rint,stats] = regress(y,X,alpha)  % 详解: 函数定义：regress(y,X,alpha), 返回：b,bint,r,rint,stats
 
-%   B.A. Jones 3-04-93
-%   Copyright (c) 1993-98 by The MathWorks, Inc.
-%   $Revision: 2.6 $  $Date: 1997/11/29 01:46:38 $
 
-if  nargin < 2,              
-    error('REGRESS requires at least two input arguments.');      
-end 
 
-if nargin == 2, 
-    alpha = 0.05; 
-end
+if  nargin < 2,  % 详解: 条件判断：if (nargin < 2,)
+    error('REGRESS requires at least two input arguments.');  % 详解: 调用函数：error('REGRESS requires at least two input arguments.')
+end  % 详解: 执行语句
 
-% Check that matrix (X) and left hand side (y) have compatible dimensions
-[n,p] = size(X);
-[n1,collhs] = size(y);
-if n ~= n1, 
-    error('The number of rows in Y must equal the number of rows in X.'); 
-end 
+if nargin == 2,  % 详解: 条件判断：if (nargin == 2,)
+    alpha = 0.05;  % 详解: 赋值：计算表达式并保存到 alpha
+end  % 详解: 执行语句
 
-if collhs ~= 1, 
-    error('Y must be a vector, not a matrix'); 
-end
+[n,p] = size(X);  % 详解: 获取向量/矩阵尺寸
+[n1,collhs] = size(y);  % 详解: 获取向量/矩阵尺寸
+if n ~= n1,  % 详解: 条件判断：if (n ~= n1,)
+    error('The number of rows in Y must equal the number of rows in X.');  % 详解: 调用函数：error('The number of rows in Y must equal the number of rows in X.')
+end  % 详解: 执行语句
 
-% Find the least squares solution.
-[Q, R]=qr(X,0);
-b = R\(Q'*y);
+if collhs ~= 1,  % 详解: 条件判断：if (collhs ~= 1,)
+    error('Y must be a vector, not a matrix');  % 详解: 调用函数：error('Y must be a vector, not a matrix')
+end  % 详解: 执行语句
 
-% Find a confidence interval for each component of x
-% Draper and Smith, equation 2.6.15, page 94
+[Q, R]=qr(X,0);  % 详解: 执行语句
+b = R\(Q'*y);  % 赋值：设置变量 b  % 详解: 赋值：计算表达式并保存到 b  % 详解: 赋值：计算表达式并保存到 b
 
-RI = R\eye(p);
-xdiag=sqrt(sum((RI .* RI)'))';
-nu = n-p;                       % Regression degrees of freedom
-yhat = X*b;                     % Predicted responses at each data point.
-r = y-yhat;                     % Residuals.
-if nu ~= 0
-   rmse = norm(r)/sqrt(nu);        % Root mean square error.
-else
-   rmse = Inf;
-end
-s2 = rmse^2;                    % Estimator of error variance.
-tval = tinv((1-alpha/2),nu);
-bint = [b-tval*xdiag*rmse, b+tval*xdiag*rmse];
 
-% Calculate R-squared.
-if nargout==5,
-   RSS = norm(yhat-mean(y))^2;  % Residual sum of squares.
-   TSS = norm(y-mean(y))^2;     % Total sum of squares.
-   r2 = RSS/TSS;                % R-square statistic.
-   F = (RSS/(p-1))/s2;          % F statistic for regression
-   prob = 1 - fcdf(F,p-1,nu);   % Significance probability for regression
-   stats = [r2 F prob];
-end
+RI = R\eye(p);  % 详解: 赋值：计算表达式并保存到 RI
+xdiag=sqrt(sum((RI .* RI)'))';  % 详解: 赋值：将 sqrt(...) 的结果保存到 xdiag
+nu = n-p;  % 详解: 赋值：计算表达式并保存到 nu
+yhat = X*b;  % 详解: 赋值：计算表达式并保存到 yhat
+r = y-yhat;  % 详解: 赋值：计算表达式并保存到 r
+if nu ~= 0  % 详解: 条件判断：if (nu ~= 0)
+   rmse = norm(r)/sqrt(nu);  % 详解: 赋值：将 norm(...) 的结果保存到 rmse
+else  % 详解: 条件判断：else 分支
+   rmse = Inf;  % 详解: 赋值：计算表达式并保存到 rmse
+end  % 详解: 执行语句
+s2 = rmse^2;  % 详解: 赋值：计算表达式并保存到 s2
+tval = tinv((1-alpha/2),nu);  % 详解: 赋值：将 tinv(...) 的结果保存到 tval
+bint = [b-tval*xdiag*rmse, b+tval*xdiag*rmse];  % 详解: 赋值：计算表达式并保存到 bint
 
-% Find the standard errors of the residuals.
-% Get the diagonal elements of the "Hat" matrix.
-% Calculate the variance estimate obtained by removing each case (i.e. sigmai)
-% see Chatterjee and Hadi p. 380 equation 14.
-T = X*RI;
-hatdiag=sum((T .* T)')';
-if nu < 1, 
-  ser=rmse*ones(length(y),1);
-elseif nu > 1
-  sigmai = sqrt((nu*s2/(nu-1)) - (r .^2 ./ ((nu-1) .* (1-hatdiag))));
-  ser = sqrt(1-hatdiag) .* sigmai;
-elseif nu == 1
-  ser = sqrt(1-hatdiag) .* rmse;
-end
+if nargout==5,  % 详解: 条件判断：if (nargout==5,)
+   RSS = norm(yhat-mean(y))^2;  % 详解: 赋值：将 norm(...) 的结果保存到 RSS
+   TSS = norm(y-mean(y))^2;  % 详解: 赋值：将 norm(...) 的结果保存到 TSS
+   r2 = RSS/TSS;  % 详解: 赋值：计算表达式并保存到 r2
+   F = (RSS/(p-1))/s2;  % 详解: 赋值：计算表达式并保存到 F
+   prob = 1 - fcdf(F,p-1,nu);  % 详解: 赋值：计算表达式并保存到 prob
+   stats = [r2 F prob];  % 详解: 赋值：计算表达式并保存到 stats
+end  % 详解: 执行语句
 
-ti= r ./ ser;
+T = X*RI;  % 详解: 赋值：计算表达式并保存到 T
+hatdiag=sum((T .* T)')';  % 详解: 赋值：将 sum(...) 的结果保存到 hatdiag
+if nu < 1,  % 详解: 条件判断：if (nu < 1,)
+  ser=rmse*ones(length(y),1);  % 详解: 赋值：计算表达式并保存到 ser
+elseif nu > 1  % 详解: 条件判断：elseif (nu > 1)
+  sigmai = sqrt((nu*s2/(nu-1)) - (r .^2 ./ ((nu-1) .* (1-hatdiag))));  % 详解: 赋值：将 sqrt(...) 的结果保存到 sigmai
+  ser = sqrt(1-hatdiag) .* sigmai;  % 详解: 赋值：将 sqrt(...) 的结果保存到 ser
+elseif nu == 1  % 详解: 条件判断：elseif (nu == 1)
+  ser = sqrt(1-hatdiag) .* rmse;  % 详解: 赋值：将 sqrt(...) 的结果保存到 ser
+end  % 详解: 执行语句
 
-% Create confidence intervals for residuals.
-Z=[(r-tval*ser) (r+tval*ser)]';
-rint=Z';
+ti= r ./ ser;  % 详解: 赋值：计算表达式并保存到 ti
+
+Z=[(r-tval*ser) (r+tval*ser)]';  % 赋值：设置变量 Z  % 详解: 赋值：计算表达式并保存到 Z  % 详解: 赋值：计算表达式并保存到 Z
+rint=Z';  % 赋值：设置变量 rint  % 详解: 赋值：计算表达式并保存到 rint  % 详解: 赋值：计算表达式并保存到 rint
+
+
+
+

@@ -1,14 +1,19 @@
-function fval = f5(x)
-% Unimodal function f_1
-% global ii
-% ii=ii+1
-Bound=[-30 30];
+﻿% 文件: f5.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-if nargin == 0
-    fval = Bound;
-else
-    fval = 0;
-    for i = 1:29
-        fval = fval+(100*(x(i+1)-x(i)^2)^2+(x(i)-1))^2;
-    end
-end
+function fval = f5(x)  % 详解: 执行语句
+Bound=[-30 30];  % 详解: 赋值：计算表达式并保存到 Bound
+
+if nargin == 0  % 详解: 条件判断：if (nargin == 0)
+    fval = Bound;  % 详解: 赋值：计算表达式并保存到 fval
+else  % 详解: 条件判断：else 分支
+    fval = 0;  % 详解: 赋值：计算表达式并保存到 fval
+    for i = 1:29  % 详解: for 循环：迭代变量 i 遍历 1:29
+        fval = fval+(100*(x(i+1)-x(i)^2)^2+(x(i)-1))^2;  % 详解: 赋值：计算表达式并保存到 fval
+    end  % 详解: 执行语句
+end  % 详解: 执行语句
+
+
+

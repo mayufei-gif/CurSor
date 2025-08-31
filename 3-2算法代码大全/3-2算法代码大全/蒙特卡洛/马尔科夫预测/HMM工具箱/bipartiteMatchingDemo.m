@@ -1,3 +1,8 @@
+﻿% 文件: bipartiteMatchingDemo.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
+
 % Consider matching sources to detections
 
 %  s1 d2  
@@ -7,106 +12,93 @@
 %a  = bipartiteMatchingHungarian([52;0.01])
 
 % sources(:,i) = [x y] coords
-sources = [0.1 0.7; 0.6 0.4]';
-detections = [0.2 0.2; 0.2 0.8; 0.7 0.1]';
-dst = sqdist(sources, detections);
+sources = [0.1 0.7; 0.6 0.4]';  % 赋值：设置变量 sources  % 详解: 赋值：计算表达式并保存到 sources  % 详解: 赋值：计算表达式并保存到 sources
+detections = [0.2 0.2; 0.2 0.8; 0.7 0.1]';  % 赋值：设置变量 detections  % 详解: 赋值：计算表达式并保存到 detections  % 详解: 赋值：计算表达式并保存到 detections
+dst = sqdist(sources, detections);  % 详解: 赋值：将 sqdist(...) 的结果保存到 dst
 
-% a = [2 3] which means s1-d2, s2-d3
-a = bipartiteMatchingHungarian(dst);
-a2 = bipartiteMatchingIntProg(dst);
-assert(isequal(a(:),a2(:)))
-
-
-figure(1); clf
-bipartiteMatchingDemoPlot(sources, detections, a)
+a = bipartiteMatchingHungarian(dst);  % 详解: 赋值：将 bipartiteMatchingHungarian(...) 的结果保存到 a
+a2 = bipartiteMatchingIntProg(dst);  % 详解: 赋值：将 bipartiteMatchingIntProg(...) 的结果保存到 a2
+assert(isequal(a(:),a2(:)))  % 详解: 调用函数：assert(isequal(a(:),a2(:)))
 
 
-
-
-%%%% Flip roles of sources and detections
-
-%dst  = dst';
-dst = sqdist(detections, sources);
-% a = [0 1 2] which means d1-0, d2-s1, d3-s2
-a = bipartiteMatchingHungarian(dst);
-
-a2 = bipartiteMatchingIntProg(dst);
-assert(isequal(a(:),a2(:)))
-
-figure(2); clf
-bipartiteMatchingDemoPlot(detections, sources, a) % swapped args
+figure(1); clf  % 详解: 执行语句
+bipartiteMatchingDemoPlot(sources, detections, a)  % 详解: 调用函数：bipartiteMatchingDemoPlot(sources, detections, a)
 
 
 
 
-%%%%%%%%%% Move s1 nearer to d1
-%  d2  
-%         s2 d3
-%  s1 d1
 
-sources = [0.1 0.3; 0.6 0.4]';
-detections = [0.2 0.2; 0.2 0.8; 0.7 0.1]';
-dst = sqdist(sources, detections);
+dst = sqdist(detections, sources);  % 详解: 赋值：将 sqdist(...) 的结果保存到 dst
+a = bipartiteMatchingHungarian(dst);  % 详解: 赋值：将 bipartiteMatchingHungarian(...) 的结果保存到 a
 
-% a = [2 3] which means s1-d2, s2-d3
-a = bipartiteMatchingHungarian(dst);
-[a2, ass] = bipartiteMatchingIntProg(dst);
-assert(isequal(a(:),a2(:)))
+a2 = bipartiteMatchingIntProg(dst);  % 详解: 赋值：将 bipartiteMatchingIntProg(...) 的结果保存到 a2
+assert(isequal(a(:),a2(:)))  % 详解: 调用函数：assert(isequal(a(:),a2(:)))
 
-
-figure(3); clf
-bipartiteMatchingDemoPlot(sources, detections, a)
+figure(2); clf  % 详解: 执行语句
+bipartiteMatchingDemoPlot(detections, sources, a)  % 详解: 调用函数：bipartiteMatchingDemoPlot(detections, sources, a)
 
 
 
-%%%%%%%%%%
-
-% Use random points
-
-% Generate 2D data from a mixture of 2 Gaussians (from netlab demgmm1)
-randn('state', 0); rand('state', 0);
-gmix = gmm(2, 2, 'spherical');
-ndat1 = 10; ndat2 = 10; ndata = ndat1+ndat2;
-%gmix.centres =  [0.3 0.3; 0.7 0.7]; 
-%gmix.covars = [0.01 0.01];
-gmix.centres =  [0.5 0.5; 0.5 0.5];
-gmix.covars = [0.1 0.01];
-[x, label] = gmmsamp(gmix, ndata);
-
-ndx = find(label==1);
-sources = x(ndx,:)';
-ndx = find(label==2);
-detections = x(ndx,:)';
-dst = sqdist(sources, detections);
-
-[a, ass] = bipartiteMatchingIntProg(dst);
-[a2] = bipartiteMatchingHungarian(dst);
-assert(isequal(a(:), a2(:)))
-
-figure(4); clf
-bipartiteMatchingDemoPlot(sources, detections, a)
-
-% only match 80% of points
-p1 = size(sources, 2);
-p2 = size(detections, 2);
-nmatch = ceil(0.8*min(p1,p2));
-a2 = bipartiteMatchingIntProg(dst, nmatch);
-figure(5); clf
-bipartiteMatchingDemoPlot(sources, detections, a2)
 
 
-%%% swap roles
+sources = [0.1 0.3; 0.6 0.4]';  % 赋值：设置变量 sources  % 详解: 赋值：计算表达式并保存到 sources  % 详解: 赋值：计算表达式并保存到 sources
+detections = [0.2 0.2; 0.2 0.8; 0.7 0.1]';  % 赋值：设置变量 detections  % 详解: 赋值：计算表达式并保存到 detections  % 详解: 赋值：计算表达式并保存到 detections
+dst = sqdist(sources, detections);  % 详解: 赋值：将 sqdist(...) 的结果保存到 dst
 
-ndx = find(label==2);
-sources = x(ndx,:)';
-ndx = find(label==1);
-detections = x(ndx,:)';
-dst = sqdist(sources, detections);
+a = bipartiteMatchingHungarian(dst);  % 详解: 赋值：将 bipartiteMatchingHungarian(...) 的结果保存到 a
+[a2, ass] = bipartiteMatchingIntProg(dst);  % 详解: 执行语句
+assert(isequal(a(:),a2(:)))  % 详解: 调用函数：assert(isequal(a(:),a2(:)))
 
-% only match 80% of points
-p1 = size(sources, 2);
-p2 = size(detections, 2);
-nmatch = ceil(0.8*min(p1,p2));
-a2 = bipartiteMatchingIntProg(dst, nmatch);
-figure(6); clf
-bipartiteMatchingDemoPlot(sources, detections, a2)
+
+figure(3); clf  % 详解: 执行语句
+bipartiteMatchingDemoPlot(sources, detections, a)  % 详解: 调用函数：bipartiteMatchingDemoPlot(sources, detections, a)
+
+
+
+
+
+randn('state', 0); rand('state', 0);  % 详解: 调用函数：randn('state', 0); rand('state', 0)
+gmix = gmm(2, 2, 'spherical');  % 详解: 赋值：将 gmm(...) 的结果保存到 gmix
+ndat1 = 10; ndat2 = 10; ndata = ndat1+ndat2;  % 详解: 赋值：计算表达式并保存到 ndat1
+gmix.centres =  [0.5 0.5; 0.5 0.5];  % 详解: 赋值：计算表达式并保存到 gmix.centres
+gmix.covars = [0.1 0.01];  % 详解: 赋值：计算表达式并保存到 gmix.covars
+[x, label] = gmmsamp(gmix, ndata);  % 详解: 执行语句
+
+ndx = find(label==1);  % 详解: 赋值：将 find(...) 的结果保存到 ndx
+sources = x(ndx,:)';  % 赋值：设置变量 sources  % 详解: 赋值：将 x(...) 的结果保存到 sources  % 详解: 赋值：将 x(...) 的结果保存到 sources
+ndx = find(label==2);  % 详解: 赋值：将 find(...) 的结果保存到 ndx
+detections = x(ndx,:)';  % 赋值：设置变量 detections  % 详解: 赋值：将 x(...) 的结果保存到 detections  % 详解: 赋值：将 x(...) 的结果保存到 detections
+dst = sqdist(sources, detections);  % 详解: 赋值：将 sqdist(...) 的结果保存到 dst
+
+[a, ass] = bipartiteMatchingIntProg(dst);  % 详解: 执行语句
+[a2] = bipartiteMatchingHungarian(dst);  % 详解: 执行语句
+assert(isequal(a(:), a2(:)))  % 详解: 调用函数：assert(isequal(a(:), a2(:)))
+
+figure(4); clf  % 详解: 执行语句
+bipartiteMatchingDemoPlot(sources, detections, a)  % 详解: 调用函数：bipartiteMatchingDemoPlot(sources, detections, a)
+
+p1 = size(sources, 2);  % 详解: 赋值：将 size(...) 的结果保存到 p1
+p2 = size(detections, 2);  % 详解: 赋值：将 size(...) 的结果保存到 p2
+nmatch = ceil(0.8*min(p1,p2));  % 详解: 赋值：将 ceil(...) 的结果保存到 nmatch
+a2 = bipartiteMatchingIntProg(dst, nmatch);  % 详解: 赋值：将 bipartiteMatchingIntProg(...) 的结果保存到 a2
+figure(5); clf  % 详解: 执行语句
+bipartiteMatchingDemoPlot(sources, detections, a2)  % 详解: 调用函数：bipartiteMatchingDemoPlot(sources, detections, a2)
+
+
+
+ndx = find(label==2);  % 详解: 赋值：将 find(...) 的结果保存到 ndx
+sources = x(ndx,:)';  % 赋值：设置变量 sources  % 详解: 赋值：将 x(...) 的结果保存到 sources  % 详解: 赋值：将 x(...) 的结果保存到 sources
+ndx = find(label==1);  % 详解: 赋值：将 find(...) 的结果保存到 ndx
+detections = x(ndx,:)';  % 赋值：设置变量 detections  % 详解: 赋值：将 x(...) 的结果保存到 detections  % 详解: 赋值：将 x(...) 的结果保存到 detections
+dst = sqdist(sources, detections);  % 详解: 赋值：将 sqdist(...) 的结果保存到 dst
+
+p1 = size(sources, 2);  % 详解: 赋值：将 size(...) 的结果保存到 p1
+p2 = size(detections, 2);  % 详解: 赋值：将 size(...) 的结果保存到 p2
+nmatch = ceil(0.8*min(p1,p2));  % 详解: 赋值：将 ceil(...) 的结果保存到 nmatch
+a2 = bipartiteMatchingIntProg(dst, nmatch);  % 详解: 赋值：将 bipartiteMatchingIntProg(...) 的结果保存到 a2
+figure(6); clf  % 详解: 执行语句
+bipartiteMatchingDemoPlot(sources, detections, a2)  % 详解: 调用函数：bipartiteMatchingDemoPlot(sources, detections, a2)
+
+
+
+

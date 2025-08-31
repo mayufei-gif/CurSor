@@ -1,5 +1,12 @@
-function p = isscalar(v)
-% ISSCALAR Returns 1 if all dimensions have size 1.
-% p = isscalar(v)
+﻿% 文件: isscalarKPM.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-p = (prod(size(v))==1);
+function p = isscalar(v)  % 详解: 执行语句
+
+p = (prod(size(v))==1);  % 详解: 赋值：计算表达式并保存到 p
+
+
+
+

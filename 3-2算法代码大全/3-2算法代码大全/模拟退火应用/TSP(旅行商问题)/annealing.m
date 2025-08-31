@@ -1,29 +1,38 @@
+﻿% 文件: annealing.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
+
 %function R=annealing(N,L,s,t,dt,C,R)
-%NΪ�����ģ�����ڵ������L��ȡ�ϴ�ֵ����500��1000��
-%sȡ1��2�ȣ�tΪ��ʼ�¶ȣ��ο���ΧΪ0.5--2��
-%dtΪ˥�����ӣ�һ�㲻С��0.9;
-%CΪ��Ȩ����Ӧ��һ��ǿ��ͨͼ�ı�Ȩ����
-%RΪ��ʼ·�������·��Ҳ�����R��
-%L��s��t��dtӦͨ�����������ȷ�����Ի���Ż��Ľ��
-%�ο�������ֵ�����㷨--ģ���˻��㷨����ѧ������
-function R=annealing(N,L,s,t,dt,C,R)
-s0=0;
-while 1
-    a=0;
-    for k=1:L
-        [r,df]=calculate(R,C,N);
-        if accept(t,df)
-            R=r;a=1;
-            disp(cost_sum(R,C,N));
-        end
-    end
-    t=t*dt
-    if a==0
-        s0=s0+1;
-    else 
-        s0=0;
-    end
-    if s0==s
-        break;
-    end
-end
+%N为问题规模，即节点个数；L可取较大值，如500、1000；
+%s取1、2等；t为初始温度，参考范围为0.5--2；
+%dt为衰减因子，一般不小于0.9;
+%C为边权矩阵，应是一个强连通图的边权矩阵
+%R为初始路径，结果路径也存放在R中
+%L、s、t、dt应通过多次试验来确定，以获得优化的结果
+%参考《非数值并行算法--模拟退火算法》科学出版社
+function R=annealing(N,L,s,t,dt,C,R)  % 详解: 执行语句
+s0=0;  % 详解: 赋值：计算表达式并保存到 s0
+while 1  % 详解: while 循环：当 (1) 为真时迭代
+    a=0;  % 详解: 赋值：计算表达式并保存到 a
+    for k=1:L  % 详解: for 循环：迭代变量 k 遍历 1:L
+        [r,df]=calculate(R,C,N);  % 详解: 执行语句
+        if accept(t,df)  % 详解: 条件判断：if (accept(t,df))
+            R=r;a=1;  % 详解: 赋值：计算表达式并保存到 R
+            disp(cost_sum(R,C,N));  % 详解: 调用函数：disp(cost_sum(R,C,N))
+        end  % 详解: 执行语句
+    end  % 详解: 执行语句
+    t=t*dt  % 详解: 赋值：计算表达式并保存到 t
+    if a==0  % 详解: 条件判断：if (a==0)
+        s0=s0+1;  % 详解: 赋值：计算表达式并保存到 s0
+    else  % 详解: 条件判断：else 分支
+        s0=0;  % 详解: 赋值：计算表达式并保存到 s0
+    end  % 详解: 执行语句
+    if s0==s  % 详解: 条件判断：if (s0==s)
+        break;  % 详解: 跳出循环：break
+    end  % 详解: 执行语句
+end  % 详解: 执行语句
+
+
+
+

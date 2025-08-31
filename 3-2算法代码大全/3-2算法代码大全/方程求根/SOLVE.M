@@ -1,233 +1,157 @@
-function varargout = solve(varargin)
-%��������ͷ�����Ľ�����, 
-%���Ҳ���������ʱ,���Զ�Ѱ��ԭ�㸽����һ�����ƽ�, ���ɴ����⾫��.
-%�÷�
-%   solve('����1','����2',...,'����N','����1','����2',...,'����M')
-%SOLVE  Symbolic solution of algebraic equations.
-%   SOLVE('eqn1','eqn2',...,'eqnN')
-%   SOLVE('eqn1','eqn2',...,'eqnN','var1,var2,...,varN')
-%   SOLVE('eqn1','eqn2',...,'eqnN','var1','var2',...'varN')
-%
-%   The eqns are symbolic expressions or strings specifying equations.  The
-%   vars are symbolic variables or strings specifying the unknown variables.
-%   SOLVE seeks zeros of the expressions or solutions of the equations.
-%   If not specified, the unknowns in the system are determined by FINDSYM.
-%   If no analytical solution is found and the number of equations equals
-%   the number of dependent variables, a numeric solution is attempted.
-%
-%   Three different types of output are possible.  For one equation and one
-%   output, the resulting solution is returned, with multiple solutions to
-%   a nonlinear equation in a symbolic vector.  For several equations and
-%   an equal number of outputs, the results are sorted in lexicographic
-%   order and assigned to the outputs.  For several equations and a single
-%   output, a structure containing the solutions is returned.
-%
-%   Examples:
-%
-%      solve('p*sin(x) = r') chooses 'x' as the unknown and returns
-%
-%        ans =
-%        asin(r/p)
-%
-%      [x,y] = solve('x^2 + x*y + y = 3','x^2 - 4*x + 3 = 0') returns
-%
-%        x =
-%        [ 1]
-%        [ 3]
-%
-%        y =
-%        [    1]
-%        [ -3/2]
-%
-%      S = solve('x^2*y^2 - 2*x - 1 = 0','x^2 - y^2 - 1 = 0') returns
-%      the solutions in a structure.
-%
-%        S =
-%          x: [8x1 sym]
-%          y: [8x1 sym]
-%
-%      [u,v] = solve('a*u^2 + v^2 = 0','u - v = 1') regards 'a' as a
-%      parameter and solves the two equations for u and v.
-%
-%      S = solve('a*u^2 + v^2','u - v = 1','a,u') regards 'v' as a
-%      parameter, solves the two equations, and returns S.a and S.u.
-%
-%      [a,u,v] = solve('a*u^2 + v^2','u - v = 1','a^2 - 5*a + 6') solves
-%      the three equations for a, u and v.
-%
-%      [x,y] = solve('sin(x+y)-exp(x)*y = 0','x^2-y = 2') cannot find
-%      an analytic solution, so returns a numeric solution.
-%
-%   See also DSOLVE.
+﻿% 文件: SOLVE.M
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-%   Copyright (c) 1993-98 by The MathWorks, Inc.
-%   $Revision: 1.13 $  $Date: 1997/11/29 01:06:35 $
+function varargout = solve(varargin)  % 详解: 执行语句
 
-% Set the Explicit solution (for equations of order 4 or less)
-% option on in the Maple Workspace.
 
-maple('_EnvExplicit := true;');
 
-% Collect input arguments together in either equation or variable lists.
+maple('_EnvExplicit := true;');  % 详解: 调用函数：maple('_EnvExplicit := true;')
 
-eqns = [];
-vars = [];
-for k = 1:nargin
-   v = varargin{k};
-   if all(isletter(v) | ('0'<=v & v<='9') | v == '_' | v == ',')
-      vars = [vars ',' v];
-   else
-      [t,stat] = maple(v);
-      if stat
-         error(['''' v ''' is not a valid expression or equation.'])
-      end
-      eqns = [eqns ',' v];   
-   end
-end
 
-if isempty(eqns)
-   warning('List of equations is empty.')
-   varargout = cell(1,nargout);
-   varargout{1} = sym([]);
-   return
-else
-   eqns(1) = '{'; eqns(end+1) = '}';
-end
-neqns = sum(commas(eqns)) + 1;
+eqns = [];  % 详解: 赋值：计算表达式并保存到 eqns
+vars = [];  % 详解: 赋值：计算表达式并保存到 vars
+for k = 1:nargin  % 详解: for 循环：迭代变量 k 遍历 1:nargin
+   v = varargin{k};  % 详解: 赋值：计算表达式并保存到 v
+   if all(isletter(v) | ('0'<=v & v<='9') | v == '_' | v == ',')  % 详解: 条件判断：if (all(isletter(v) | ('0'<=v & v<='9') | v == '_' | v == ','))
+      vars = [vars ',' v];  % 详解: 赋值：计算表达式并保存到 vars
+   else  % 详解: 条件判断：else 分支
+      [t,stat] = maple(v);  % 详解: 执行语句
+      if stat  % 详解: 条件判断：if (stat)
+         error(['''' v ''' is not a valid expression or equation.'])  % 详解: 调用函数：error(['''' v ''' is not a valid expression or equation.'])
+      end  % 详解: 执行语句
+      eqns = [eqns ',' v];  % 详解: 赋值：计算表达式并保存到 eqns
+   end  % 详解: 执行语句
+end  % 详解: 执行语句
 
-% Determine default variables and sort variable list.
+if isempty(eqns)  % 详解: 条件判断：if (isempty(eqns))
+   warning('List of equations is empty.')  % 详解: 调用函数：warning('List of equations is empty.')
+   varargout = cell(1,nargout);  % 详解: 赋值：将 cell(...) 的结果保存到 varargout
+   varargout{1} = sym([]);  % 详解: 执行语句
+   return  % 详解: 返回：从当前函数返回
+else  % 详解: 条件判断：else 分支
+   eqns(1) = '{'; eqns(end+1) = '}';  % 详解: 执行语句
+end  % 详解: 执行语句
+neqns = sum(commas(eqns)) + 1;  % 详解: 赋值：将 sum(...) 的结果保存到 neqns
 
-if isempty(vars)
-   vars = ['[' findsym(sym(eqns),neqns) ']'];
-else
-   vars(1) = '['; vars(end+1) = ']';
-end
-v = vars;
-[vars,stat] = maple('sort',v);
-if stat
-   error(['''' v ''' is not a valid variable list.'])
-end
-vars(1) = '{'; vars(end) = '}';
-nvars = sum(commas(vars)) + 1;
 
-if neqns ~= nvars
-   warning([int2str(neqns) ' equations in ' int2str(nvars) ' variables.'])
-end
+if isempty(vars)  % 详解: 条件判断：if (isempty(vars))
+   vars = ['[' findsym(sym(eqns),neqns) ']'];  % 详解: 赋值：计算表达式并保存到 vars
+else  % 详解: 条件判断：else 分支
+   vars(1) = '['; vars(end+1) = ']';  % 详解: 执行语句
+end  % 详解: 执行语句
+v = vars;  % 详解: 赋值：计算表达式并保存到 v
+[vars,stat] = maple('sort',v);  % 详解: 执行语句
+if stat  % 详解: 条件判断：if (stat)
+   error(['''' v ''' is not a valid variable list.'])  % 详解: 调用函数：error(['''' v ''' is not a valid variable list.'])
+end  % 详解: 执行语句
+vars(1) = '{'; vars(end) = '}';  % 详解: 执行语句
+nvars = sum(commas(vars)) + 1;  % 详解: 赋值：将 sum(...) 的结果保存到 nvars
 
-% Seek analytic solution.
+if neqns ~= nvars  % 详解: 条件判断：if (neqns ~= nvars)
+   warning([int2str(neqns) ' equations in ' int2str(nvars) ' variables.'])  % 详解: 调用函数：warning([int2str(neqns) ' equations in ' int2str(nvars) ' variables.'])
+end  % 详解: 执行语句
 
-[R,stat] = maple('solve',eqns,vars);
 
-% If no analytic solution, seek numerical solution.
+[R,stat] = maple('solve',eqns,vars);  % 详解: 执行语句
 
-if (isempty(R) & (nvars == neqns))
-   [R,stat] = maple('fsolve',eqns,vars);
-end
 
-if stat
-   error(R)
-end
+if (isempty(R) & (nvars == neqns))  % 详解: 条件判断：if ((isempty(R) & (nvars == neqns)))
+   [R,stat] = maple('fsolve',eqns,vars);  % 详解: 执行语句
+end  % 详解: 执行语句
 
-% If still no solution, give up.
+if stat  % 详解: 条件判断：if (stat)
+   error(R)  % 详解: 调用函数：error(R)
+end  % 详解: 执行语句
 
-if isempty(R) | findstr(R,'fsolve')
-   warning('Explicit solution could not be found.');
-   varargout = cell(1,nargout);
-   varargout{1} = sym([]);
-   return
-end
 
-% Expand any RootOf.
+if isempty(R) | findstr(R,'fsolve')  % 详解: 条件判断：if (isempty(R) | findstr(R,'fsolve'))
+   warning('Explicit solution could not be found.');  % 详解: 调用函数：warning('Explicit solution could not be found.')
+   varargout = cell(1,nargout);  % 详解: 赋值：将 cell(...) 的结果保存到 varargout
+   varargout{1} = sym([]);  % 详解: 执行语句
+   return  % 详解: 返回：从当前函数返回
+end  % 详解: 执行语句
 
-while ~isempty(findstr(R,'RootOf'))
-   k = min(findstr(R,'RootOf'));
-   p = findstr(R,'{'); p = max(p(p<k));
-   q = findstr(R,'}'); q = min(q(q>k));
-   s = R(p:q);
-   t = s(min(findstr(s,'RootOf'))+6:end);
-   e = min(find(cumsum((t=='(')-(t==')'))==0));
-   if isempty(find(commas(t(2:e-1))))
-      % RootOf with one argument, possibly an imbedded RootOf.
-      [s,stat] = maple('allvalues',s,'dependent');
-      if stat
-         error(s)
-      end
-   else
-      % RootOf with a good estimate as the second argument.
-      s = maple('evalf',s);
-   end
-   R = [R(1:p-1) s R(q+1:end)];
-end
 
-% Parse the result.
+while ~isempty(findstr(R,'RootOf'))  % 详解: while 循环：当 (~isempty(findstr(R,'RootOf'))) 为真时迭代
+   k = min(findstr(R,'RootOf'));  % 详解: 赋值：将 min(...) 的结果保存到 k
+   p = findstr(R,'{'); p = max(p(p<k));  % 详解: 赋值：将 findstr(...) 的结果保存到 p
+   q = findstr(R,'}'); q = min(q(q>k));  % 详解: 赋值：将 findstr(...) 的结果保存到 q
+   s = R(p:q);  % 详解: 赋值：将 R(...) 的结果保存到 s
+   t = s(min(findstr(s,'RootOf'))+6:end);  % 详解: 赋值：将 s(...) 的结果保存到 t
+   e = min(find(cumsum((t=='(')-(t==')'))==0));  % 详解: 赋值：将 min(...) 的结果保存到 e
+   if isempty(find(commas(t(2:e-1))))  % 详解: 条件判断：if (isempty(find(commas(t(2:e-1)))))
+      [s,stat] = maple('allvalues',s,'dependent');  % 详解: 执行语句
+      if stat  % 详解: 条件判断：if (stat)
+         error(s)  % 详解: 调用函数：error(s)
+      end  % 详解: 执行语句
+   else  % 详解: 条件判断：else 分支
+      s = maple('evalf',s);  % 详解: 赋值：将 maple(...) 的结果保存到 s
+   end  % 详解: 执行语句
+   R = [R(1:p-1) s R(q+1:end)];  % 详解: 赋值：计算表达式并保存到 R
+end  % 详解: 执行语句
 
-if nvars == 1 & nargout <= 1
 
-   % One variable and at most one output.
-   % Return a single scalar or vector sym.
+if nvars == 1 & nargout <= 1  % 详解: 条件判断：if (nvars == 1 & nargout <= 1)
 
-   S = sym([]);
-   c = find(commas(R) | R == '}');
-   for p = find(R == '=')
-      q = min(c(c>p));
-      t = trim(R(p+1:q-1));  % The solution (xk)
-      S = [S; sym(t)];
-   end
-   varargout{1} = S;
 
-else
+   S = sym([]);  % 详解: 赋值：将 sym(...) 的结果保存到 S
+   c = find(commas(R) | R == '}');  % 详解: 赋值：将 find(...) 的结果保存到 c
+   for p = find(R == '=')  % 详解: for 循环：迭代变量 p 遍历 find(R == '=')
+      q = min(c(c>p));  % 详解: 赋值：将 min(...) 的结果保存到 q
+      t = trim(R(p+1:q-1));  % 详解: 赋值：将 trim(...) 的结果保存到 t
+      S = [S; sym(t)];  % 详解: 赋值：计算表达式并保存到 S
+   end  % 详解: 执行语句
+   varargout{1} = S;  % 详解: 执行语句
 
-   % Several variables.
-   % Create a skeleton structure.
+else  % 详解: 条件判断：else 分支
 
-   c = [1 find(commas(vars)) length(vars)];
-   S = [];
-   for j = 1:nvars
-      v = trim(vars(c(j)+1:c(j+1)-1));
-      S = setfield(S,v,[]);
-   end
 
-   % Complete the structure.
+   c = [1 find(commas(vars)) length(vars)];  % 详解: 赋值：计算表达式并保存到 c
+   S = [];  % 详解: 赋值：计算表达式并保存到 S
+   for j = 1:nvars  % 详解: for 循环：迭代变量 j 遍历 1:nvars
+      v = trim(vars(c(j)+1:c(j+1)-1));  % 详解: 赋值：将 trim(...) 的结果保存到 v
+      S = setfield(S,v,[]);  % 详解: 赋值：将 setfield(...) 的结果保存到 S
+   end  % 详解: 执行语句
 
-   c = [1 find(commas(R) | R == '{' | R == '}') length(R)];
-   for p = find(R == '=')
-      q = max(c(c<p));
-      v = trim(R(q+1:p-1));  % The variable (x)
-      q = min(c(c>p));
-      t = trim(R(p+1:q-1));  % The solution (xk)
-      S = setfield(S,v,[getfield(S,v); sym(t)]);
-   end
+
+   c = [1 find(commas(R) | R == '{' | R == '}') length(R)];  % 详解: 赋值：计算表达式并保存到 c
+   for p = find(R == '=')  % 详解: for 循环：迭代变量 p 遍历 find(R == '=')
+      q = max(c(c<p));  % 详解: 赋值：将 max(...) 的结果保存到 q
+      v = trim(R(q+1:p-1));  % 详解: 赋值：将 trim(...) 的结果保存到 v
+      q = min(c(c>p));  % 详解: 赋值：将 min(...) 的结果保存到 q
+      t = trim(R(p+1:q-1));  % 详解: 赋值：将 trim(...) 的结果保存到 t
+      S = setfield(S,v,[getfield(S,v); sym(t)]);  % 详解: 赋值：将 setfield(...) 的结果保存到 S
+   end  % 详解: 执行语句
    
-   if nargout <= 1
+   if nargout <= 1  % 详解: 条件判断：if (nargout <= 1)
 
-      % At most one output, return the structure.
-      varargout{1} = S;
+      varargout{1} = S;  % 详解: 执行语句
 
-   elseif nargout == nvars
+   elseif nargout == nvars  % 详解: 条件判断：elseif (nargout == nvars)
 
-      % Same number of outputs as variables.
-      % Match results in lexicographic order to outputs.
-      v = fieldnames(S);
-      for j = 1:nvars
-         varargout{j} = getfield(S,v{j});
-      end
+      v = fieldnames(S);  % 详解: 赋值：将 fieldnames(...) 的结果保存到 v
+      for j = 1:nvars  % 详解: for 循环：迭代变量 j 遍历 1:nvars
+         varargout{j} = getfield(S,v{j});  % 详解: 执行语句
+      end  % 详解: 执行语句
 
-   else
-      error([int2str(nvars) ' variables does not match ' ...
-             int2str(nargout) ' outputs.'])
-   end
-end
+   else  % 详解: 条件判断：else 分支
+      error([int2str(nvars) ' variables does not match ' ...  % 详解: 执行语句
+             int2str(nargout) ' outputs.'])  % 详解: 调用函数：int2str(nargout) ' outputs.'])
+   end  % 详解: 执行语句
+end  % 详解: 执行语句
 
-%-------------------------
 
-function s = trim(s);
-%TRIM  TRIM(s) deletes any leading or trailing blanks.
-while s(1) == ' ', s(1) = []; end
-while s(end) == ' ', s(end) = []; end
+function s = trim(s);  % 详解: 执行语句
+while s(1) == ' ', s(1) = []; end  % 详解: while 循环：当 (s(1) == ' ', s(1) = []; end) 为真时迭代
+while s(end) == ' ', s(end) = []; end  % 详解: while 循环：当 (s(end) == ' ', s(end) = []; end) 为真时迭代
 
-%-------------------------
 
-function c = commas(s)
-%COMMAS  COMMAS(s) is true for commas not inside parentheses.
-p = cumsum((s == '(') - (s == ')'));
-c = (s == ',') & (p == 0);
+function c = commas(s)  % 详解: 执行语句
+p = cumsum((s == '(') - (s == ')'));  % 详解: 赋值：将 cumsum(...) 的结果保存到 p
+c = (s == ',') & (p == 0);  % 详解: 赋值：计算表达式并保存到 c
+
+
+
+

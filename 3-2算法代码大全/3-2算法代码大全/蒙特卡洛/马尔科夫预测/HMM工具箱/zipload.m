@@ -1,3 +1,8 @@
+﻿% 文件: zipload.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
+
 %ZIPLOAD   Load compressed data file created with ZIPSAVE
 %
 %	[data] = zipload( filename )
@@ -18,30 +23,24 @@
 %		[loadedData] = zipload('testfile');
 %--------------------------------------------------------------------
 
-function [data] = zipload( filename )
-
-%--- Decompress data file by calling pkzip (comand line command) ---
-% 	Options used: 
-%	'extract' = decompress file
-%	'silent' = no console output 
-%	'over=all' = overwrite files
-
-%eval( ['!pkzip25 -extract -silent -over=all ', filename, '.zip'] )
-eval( ['!pkzip25 -extract -silent -over=all ', filename, '.zip'] )
+function [data] = zipload( filename )  % 详解: 函数定义：zipload(filename), 返回：data
 
 
-%--- Load data from decompressed file ---
-%	try, catch takes care of cases when pkzip fails to decompress a 
-%	valid matlab format file
-
-try
-   tmpStruc = load( filename );
-   data = tmpStruc.data;
-catch, return, end
+eval( ['!pkzip25 -extract -silent -over=all ', filename, '.zip'] )  % 详解: 调用函数：eval(['!pkzip25 -extract -silent -over=all ', filename, '.zip'])
 
 
-%--- Delete decompressed file ---
 
-delete( [filename,'.mat'] )
+try  % 详解: 异常处理：try 块开始
+   tmpStruc = load( filename );  % 详解: 赋值：将 load(...) 的结果保存到 tmpStruc
+   data = tmpStruc.data;  % 详解: 赋值：计算表达式并保存到 data
+catch, return, end  % 详解: 异常处理：catch 捕获变量 , return, end
+
+
+
+delete( [filename,'.mat'] )  % 详解: 调用函数：delete([filename,'.mat'])
+
+
+
+
 
 

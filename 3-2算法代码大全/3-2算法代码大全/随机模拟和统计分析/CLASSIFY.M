@@ -1,62 +1,44 @@
-function class = classify(sample,training,group)
-%ÏßĞÔÍ³¼Æ¾ÛÀà
-%class = classify(ÑùÆ·¼¯£¬ÑµÁ·Æ·¼¯£¬ÑµÁ·Æ·Àà±ğ¼¯)½«¸÷ÑùÆ··ÖÀà¡£
-%         ÑùÆ·¼¯Îªn*p¾ØÕó£¬ÑµÁ·Æ·¼¯Îªm*p¾ØÕó£¬
-%         Àà±ğ¼¯ÎªmÎ¬ÁĞÏòÁ¿£¬±íÊ¾¸÷ÑµÁ·Æ·¹éÀà¡£
-%         classÎªnÎ¬ÁĞÏòÁ¿£¬·µ»Ø¸÷ÑùÆ··ÖÀà¡£
-%
-%ÀıÈç
-%     load discrim      %MATLABÄÚ²¿Êı¾İ£¬±í´ïÃÀ¹ú329¸ö³ÇÊĞÌìÆø×¡·¿µÈ9¸öÖ¸±ê
-%       					  %¹²·Ö1£¬2Á½Àà
-%     sample = ratings(idx,:);       %ÆäÊµidx¶¼ÊÇ2Àà
-%     training = ratings(1:200,:);  %ÒÑÖªÑµÁ·Æ·¼¯
-%     g = group(1:200);				 %ÒÑÖªÑµÁ·Æ·¼¯³ÇÊĞÀà±ğ
-%     class = classify(sample,training,g)£»%¶Ôidx·ÖÀà
-%     [class,group(idx)]              %½á¹û»ù±¾ÕıÈ·
-%
-%CLASSIFY Linear discriminant analysis.
-%   CLASSIFY(SAMPLE,TRAINING,GROUP) classifies each row of 
-%   the data in SAMPLE into one of the values of the vector
-%   GROUP. GROUP contains integers from one to the number of 
-%   groups in the training set, which is the matrix, TRAINING.
-%
-%   SAMPLE and TRAINING must have the same number of columns.
-%   TRAINING and GROUP must have the same number of rows.
-%   CLASS is a vector with the same number of rows as SAMPLE.
+ï»¿% æ–‡ä»¶: CLASSIFY.M
+% è¯´æ˜: è‡ªåŠ¨æ·»åŠ çš„æ³¨é‡Šå ä½ï¼Œè¯·æ ¹æ®éœ€è¦è¡¥å……ã€‚
+% ç”Ÿæˆ: 2025-08-31 23:06
+% æ³¨é‡Š: æœ¬æ–‡ä»¶å¤´ç”±è„šæœ¬è‡ªåŠ¨æ·»åŠ 
 
-%   B.A. Jones 2-05-95
-%   Copyright (c) 1993-98 by The MathWorks, Inc.
-%   $Revision: 2.5 $  $Date: 1997/11/29 01:45:07 $
+function class = classify(sample,training,group)  % è¯¦è§£: æ‰§è¡Œè¯­å¥
 
-[gr,gc] = size(group);
-if min(gr,gc) ~= 1
-   error('Requires a vector third argument.');
-end
 
-if gc ~= 1,
-   group = group(:);
-   gr = gc;
-end
+[gr,gc] = size(group);  % è¯¦è§£: è·å–å‘é‡/çŸ©é˜µå°ºå¯¸
+if min(gr,gc) ~= 1  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šif (min(gr,gc) ~= 1)
+   error('Requires a vector third argument.');  % è¯¦è§£: è°ƒç”¨å‡½æ•°ï¼šerror('Requires a vector third argument.')
+end  % è¯¦è§£: æ‰§è¡Œè¯­å¥
 
-if any(group - round(group)) | any(group) < 1
-  error('The third input argument must be positive integers.');
-end
-maxg = max(group);
+if gc ~= 1,  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šif (gc ~= 1,)
+   group = group(:);  % è¯¦è§£: èµ‹å€¼ï¼šå°† group(...) çš„ç»“æœä¿å­˜åˆ° group
+   gr = gc;  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° gr
+end  % è¯¦è§£: æ‰§è¡Œè¯­å¥
 
-[tr,tc] = size(training);
-if tr ~= gr,
-  error('The number of rows in the second and third input arguments must match.');
-end
+if any(group - round(group)) | any(group) < 1  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šif (any(group - round(group)) | any(group) < 1)
+  error('The third input argument must be positive integers.');  % è¯¦è§£: è°ƒç”¨å‡½æ•°ï¼šerror('The third input argument must be positive integers.')
+end  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+maxg = max(group);  % è¯¦è§£: èµ‹å€¼ï¼šå°† max(...) çš„ç»“æœä¿å­˜åˆ° maxg
 
-[sr,sc] = size(sample);
-if sc ~= tc
-  error('The number of columns in the first and second input arguments must match.');
-end
+[tr,tc] = size(training);  % è¯¦è§£: è·å–å‘é‡/çŸ©é˜µå°ºå¯¸
+if tr ~= gr,  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šif (tr ~= gr,)
+  error('The number of rows in the second and third input arguments must match.');  % è¯¦è§£: è°ƒç”¨å‡½æ•°ï¼šerror('The number of rows in the second and third input arguments must match.')
+end  % è¯¦è§£: æ‰§è¡Œè¯­å¥
 
-d = zeros(sr,maxg);
-for k = 1:maxg
-   groupk = training(find(group == k),:);
-   d(:,k) = mahal(sample,groupk);
-end
-[tmp, class] = min(d');
-class = class';
+[sr,sc] = size(sample);  % è¯¦è§£: è·å–å‘é‡/çŸ©é˜µå°ºå¯¸
+if sc ~= tc  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šif (sc ~= tc)
+  error('The number of columns in the first and second input arguments must match.');  % è¯¦è§£: è°ƒç”¨å‡½æ•°ï¼šerror('The number of columns in the first and second input arguments must match.')
+end  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+
+d = zeros(sr,maxg);  % è¯¦è§£: èµ‹å€¼ï¼šå°† zeros(...) çš„ç»“æœä¿å­˜åˆ° d
+for k = 1:maxg  % è¯¦è§£: for å¾ªç¯ï¼šè¿­ä»£å˜é‡ k éå† 1:maxg
+   groupk = training(find(group == k),:);  % è¯¦è§£: èµ‹å€¼ï¼šå°† training(...) çš„ç»“æœä¿å­˜åˆ° groupk
+   d(:,k) = mahal(sample,groupk);  % è¯¦è§£: è°ƒç”¨å‡½æ•°ï¼šd(:,k) = mahal(sample,groupk)
+end  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+[tmp, class] = min(d');  % ç»Ÿè®¡ï¼šæœ€å¤§/æœ€å°å€¼  % è¯¦è§£: ç»Ÿè®¡ï¼šæœ€å¤§/æœ€å°å€¼  % è¯¦è§£: ç»Ÿè®¡ï¼šæœ€å¤§/æœ€å°å€¼
+class = class';  % èµ‹å€¼ï¼šè®¾ç½®å˜é‡ class  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° class  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° class
+
+
+
+

@@ -1,4 +1,13 @@
-HMM
-KPMstats
-KPMtools
-netlab3.3
+﻿% 文件: publishHMM.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
+
+HMM  % 详解: 执行语句
+KPMstats  % 详解: 执行语句
+KPMtools  % 详解: 执行语句
+netlab3.3  % 详解: 执行语句
+
+
+
+

@@ -1,68 +1,40 @@
-function xticklabel_rotate90(XTick,varargin)
-%XTICKLABEL_ROTATE90 - Rotate numeric Xtick labels by 90 degrees
-%
-% Syntax: xticklabel_rotate90(XTick)
-%
-% Input:  XTick - vector array of XTick positions & values (numeric)
-%
-% Output:  none
-%
-% Example 1:  Set the positions of the XTicks and rotate them
-%    figure;  plot([1960:2004],randn(45,1)); xlim([1960 2004]);
-%    xticklabel_rotate90([1960:2:2004]);
-%    %If you wish, you may set a few text "Property-value" pairs
-%    xticklabel_rotate90([1960:2:2004],'Color','m','Fontweight','bold');
-%
-% Example 2:  %Rotate XTickLabels at their current position
-%    XTick = get(gca,'XTick');
-%    xticklabel_rotate90(XTick);
-%
-% Other m-files required: none
-% Subfunctions: none
-% MAT-files required: none
-%
-% See also: TEXT,  SET
+﻿% 文件: xticklabel_rotate90.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-% Author: Denis Gilbert, Ph.D., physical oceanography
-% Maurice Lamontagne Institute, Dept. of Fisheries and Oceans Canada
-% email: gilbertd@dfo-mpo.gc.ca  Web: http://www.qc.dfo-mpo.gc.ca/iml/
-% February 1998; Last revision: 24-Mar-2003
+function xticklabel_rotate90(XTick,varargin)  % 详解: 函数定义：xticklabel_rotate90(XTick,varargin)
 
-if ~isnumeric(XTick)
-   error('XTICKLABEL_ROTATE90 requires a numeric input argument');
-end
 
-%Make sure XTick is a column vector
-XTick = XTick(:);
+if ~isnumeric(XTick)  % 详解: 条件判断：if (~isnumeric(XTick))
+   error('XTICKLABEL_ROTATE90 requires a numeric input argument');  % 详解: 调用函数：error('XTICKLABEL_ROTATE90 requires a numeric input argument')
+end  % 详解: 执行语句
 
-%Set the Xtick locations and set XTicklabel to an empty string
-set(gca,'XTick',XTick,'XTickLabel','')
+XTick = XTick(:);  % 详解: 赋值：将 XTick(...) 的结果保存到 XTick
 
-% Define the xtickLabels
-xTickLabels = num2str(XTick);
+set(gca,'XTick',XTick,'XTickLabel','')  % 详解: 调用函数：set(gca,'XTick',XTick,'XTickLabel','')
 
-% Determine the location of the labels based on the position
-% of the xlabel
-hxLabel = get(gca,'XLabel');  % Handle to xlabel
-xLabelString = get(hxLabel,'String');
+xTickLabels = num2str(XTick);  % 详解: 赋值：将 num2str(...) 的结果保存到 xTickLabels
 
-if ~isempty(xLabelString)
-   warning('You may need to manually reset the XLABEL vertical position')
-end
+hxLabel = get(gca,'XLabel');  % 详解: 赋值：将 get(...) 的结果保存到 hxLabel
+xLabelString = get(hxLabel,'String');  % 详解: 赋值：将 get(...) 的结果保存到 xLabelString
 
-set(hxLabel,'Units','data');
-xLabelPosition = get(hxLabel,'Position');
-y = xLabelPosition(2);
+if ~isempty(xLabelString)  % 详解: 条件判断：if (~isempty(xLabelString))
+   warning('You may need to manually reset the XLABEL vertical position')  % 详解: 调用函数：warning('You may need to manually reset the XLABEL vertical position')
+end  % 详解: 执行语句
 
-%CODE below was modified following suggestions from Urs Schwarz
-y=repmat(y,size(XTick,1),1);
-% retrieve current axis' fontsize
-fs = get(gca,'fontsize');
+set(hxLabel,'Units','data');  % 详解: 调用函数：set(hxLabel,'Units','data')
+xLabelPosition = get(hxLabel,'Position');  % 详解: 赋值：将 get(...) 的结果保存到 xLabelPosition
+y = xLabelPosition(2);  % 详解: 赋值：将 xLabelPosition(...) 的结果保存到 y
 
-% Place the new xTickLabels by creating TEXT objects
-hText = text(XTick, y, xTickLabels,'fontsize',fs);
+y=repmat(y,size(XTick,1),1);  % 详解: 赋值：将 repmat(...) 的结果保存到 y
+fs = get(gca,'fontsize');  % 详解: 赋值：将 get(...) 的结果保存到 fs
 
-% Rotate the text objects by 90 degrees
-set(hText,'Rotation',90,'HorizontalAlignment','right',varargin{:})
+hText = text(XTick, y, xTickLabels,'fontsize',fs);  % 详解: 赋值：将 text(...) 的结果保存到 hText
 
-%------------- END OF CODE --------------
+set(hText,'Rotation',90,'HorizontalAlignment','right',varargin{:})  % 详解: 调用函数：set(hText,'Rotation',90,'HorizontalAlignment','right',varargin{:})
+
+
+
+
+

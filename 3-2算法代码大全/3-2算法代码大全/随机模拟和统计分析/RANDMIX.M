@@ -1,12 +1,18 @@
-function x=randmix(v)
-% ����Ԫ�ص�����û�
-% x=randmix(v)������v��Ԫ�������ϵ�x
+﻿% 文件: RANDMIX.M
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-% L.J.Hu 8-17-1999
+function x=randmix(v)  % 详解: 执行语句
 
-[m,n]=size(v);
-v=v(:);
-v=[randperm(m*n)',v];
-v=sortrows(v);
-x=reshape(v(:,2),m,n);
+
+[m,n]=size(v);  % 详解: 获取向量/矩阵尺寸
+v=v(:);  % 详解: 赋值：将 v(...) 的结果保存到 v
+v=[randperm(m*n)',v];  % 赋值：设置变量 v  % 详解: 赋值：计算表达式并保存到 v  % 详解: 赋值：计算表达式并保存到 v
+v=sortrows(v);  % 详解: 赋值：将 sortrows(...) 的结果保存到 v
+x=reshape(v(:,2),m,n);  % 详解: 赋值：将 reshape(...) 的结果保存到 x
+
+
+
+
 

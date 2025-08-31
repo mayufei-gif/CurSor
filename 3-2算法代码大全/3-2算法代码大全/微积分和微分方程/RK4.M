@@ -1,52 +1,23 @@
-function [tout, yout] = rk4(ypfun, tspan, y0, h)
-%¶¨²½³¤ËÄ½×Runge-Kutta·¨Çó³£Î¢·Ö·½³ÌÊıÖµ½â
-%[tout,yout] = rk4('ypfun', tspan, y0,h)
-%    ÕâÀï×Ö·û´®ypfunÊÇÓÃÒÔ±íÊ¾f(t, y)µÄMÎÄ¼şÃû,
-%    tspan=[t0, tfinal]±íÊ¾×Ô±äÁ¿³õÖµt0ºÍÖÕÖµtf
-%    y0±íÊ¾³õÖµÏòÁ¿y0£¬hÊÇ²½³¤¡£ 
-%    Êä³öÁĞÏòÁ¿tout±íÊ¾½Úµã (t0 , t1 , ¡­ , tn)'
-%    Êä³ö¾ØÕóyout ±íÊ¾ÊıÖµ½â£¬Ã¿Ò»ÁĞ¶ÔÓ¦yµÄÒ»¸ö·ÖÁ¿
-%Àı ½âÎ¢·Ö·½³Ì
-%							y' = y-2t/y, y(0)=1, 0<t<1	(²½³¤0.1)			
-%  ÏÈĞ´Mº¯Êıquadeg5fun.m
-%             function f=quadeg5fun(t,y)
-%             f=y-2*t./y;
-%             f=f(:);			%±£Ö¤fÎªÒ»¸öÁĞÏòÁ¿
-%  ÔÙÓÃ
-%   [t,y]=rk4('quadeg5fun',[0,1],1,0.1)
-%   plot(t,y); 
-%
-%Purpose: Solve differential equations by 4 order Runge_Kutta method.
-% Synopsis:	[tout,yout] = rk4('ypfun', [t0, tfinal], y0,h) 
-%	INPUT:
-%	ypfun - String containing name of M-file user-supplied problem description.
-%	        Call: f = ypfun(t,y) 
-%	        t      - Time (scalar).
-%	        y      - Solution column-vector.
-%	        f      - Returned derivative column-vector; f(i) = dy(i)/dt.
-%	t0    - Initial value of t.
-%	tfinal- Final value of t.
-%	y0    - Initial value vector.
-%	h     - Step size
-%	OUTPUT:
-%	tout     - Returned integration time points (column-vector).
-%	yout     - Returned solution, one solution column-vector per tout-value.
-%
-%	The result can be displayed by: plot(t, y).
-%
-%	See also EULER, ODE23, ODE45, ODEDEMO.
+ï»¿% æ–‡ä»¶: RK4.M
+% è¯´æ˜: è‡ªåŠ¨æ·»åŠ çš„æ³¨é‡Šå ä½ï¼Œè¯·æ ¹æ®éœ€è¦è¡¥å……ã€‚
+% ç”Ÿæˆ: 2025-08-31 23:06
+% æ³¨é‡Š: æœ¬æ–‡ä»¶å¤´ç”±è„šæœ¬è‡ªåŠ¨æ·»åŠ 
 
-%	L.J.Hu  8-20-98
+function [tout, yout] = rk4(ypfun, tspan, y0, h)  % è¯¦è§£: å‡½æ•°å®šä¹‰ï¼šrk4(ypfun, tspan, y0, h), è¿”å›ï¼štout, yout
 
-t=tspan(1):h:tspan(2);
-y(:,1)=y0(:);
 
-for i=1:length(t)-1,
-   k1=feval(ypfun,t(i),y(:,i));
-   k2=feval(ypfun,t(i)+h/2,y(:,i)+h*k1/2);
-   k3=feval(ypfun,t(i)+h/2,y(:,i)+h*k2/2);
-   k4=feval(ypfun,t(i)+h,y(:,i)+h*k3);
-   y(:,i+1)=y(:,i)+h*(k1+2*k2+2*k3+k4)/6;
-end
+t=tspan(1):h:tspan(2);  % è¯¦è§£: èµ‹å€¼ï¼šå°† tspan(...) çš„ç»“æœä¿å­˜åˆ° t
+y(:,1)=y0(:);  % è¯¦è§£: è°ƒç”¨å‡½æ•°ï¼šy(:,1)=y0(:)
 
-tout=t';yout=y';
+for i=1:length(t)-1,  % è¯¦è§£: for å¾ªç¯ï¼šè¿­ä»£å˜é‡ i éå† 1:length(t)-1,
+   k1=feval(ypfun,t(i),y(:,i));  % è¯¦è§£: èµ‹å€¼ï¼šå°† feval(...) çš„ç»“æœä¿å­˜åˆ° k1
+   k2=feval(ypfun,t(i)+h/2,y(:,i)+h*k1/2);  % è¯¦è§£: èµ‹å€¼ï¼šå°† feval(...) çš„ç»“æœä¿å­˜åˆ° k2
+   k3=feval(ypfun,t(i)+h/2,y(:,i)+h*k2/2);  % è¯¦è§£: èµ‹å€¼ï¼šå°† feval(...) çš„ç»“æœä¿å­˜åˆ° k3
+   k4=feval(ypfun,t(i)+h,y(:,i)+h*k3);  % è¯¦è§£: èµ‹å€¼ï¼šå°† feval(...) çš„ç»“æœä¿å­˜åˆ° k4
+   y(:,i+1)=y(:,i)+h*(k1+2*k2+2*k3+k4)/6;  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+end  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+
+tout=t';yout=y';  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° tout
+
+
+

@@ -1,8 +1,13 @@
-%ÇóÄæ¾ØÕó
-%ÓÃ·¨ B=inv(A) ÆäÖĞAÎªÊıÖµ»ò·ûºÅ·½Õó,B·µ»ØAµÄÄæ
-%ÀıÈç
-%    inv([1 2;3 4])                    %ÊıÖµ
-%    syms a b c d;inv([[a,b;c,d])      %·ûºÅ
+ï»¿% æ–‡ä»¶: INV.M
+% è¯´æ˜: è‡ªåŠ¨æ·»åŠ çš„æ³¨é‡Šå ä½ï¼Œè¯·æ ¹æ®éœ€è¦è¡¥å……ã€‚
+% ç”Ÿæˆ: 2025-08-31 23:06
+% æ³¨é‡Š: æœ¬æ–‡ä»¶å¤´ç”±è„šæœ¬è‡ªåŠ¨æ·»åŠ 
+
+%æ±‚é€†çŸ©é˜µ
+%ç”¨æ³• B=inv(A) å…¶ä¸­Aä¸ºæ•°å€¼æˆ–ç¬¦å·æ–¹é˜µ,Bè¿”å›Açš„é€†
+%ä¾‹å¦‚
+%    inv([1 2;3 4])                    %æ•°å€¼
+%    syms a b c d;inv([[a,b;c,d])      %ç¬¦å·
 %
 %INV    Matrix inverse.
 %   INV(X) is the inverse of the square matrix X.
@@ -11,6 +16,8 @@
 %
 %   See also SLASH, PINV, COND, CONDEST, NNLS, LSCOV.
 
-%   Copyright (c) 1984-98 by The MathWorks, Inc.
+%   Copyright (c) 1984-98 by The MathWorks, Inc.  % ä¸­æ–‡: Mathworksï¼ŒIncã€‚ç‰ˆæƒï¼ˆCï¼‰1984-98
 %   $Revision: 5.5 $  $Date: 1997/11/21 23:38:31 $
 %   Built-in function.
+
+

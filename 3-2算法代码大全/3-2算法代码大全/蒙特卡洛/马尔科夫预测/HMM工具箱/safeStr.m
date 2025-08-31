@@ -1,5 +1,13 @@
-function s = safeStr(s)
-% Change punctuation characters to they print properly
+﻿% 文件: safeStr.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-s = strrep(s, '\', '/');
-s = strrep(s, '_', '-');
+function s = safeStr(s)  % 详解: 执行语句
+
+s = strrep(s, '\', '/');  % 详解: 赋值：将 strrep(...) 的结果保存到 s
+s = strrep(s, '_', '-');  % 详解: 赋值：将 strrep(...) 的结果保存到 s
+
+
+
+

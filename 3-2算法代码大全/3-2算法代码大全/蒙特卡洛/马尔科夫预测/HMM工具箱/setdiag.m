@@ -1,21 +1,22 @@
-function M = setdiag(M, v)
-% SETDIAG Set the diagonal of a matrix to a specified scalar/vector.
-% M = set_diag(M, v)
+﻿% 文件: setdiag.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-n = length(M);
-if length(v)==1
-  v = repmat(v, 1, n);
-end
+function M = setdiag(M, v)  % 详解: 执行语句
 
-% e.g., for 3x3 matrix,  elements are numbered
-% 1 4 7 
-% 2 5 8 
-% 3 6 9
-% so diagnoal = [1 5 9]
+n = length(M);  % 详解: 赋值：将 length(...) 的结果保存到 n
+if length(v)==1  % 详解: 条件判断：if (length(v)==1)
+  v = repmat(v, 1, n);  % 详解: 赋值：将 repmat(...) 的结果保存到 v
+end  % 详解: 执行语句
 
 
-J = 1:n+1:n^2;
-M(J) = v;
 
-%M = triu(M,1) + tril(M,-1) + diag(v);
+J = 1:n+1:n^2;  % 详解: 赋值：计算表达式并保存到 J
+M(J) = v;  % 详解: 执行语句
+
+
+
+
+
 

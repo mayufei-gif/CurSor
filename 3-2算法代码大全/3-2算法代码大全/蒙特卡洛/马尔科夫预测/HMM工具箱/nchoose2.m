@@ -1,35 +1,29 @@
-function c = nchoose2(v, f)
-%NCHOOSE2 All combinations of N elements taken two at a time.
-%
-%   NCHOOSE2(1:N) or NCHOOSEK(V) where V is a vector of length N,
-%   produces a matrix with N*(N-1)/2 rows and K columns. Each row of
-%   the result has K of the elements in the vector V.
-%
-%   NCHOOSE2(N,FLAG) is the same as NCHOOSE2(1:N) but faster.
-%
-%   NCHOOSE2(V) is much faster than NCHOOSEK(V,2).
-%
-%   See also NCHOOSEK, PERMS.
+﻿% 文件: nchoose2.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-%   Author:      Peter J. Acklam
-%   Time-stamp:  2000-03-03 13:03:59
-%   E-mail:      jacklam@math.uio.no
-%   URL:         http://www.math.uio.no/~jacklam
+function c = nchoose2(v, f)  % 详解: 执行语句
 
-   nargs = nargin;
-   if nargs < 1
-      error('Not enough input arguments.');
-   elseif nargs == 1
-      v = v(:);
-      n = length(v);
-   elseif nargs == 2
-      n = v;
-   else
-      error('Too many input arguments.');
-   end
 
-   [ c(:,2), c(:,1) ] = find( tril( ones(n), -1 ) );
+   nargs = nargin;  % 详解: 赋值：计算表达式并保存到 nargs
+   if nargs < 1  % 详解: 条件判断：if (nargs < 1)
+      error('Not enough input arguments.');  % 详解: 调用函数：error('Not enough input arguments.')
+   elseif nargs == 1  % 详解: 条件判断：elseif (nargs == 1)
+      v = v(:);  % 详解: 赋值：将 v(...) 的结果保存到 v
+      n = length(v);  % 详解: 赋值：将 length(...) 的结果保存到 n
+   elseif nargs == 2  % 详解: 条件判断：elseif (nargs == 2)
+      n = v;  % 详解: 赋值：计算表达式并保存到 n
+   else  % 详解: 条件判断：else 分支
+      error('Too many input arguments.');  % 详解: 调用函数：error('Too many input arguments.')
+   end  % 详解: 执行语句
 
-   if nargs == 1
-      c = v(c);
-   end
+   [ c(:,2), c(:,1) ] = find( tril( ones(n), -1 ) );  % 详解: 创建全 1 矩阵/数组
+
+   if nargs == 1  % 详解: 条件判断：if (nargs == 1)
+      c = v(c);  % 详解: 赋值：将 v(...) 的结果保存到 c
+   end  % 详解: 执行语句
+
+
+
+

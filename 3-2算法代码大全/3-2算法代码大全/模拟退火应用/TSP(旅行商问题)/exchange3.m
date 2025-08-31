@@ -1,81 +1,90 @@
-function r=exchange3(R)
-N=length(R);
-K=fix(unifrnd(0,N));
-J=fix(unifrnd(0,N-1));
-I=fix(unifrnd(0,N-2));
-if I==J
-    J=J+1;
-end
-if I==K
-    K=K+2;
-end
-if J==K
-    K=K+1;
-end
+﻿% 文件: exchange3.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-if I>J
-    I=I+J;
-    J=I-J;
-    I=I-J;
-end
-if I>K
-    I=I+K;
-    K=I-K;
-    I=I-K;
-end
-if J>K
-    J=J+K;
-    K=J-K;
-    J=J-K;
-end
+function r=exchange3(R)  % 详解: 执行语句
+N=length(R);  % 详解: 赋值：将 length(...) 的结果保存到 N
+K=fix(unifrnd(0,N));  % 详解: 赋值：将 fix(...) 的结果保存到 K
+J=fix(unifrnd(0,N-1));  % 详解: 赋值：将 fix(...) 的结果保存到 J
+I=fix(unifrnd(0,N-2));  % 详解: 赋值：将 fix(...) 的结果保存到 I
+if I==J  % 详解: 条件判断：if (I==J)
+    J=J+1;  % 详解: 赋值：计算表达式并保存到 J
+end  % 详解: 执行语句
+if I==K  % 详解: 条件判断：if (I==K)
+    K=K+2;  % 详解: 赋值：计算表达式并保存到 K
+end  % 详解: 执行语句
+if J==K  % 详解: 条件判断：if (J==K)
+    K=K+1;  % 详解: 赋值：计算表达式并保存到 K
+end  % 详解: 执行语句
+
+if I>J  % 详解: 条件判断：if (I>J)
+    I=I+J;  % 详解: 赋值：计算表达式并保存到 I
+    J=I-J;  % 详解: 赋值：计算表达式并保存到 J
+    I=I-J;  % 详解: 赋值：计算表达式并保存到 I
+end  % 详解: 执行语句
+if I>K  % 详解: 条件判断：if (I>K)
+    I=I+K;  % 详解: 赋值：计算表达式并保存到 I
+    K=I-K;  % 详解: 赋值：计算表达式并保存到 K
+    I=I-K;  % 详解: 赋值：计算表达式并保存到 I
+end  % 详解: 执行语句
+if J>K  % 详解: 条件判断：if (J>K)
+    J=J+K;  % 详解: 赋值：计算表达式并保存到 J
+    K=J-K;  % 详解: 赋值：计算表达式并保存到 K
+    J=J-K;  % 详解: 赋值：计算表达式并保存到 J
+end  % 详解: 执行语句
 
 
-r=R;
-    if J-I~=1&K-J~=1&K-I~=N-1
-        for q=1:(J-I)
-            r(I+q)=R(J+1-q);
-        end
-        for q=1:(K-J)
-            r(J+q)=R(K+1-q);
-        end
-    end
-    if J-I==1&K-J==1
-        r(K)=R(J);r(J)=R(K);
-    end
-    if J-I==1&K-J~=1&K-I~=N-1
-        for q=1:(K-J)
-            r(I+q)=R(I+1+q);
-        end
-        r(K)=R(J);
-    end
-    if K-J==1&J-I~=1&K~=N
-        for q=1:(J-I)
-            r(I+1+q)=R(I+q);
-        end
-        r(I+1)=R(K);
-    end
-    if I==1&J==2&K==N
-        for q=1:(N-2)
-            r(1+q)=R(2+q);
-        end
-        r(N)=R(2);
-    end
-    if I==1&J==(N-1)&K==N
-        for q=1:(N-2)
-            r(q)=R(1+q);
-        end
-        r(N-1)=R(1);
-    end
-    if J-I~=1&K-I==N-1
-        for q=1:(J-1)
-            r(q)=R(1+q);
-        end
-        r(J)=R(1);
-    end
-    if J==(N-1)&K==N&J-I~=1
-        r(J+1)=R(N);
-        for q=1:(N-J-1)
-            r(J+1+q)=R(J+q);
-        end
-    end
+r=R;  % 详解: 赋值：计算表达式并保存到 r
+    if J-I~=1&K-J~=1&K-I~=N-1  % 详解: 条件判断：if (J-I~=1&K-J~=1&K-I~=N-1)
+        for q=1:(J-I)  % 详解: for 循环：迭代变量 q 遍历 1:(J-I)
+            r(I+q)=R(J+1-q);  % 详解: 调用函数：r(I+q)=R(J+1-q)
+        end  % 详解: 执行语句
+        for q=1:(K-J)  % 详解: for 循环：迭代变量 q 遍历 1:(K-J)
+            r(J+q)=R(K+1-q);  % 详解: 调用函数：r(J+q)=R(K+1-q)
+        end  % 详解: 执行语句
+    end  % 详解: 执行语句
+    if J-I==1&K-J==1  % 详解: 条件判断：if (J-I==1&K-J==1)
+        r(K)=R(J);r(J)=R(K);  % 详解: 调用函数：r(K)=R(J);r(J)=R(K)
+    end  % 详解: 执行语句
+    if J-I==1&K-J~=1&K-I~=N-1  % 详解: 条件判断：if (J-I==1&K-J~=1&K-I~=N-1)
+        for q=1:(K-J)  % 详解: for 循环：迭代变量 q 遍历 1:(K-J)
+            r(I+q)=R(I+1+q);  % 详解: 调用函数：r(I+q)=R(I+1+q)
+        end  % 详解: 执行语句
+        r(K)=R(J);  % 详解: 调用函数：r(K)=R(J)
+    end  % 详解: 执行语句
+    if K-J==1&J-I~=1&K~=N  % 详解: 条件判断：if (K-J==1&J-I~=1&K~=N)
+        for q=1:(J-I)  % 详解: for 循环：迭代变量 q 遍历 1:(J-I)
+            r(I+1+q)=R(I+q);  % 详解: 调用函数：r(I+1+q)=R(I+q)
+        end  % 详解: 执行语句
+        r(I+1)=R(K);  % 详解: 调用函数：r(I+1)=R(K)
+    end  % 详解: 执行语句
+    if I==1&J==2&K==N  % 详解: 条件判断：if (I==1&J==2&K==N)
+        for q=1:(N-2)  % 详解: for 循环：迭代变量 q 遍历 1:(N-2)
+            r(1+q)=R(2+q);  % 详解: 调用函数：r(1+q)=R(2+q)
+        end  % 详解: 执行语句
+        r(N)=R(2);  % 详解: 调用函数：r(N)=R(2)
+    end  % 详解: 执行语句
+    if I==1&J==(N-1)&K==N  % 详解: 条件判断：if (I==1&J==(N-1)&K==N)
+        for q=1:(N-2)  % 详解: for 循环：迭代变量 q 遍历 1:(N-2)
+            r(q)=R(1+q);  % 详解: 调用函数：r(q)=R(1+q)
+        end  % 详解: 执行语句
+        r(N-1)=R(1);  % 详解: 调用函数：r(N-1)=R(1)
+    end  % 详解: 执行语句
+    if J-I~=1&K-I==N-1  % 详解: 条件判断：if (J-I~=1&K-I==N-1)
+        for q=1:(J-1)  % 详解: for 循环：迭代变量 q 遍历 1:(J-1)
+            r(q)=R(1+q);  % 详解: 调用函数：r(q)=R(1+q)
+        end  % 详解: 执行语句
+        r(J)=R(1);  % 详解: 调用函数：r(J)=R(1)
+    end  % 详解: 执行语句
+    if J==(N-1)&K==N&J-I~=1  % 详解: 条件判断：if (J==(N-1)&K==N&J-I~=1)
+        r(J+1)=R(N);  % 详解: 调用函数：r(J+1)=R(N)
+        for q=1:(N-J-1)  % 详解: for 循环：迭代变量 q 遍历 1:(N-J-1)
+            r(J+1+q)=R(J+q);  % 详解: 调用函数：r(J+1+q)=R(J+q)
+        end  % 详解: 执行语句
+    end  % 详解: 执行语句
     
+
+
+
+

@@ -1,32 +1,20 @@
-function x = dirichletrnd(alpha)
-%DIRICHLETRND Random vector from a dirichlet distribution.
-%   x = dirichletrnd(alpha) returns a vector randomly selected
-%   from the Dirichlet distribution with parameter vector alpha.
-%
-%   The algorithm used is the following:
-%   For each alpha(i), generate a value s(i) with distribution
-%   Gamma(alpha(i),1).  Now x(i) = s(i) / sum_j s(j).
-%   
-%   The above algorithm was recounted to me by Radford Neal, but
-%   a reference would be appreciated...
-%   Do the gamma parameters always have to be 1?
-%
-%   Author: David Ross
-%   $Id$
+﻿% 文件: dirichletrnd.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-%-------------------------------------------------
-% Check the input
-%-------------------------------------------------
-error(nargchk(1,1,nargin));
+function x = dirichletrnd(alpha)  % 详解: 执行语句
 
-if min(size(alpha)) ~= 1 | length(alpha) < 2
-    error('alpha must be a vector of length at least 2');
-end
+error(nargchk(1,1,nargin));  % 详解: 调用函数：error(nargchk(1,1,nargin))
+
+if min(size(alpha)) ~= 1 | length(alpha) < 2  % 详解: 条件判断：if (min(size(alpha)) ~= 1 | length(alpha) < 2)
+    error('alpha must be a vector of length at least 2');  % 详解: 调用函数：error('alpha must be a vector of length at least 2')
+end  % 详解: 执行语句
 
 
-%-------------------------------------------------
-% Main
-%-------------------------------------------------
-gamma_vals = gamrnd(alpha, ones(size(alpha)), size(alpha));
-denom = sum(gamma_vals);
-x = gamma_vals / denom;
+gamma_vals = gamrnd(alpha, ones(size(alpha)), size(alpha));  % 详解: 赋值：将 gamrnd(...) 的结果保存到 gamma_vals
+denom = sum(gamma_vals);  % 详解: 赋值：将 sum(...) 的结果保存到 denom
+x = gamma_vals / denom;  % 详解: 赋值：计算表达式并保存到 x
+
+
+

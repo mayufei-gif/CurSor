@@ -1,4 +1,11 @@
-function c = cols(x)
-% COLS    The number of columns.
-% COLS is a more readable alternative to size(x,2).
-c = size(x,2);
+﻿% 文件: ncols.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
+
+function c = cols(x)  % 详解: 执行语句
+c = size(x,2);  % 详解: 赋值：将 size(...) 的结果保存到 c
+
+
+
+

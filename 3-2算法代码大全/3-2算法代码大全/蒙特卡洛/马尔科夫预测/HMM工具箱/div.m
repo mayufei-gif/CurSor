@@ -1,5 +1,12 @@
-function d = div(a,b)
-% DIV Integer division
-% d = div(a,b)
+﻿% 文件: div.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-d = floor(a / b);        
+function d = div(a,b)  % 详解: 执行语句
+
+d = floor(a / b);  % 详解: 赋值：将 floor(...) 的结果保存到 d
+
+
+
+

@@ -1,153 +1,76 @@
-function [lc,dflag,dattype]=loadcell(fname,delim,exclusions,options);
-%function [lc,dflag,numdata]=loadcell(fname,delim,exclusions);
-%  
-%  loadcell loads a cell array with character delimited
-%  data, which can have variable length lines and content.
-%  Numeric values are converted from string to double 
-%  unless options is a string containing 'string'.
-%  
-%  loadcell is for use with small datasets. It is not optimised
-%  for large datasets.
-% 
-%  fname is the filename to be loaded
-%
-%  delim is/are the relevant delimiter(s). If char(10) is included
-%  newlines are simply treated as delimiters and a 1-d array is created.
-%
-%  exclusions  are the set of characters to be treated as paired
-%    braces: line ends or delimiters within braces are ignored.
-%    braces are single characters and any brace can pair with 
-%    any other brace: no type pair checking is done.
-%
-%  options can be omitted or can contain 'string' if no numeric
-%    conversion is required, 'single' if multiple adjacent seperators
-%    should not be treated as one, 'free' if all linefeeds should be stripped
-%    first and 'empty2num' if empty fields are to be treated as numeric 
-%    zeros rather than an empty character set. Combine options using 
-%    concatenation.
-%
-%  lc is a cell array containing the loaded data.
-%
-%  dflag is a set of flags denoting the (i,j) values where data was entered
-%  dflag(i,j)=1 implies lc(i,j) was loaded from the data, and not just set
-%  to empty, say, by default.
-%
-%  numdata is an array  numdata(i,j)=NaN implies
-%    lc(i,j) is a string, otherwise it stores the number at i,j.
-%    This will occur regardless of whether the 'string' option is set.
-%
-%  lc will return -1 if the file is not found or could not be
-%  opened.
-%
-%  Hint: numdata+(1/dflag-1) provides a concise descriptor for the numeric data
-%  Inf=not loaded
-%  NaN=was string or empty set.
-%  otherwise numeric
-%
-%  EXAMPLE
-%
-%[a,b]=loadcell('resultsfile',[',' char(9)],'"','single-string');
-%   will load file 'resultsfile' into variable a, treating any of tab or 
-%   comma as delimiters. Delimiters or carriage returns lying 
-%   between two double inverted commas will be ignored. Two adjacent delimiters
-%   will count twice, and all data will be kept as a string.
-%
-%   Note: in space-separated data 'single' would generally be omitted,
-%   wheras in comma-seperated data it would be included.
-%  
-%   Note the exclusion characters will remain in the final data, and any data
-%   contained within or containing exclusion characters will not be 
-%   converted to numerics.
-%
-%   (c) Amos Storkey 2002
-%    v b160702
+﻿% 文件: loadcell.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-% MATLAB is incapable of loading variable length lines or variable type values
-% with a whole file command under the standard library sets. This mfile 
-% fills that gap.
-if (nargin<4) 
-    options=' ';
-end;
-dflag = [];
-%Open file
-fid=fopen(fname,'rt');
-%Cannot open: return -1
-if (fid<0)
-  lc=-1;
-else
-  fullfile=fread(fid,'uchar=>char')';
-  %Strip LF if free is set
-  if ~isempty(findstr(options,'free'))
-      fullfile=strrep(fullfile,char(10),'');
-  end;
-  %Find all delimiters
-  delimpos=[];
-  for s=1:length(delim)
-    delimpos=[delimpos find(fullfile==delim(s))];
-  end
-  %Find all eol
-  endpos=find(fullfile==char(10));
-  endpos=setdiff(endpos,delimpos);
-  %find all exclusions
-  xclpos=[];
-  for s=1:length(exclusions);
-    xclpos=[xclpos find(fullfile==exclusions(s))];
-  end
-  sort(xclpos);
-  xclpos=[xclpos(1:2:end-1);xclpos(2:2:end)];
-  %Combine eol and delimiters
-  jointpos=union(delimpos,endpos);
-  t=1;
-  %Remove delim/eol within exclusion pairs
-  removedelim=[];
-  for s=1:length(jointpos)
-    if any((jointpos(s)>xclpos(1,:)) & (jointpos(s)<xclpos(2,:)))
-      removedelim(t)=jointpos(s);
-      t=t+1;
-    end;
+function [lc,dflag,dattype]=loadcell(fname,delim,exclusions,options);  % 详解: 函数定义：loadcell(fname,delim,exclusions,options), 返回：lc,dflag,dattype
 
-  end
-  %and add start point
-  jointpos=[0 setdiff(jointpos,removedelim)];
-  i=1;
-  j=1;
-  posind=1;
-  multflag=isempty(findstr(options,'single'));
-  stringflag=~isempty(findstr(options,'string'));
-  emptnum=~isempty(findstr(options,'empty2num'));
-  %Run through
-  while (posind<(length(jointpos)))
-    %Get current field
-    tempstr=fullfile(jointpos(posind)+1:jointpos(posind+1)-1);
-    %If empty only continue if adjacent delim count.
-    if ~(isempty(tempstr) & multflag);
-      %This ij is set
-      dflag(i,j)=1;
-      %Convert to num
-      tempno=str2double([tempstr]);
-      %If emptystring convert to zero if emptnum set
-      if (isempty(tempstr) & emptnum)
-          tempno=0;
-      end;
-      %Set dattype to no (or NaN if not a num
-      dattype(i,j)=tempno;
-      %If NaN set lc to string else to num if stringflag not set
-      if (isnan(tempno) |  stringflag) 
-        lc{i,j}=tempstr;
-      else
-        lc{i,j}=tempno;
-      end;
-      %Next j
-      j=j+1;
-    end;
-    %If eol inc i and reset j
-    if ismember(jointpos(posind+1),endpos)
-        i=i+1;
-        j=1;
-    end;
-    %Inc to next delim
-    posind=posind+1;      
-  end;
-end;
-%Logicalise dflag
-dflag=logical(dflag);
+if (nargin<4)  % 详解: 条件判断：if ((nargin<4))
+    options=' ';  % 详解: 赋值：计算表达式并保存到 options
+end;  % 详解: 执行语句
+dflag = [];  % 详解: 赋值：计算表达式并保存到 dflag
+fid=fopen(fname,'rt');  % 详解: 赋值：将 fopen(...) 的结果保存到 fid
+if (fid<0)  % 详解: 条件判断：if ((fid<0))
+  lc=-1;  % 详解: 赋值：计算表达式并保存到 lc
+else  % 详解: 条件判断：else 分支
+  fullfile=fread(fid,'uchar=>char')';  % 赋值：设置变量 fullfile  % 详解: 赋值：将 fread(...) 的结果保存到 fullfile  % 详解: 赋值：将 fread(...) 的结果保存到 fullfile
+  if ~isempty(findstr(options,'free'))  % 详解: 条件判断：if (~isempty(findstr(options,'free')))
+      fullfile=strrep(fullfile,char(10),'');  % 详解: 赋值：将 strrep(...) 的结果保存到 fullfile
+  end;  % 详解: 执行语句
+  delimpos=[];  % 详解: 赋值：计算表达式并保存到 delimpos
+  for s=1:length(delim)  % 详解: for 循环：迭代变量 s 遍历 1:length(delim)
+    delimpos=[delimpos find(fullfile==delim(s))];  % 详解: 赋值：计算表达式并保存到 delimpos
+  end  % 详解: 执行语句
+  endpos=find(fullfile==char(10));  % 详解: 赋值：将 find(...) 的结果保存到 endpos
+  endpos=setdiff(endpos,delimpos);  % 详解: 赋值：将 setdiff(...) 的结果保存到 endpos
+  xclpos=[];  % 详解: 赋值：计算表达式并保存到 xclpos
+  for s=1:length(exclusions);  % 详解: for 循环：迭代变量 s 遍历 1:length(exclusions);
+    xclpos=[xclpos find(fullfile==exclusions(s))];  % 详解: 赋值：计算表达式并保存到 xclpos
+  end  % 详解: 执行语句
+  sort(xclpos);  % 详解: 调用函数：sort(xclpos)
+  xclpos=[xclpos(1:2:end-1);xclpos(2:2:end)];  % 详解: 赋值：计算表达式并保存到 xclpos
+  jointpos=union(delimpos,endpos);  % 详解: 赋值：将 union(...) 的结果保存到 jointpos
+  t=1;  % 详解: 赋值：计算表达式并保存到 t
+  removedelim=[];  % 详解: 赋值：计算表达式并保存到 removedelim
+  for s=1:length(jointpos)  % 详解: for 循环：迭代变量 s 遍历 1:length(jointpos)
+    if any((jointpos(s)>xclpos(1,:)) & (jointpos(s)<xclpos(2,:)))  % 详解: 条件判断：if (any((jointpos(s)>xclpos(1,:)) & (jointpos(s)<xclpos(2,:))))
+      removedelim(t)=jointpos(s);  % 详解: 调用函数：removedelim(t)=jointpos(s)
+      t=t+1;  % 详解: 赋值：计算表达式并保存到 t
+    end;  % 详解: 执行语句
+
+  end  % 详解: 执行语句
+  jointpos=[0 setdiff(jointpos,removedelim)];  % 详解: 赋值：计算表达式并保存到 jointpos
+  i=1;  % 详解: 赋值：计算表达式并保存到 i
+  j=1;  % 详解: 赋值：计算表达式并保存到 j
+  posind=1;  % 详解: 赋值：计算表达式并保存到 posind
+  multflag=isempty(findstr(options,'single'));  % 详解: 赋值：将 isempty(...) 的结果保存到 multflag
+  stringflag=~isempty(findstr(options,'string'));  % 详解: 赋值：计算表达式并保存到 stringflag
+  emptnum=~isempty(findstr(options,'empty2num'));  % 详解: 赋值：计算表达式并保存到 emptnum
+  while (posind<(length(jointpos)))  % 详解: while 循环：当 ((posind<(length(jointpos)))) 为真时迭代
+    tempstr=fullfile(jointpos(posind)+1:jointpos(posind+1)-1);  % 详解: 赋值：将 fullfile(...) 的结果保存到 tempstr
+    if ~(isempty(tempstr) & multflag);  % 详解: 条件判断：if (~(isempty(tempstr) & multflag);)
+      dflag(i,j)=1;  % 详解: 执行语句
+      tempno=str2double([tempstr]);  % 详解: 赋值：将 str2double(...) 的结果保存到 tempno
+      if (isempty(tempstr) & emptnum)  % 详解: 条件判断：if ((isempty(tempstr) & emptnum))
+          tempno=0;  % 详解: 赋值：计算表达式并保存到 tempno
+      end;  % 详解: 执行语句
+      dattype(i,j)=tempno;  % 详解: 执行语句
+      if (isnan(tempno) |  stringflag)  % 详解: 条件判断：if ((isnan(tempno) |  stringflag))
+        lc{i,j}=tempstr;  % 详解: 执行语句
+      else  % 详解: 条件判断：else 分支
+        lc{i,j}=tempno;  % 详解: 执行语句
+      end;  % 详解: 执行语句
+      j=j+1;  % 详解: 赋值：计算表达式并保存到 j
+    end;  % 详解: 执行语句
+    if ismember(jointpos(posind+1),endpos)  % 详解: 条件判断：if (ismember(jointpos(posind+1),endpos))
+        i=i+1;  % 详解: 赋值：计算表达式并保存到 i
+        j=1;  % 详解: 赋值：计算表达式并保存到 j
+    end;  % 详解: 执行语句
+    posind=posind+1;  % 详解: 赋值：计算表达式并保存到 posind
+  end;  % 详解: 执行语句
+end;  % 详解: 执行语句
+dflag=logical(dflag);  % 详解: 赋值：将 logical(...) 的结果保存到 dflag
+
+
+
+

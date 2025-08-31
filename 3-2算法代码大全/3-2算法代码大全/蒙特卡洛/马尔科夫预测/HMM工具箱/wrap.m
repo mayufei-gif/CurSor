@@ -1,7 +1,12 @@
-function v = wrap(u,N)
-% WRAP Wrap a vector of indices around a torus.
-% v = wrap(u,N)
-%
-% e.g., wrap([-1 0 1 2 3 4], 3)   =   2 3 1 2 3 1
+﻿% 文件: wrap.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-v = mod(u-1,N)+1;       
+function v = wrap(u,N)  % 详解: 执行语句
+
+v = mod(u-1,N)+1;  % 详解: 赋值：将 mod(...) 的结果保存到 v
+
+
+
+

@@ -1,6 +1,15 @@
-p1 = log(1e-5);
-p2 = log(5*1e-6);
-p3 = log(sum(exp([p1 p2])))
-p4 = logsumexp([p1 p2],2)
-p5 = logsum([p1 p2])
-p6 = logsum([p1 p2])
+﻿% 文件: logsum_test.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
+
+p1 = log(1e-5);  % 详解: 赋值：将 log(...) 的结果保存到 p1
+p2 = log(5*1e-6);  % 详解: 赋值：将 log(...) 的结果保存到 p2
+p3 = log(sum(exp([p1 p2])))  % 详解: 赋值：将 log(...) 的结果保存到 p3
+p4 = logsumexp([p1 p2],2)  % 详解: 赋值：将 logsumexp(...) 的结果保存到 p4
+p5 = logsum([p1 p2])  % 详解: 赋值：将 logsum(...) 的结果保存到 p5
+p6 = logsum([p1 p2])  % 详解: 赋值：将 logsum(...) 的结果保存到 p6
+
+
+
+

@@ -1,22 +1,18 @@
-function  a = polygon_area(x,y)
-% AREA  Area of a planar polygon.
-%	AREA(X,Y) Calculates the area of a 2-dimensional
-%	polygon formed by vertices with coordinate vectors
-%	X and Y. The result is direction-sensitive: the
-%	area is positive if the bounding contour is counter-
-%	clockwise and negative if it is clockwise.
-%
-%	See also TRAPZ.
+﻿% 文件: polygon_area.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-%  Copyright (c) 1995 by Kirill K. Pankratov,
-%	kirill@plume.mit.edu.
-%	04/20/94, 05/20/95  
+function  a = polygon_area(x,y)  % 详解: 执行语句
 
- % Make polygon closed .............
-x = [x(:); x(1)];
-y = [y(:); y(1)];
 
- % Calculate contour integral Int -y*dx  (same as Int x*dy).
-lx = length(x);
-a = -(x(2:lx)-x(1:lx-1))'*(y(1:lx-1)+y(2:lx))/2;
-a = abs(a);
+x = [x(:); x(1)];  % 详解: 赋值：计算表达式并保存到 x
+y = [y(:); y(1)];  % 详解: 赋值：计算表达式并保存到 y
+
+lx = length(x);  % 详解: 赋值：将 length(...) 的结果保存到 lx
+a = -(x(2:lx)-x(1:lx-1))'*(y(1:lx-1)+y(2:lx))/2;  % 赋值：设置变量 a  % 详解: 赋值：计算表达式并保存到 a  % 详解: 赋值：计算表达式并保存到 a
+a = abs(a);  % 详解: 赋值：将 abs(...) 的结果保存到 a
+
+
+
+

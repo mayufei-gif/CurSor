@@ -1,86 +1,35 @@
-function [x,lambda,how]=lp(f,A,B,vlb,vub,x,neqcstr,verbosity)
-%���Թ滮lp
-%������Թ滮���⣺
-%       min  c'x 
-%       s.t. Ax<=b
-%����AΪm*n����,CΪm*1����,bΪm*1����,nΪ��������
-%�÷�
-%     x=lp(C,A,b)����������Թ滮�Ľ⡣
-%     x=lp(C,A,b,vlb,vub) ָ�����½�vlb<=x<=vub
-%     x=lp(C,A,b,vlb,vub,x0)����������ֵ
-%     x=lp(C,A,b,vlb,vub,x0,k)ǰk��Լ��Ϊ��ʽ
-%��  max   z=10x1+5x2
-%    s.t. 5x1+2x2<=8
-%         3x1+4x2=9
-%         x1+x2>=1
-%         x1,x2>=0
-% ���Ȼ�Ϊ��min   - z = -10x1 -5x2
-%    s.t. 3x1+4x2=9              
-%         5x1+2x1<=8
-%         -x1-x2<=-1
-%         x1,x2>=0
-%  �ⷨ              
-%  clear;
-%  C=[-10,-5]';
-%  A=[3 4;5 2;-1 -1];
-%  b=[9,8,-1]';
-%  x=lp(C,A,b,zeros(2,1),[],[],1)
-%LP     Linear programming.                   
-%   LP has been replaced with LINPROG.  LP currently works but
-%   will be removed in the future.  Use LINPROG instead.
-%
-%   X=LP(f,A,b) solves the linear programming problem:
-%        
-%            min f'x    subject to:   Ax <= b 
-%             x
-%   
-%   X=LP(f,A,b,VLB,VUB) defines a set of lower and upper
-%   bounds on the design variables, X, so that the solution is always in
-%   the range VLB <= X <= VUB.
-%
-%   X=LP(f,A,b,VLB,VUB,X0) sets the initial starting point to X0.
-%
-%   X=LP(f,A,b,VLB,VUB,X0,N) indicates that the first N constraints defined
-%   by A and b are equality constraints.
-%
-%   X=LP(f,A,b,VLB,VUB,X0,N,DISPLAY) controls the level of warning
-%   messages displayed.  Warning messages can be turned off with
-%   DISPLAY = -1.
-%
-%   [x,LAMBDA]=LP(f,A,b) returns the set of Lagrangian multipliers,
-%   LAMBDA, at the solution. 
-%   
-%   [X,LAMBDA,HOW] = LP(f,A,b) also returns a string how that indicates 
-%   error conditions at the final iteration.
-%
-%   LP produces warning messages when the solution is either unbounded
-%   or infeasible. 
+﻿% 文件: LP.M
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-%   Copyright (c) 1990-98 by The MathWorks, Inc.
-%   $Revision: 1.13 $  $Date: 1998/08/31 22:29:20 $
-%   Andy Grace 7-9-90. Mary Ann Branch 9-30-96.
+function [x,lambda,how]=lp(f,A,B,vlb,vub,x,neqcstr,verbosity)  % 详解: 函数定义：lp(f,A,B,vlb,vub,x,neqcstr,verbosity), 返回：x,lambda,how
+
          
-if nargin<8, verbosity = 0; 
-    if nargin<7, neqcstr = 0; 
-        if nargin<6, x = []; 
-            if nargin<5, vub = [];
-                if nargin<4, vlb = [];
-        end, end, end, end, end
-[ncstr,nvars]=size(A);
-nvars = max([length(f),nvars]); % In case A is empty
+if nargin<8, verbosity = 0;  % 详解: 条件判断：if (nargin<8, verbosity = 0;)
+    if nargin<7, neqcstr = 0;  % 详解: 条件判断：if (nargin<7, neqcstr = 0;)
+        if nargin<6, x = [];  % 详解: 条件判断：if (nargin<6, x = [];)
+            if nargin<5, vub = [];  % 详解: 条件判断：if (nargin<5, vub = [];)
+                if nargin<4, vlb = [];  % 详解: 条件判断：if (nargin<4, vlb = [];)
+        end, end, end, end, end  % 详解: 执行语句
+[ncstr,nvars]=size(A);  % 详解: 获取向量/矩阵尺寸
+nvars = max([length(f),nvars]);  % 详解: 赋值：将 max(...) 的结果保存到 nvars
         
-if isempty(verbosity), verbosity = 0; end
-if isempty(neqcstr), neqcstr = 0; end
-if isempty(x), x=zeros(nvars,1); end       
+if isempty(verbosity), verbosity = 0; end  % 详解: 条件判断：if (isempty(verbosity), verbosity = 0; end)
+if isempty(neqcstr), neqcstr = 0; end  % 详解: 条件判断：if (isempty(neqcstr), neqcstr = 0; end)
+if isempty(x), x=zeros(nvars,1); end  % 详解: 条件判断：if (isempty(x), x=zeros(nvars,1); end)
         
-if isempty(A), A=zeros(0,nvars); end
-if isempty(B), B=zeros(0,1); end       
+if isempty(A), A=zeros(0,nvars); end  % 详解: 条件判断：if (isempty(A), A=zeros(0,nvars); end)
+if isempty(B), B=zeros(0,1); end  % 详解: 条件判断：if (isempty(B), B=zeros(0,1); end)
 
-% Set to column vectors
-f = f(:);
-B = B(:);
-x = x(:);
+f = f(:);  % 详解: 赋值：将 f(...) 的结果保存到 f
+B = B(:);  % 详解: 赋值：将 B(...) 的结果保存到 B
+x = x(:);  % 详解: 赋值：将 x(...) 的结果保存到 x
 
-caller = 'lp'; 
-[x,lambda,how]=qpsubold([],f,A,B,vlb,vub,x,neqcstr,verbosity,caller,ncstr,nvars);          
+caller = 'lp';  % 详解: 赋值：计算表达式并保存到 caller
+[x,lambda,how]=qpsubold([],f,A,B,vlb,vub,x,neqcstr,verbosity,caller,ncstr,nvars);  % 详解: 执行语句
+
+
+
+
 

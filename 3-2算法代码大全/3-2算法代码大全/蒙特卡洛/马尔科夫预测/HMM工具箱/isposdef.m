@@ -1,9 +1,14 @@
-function b = isposdef(a)
-% ISPOSDEF   Test for positive definite matrix.
-%    ISPOSDEF(A) returns 1 if A is positive definite, 0 otherwise.
-%    Using chol is much more efficient than computing eigenvectors.
+﻿% 文件: isposdef.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-%  From Tom Minka's lightspeed toolbox
+function b = isposdef(a)  % 详解: 执行语句
 
-[R,p] = chol(a);
-b = (p == 0);
+
+[R,p] = chol(a);  % 详解: 执行语句
+b = (p == 0);  % 详解: 赋值：计算表达式并保存到 b
+
+
+
+

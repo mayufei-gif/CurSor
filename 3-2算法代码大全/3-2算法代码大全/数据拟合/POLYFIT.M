@@ -1,76 +1,35 @@
-function [p,S] = polyfit(x,y,n)
-%p=polyfit(x,y,k)��k�ζ���ʽ�����������(x,y)
-%p���ض���ʽ�Ľ���ϵ��.��k>=n-1ʱ,polyfitʵ�ֶ���ʽ��ֵ.  
-%���� �ö��ζ���ʽ�������
-%   x | 0.1  0.2  0.15 0.0  -0.2 0.3
-%   --|------------------------------
-%   y | 0.95 0.84 0.86 1.06 1.50 0.72
-% ���
-%    x=[0.1,0.2,0.15,0,-0.2,0.3];
-%    y=[0.95,0.84,0.86,1.06,1.50,0.72];
-%    p=polyfit(x,y,2)
-%    xi=-0.2:0.01:0.3;
-%    yi=polyval(p,xi);
-%    plot(x,y,'o',xi,yi,'k');
-%    title('polyfit');
+﻿% 文件: POLYFIT.M
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-%POLYFIT Fit polynomial to data.
-%   POLYFIT(X,Y,N) finds the coefficients of a polynomial P(X) of
-%   degree N that fits the data, P(X(I))~=Y(I), in a least-squares sense.
-%
-%   [P,S] = POLYFIT(X,Y,N) returns the polynomial coefficients P and a
-%   structure S for use with POLYVAL to obtain error estimates on
-%   predictions.  If the errors in the data, Y, are independent normal
-%   with constant variance, POLYVAL will produce error bounds which
-%   contain at least 50% of the predictions.
-%
-%   The structure S contains the Cholesky factor of the Vandermonde
-%   matrix (R), the degrees of freedom (df), and the norm of the
-%   residuals (normr) as fields.   
-%
-%   See also POLY, POLYVAL, ROOTS.
+function [p,S] = polyfit(x,y,n)  % 详解: 函数定义：polyfit(x,y,n), 返回：p,S
 
-%   J.N. Little 4-21-85, 8-23-86; CBM, 12-27-91 BAJ, 5-7-93.
-%   Copyright (c) 1984-98 by The MathWorks, Inc.
-%   $Revision: 5.9 $  $Date: 1997/11/21 23:40:57 $
 
-% The regression problem is formulated in matrix format as:
-%
-%    y = V*p    or
-%
-%          3  2
-%    y = [x  x  x  1] [p3
-%                      p2
-%                      p1
-%                      p0]
-%
-% where the vector p contains the coefficients to be found.  For a
-% 7th order polynomial, matrix V would be:
-%
-% V = [x.^7 x.^6 x.^5 x.^4 x.^3 x.^2 x ones(size(x))];
 
-if ~isequal(size(x),size(y))
-    error('X and Y vectors must be the same size.')
-end
 
-x = x(:);
-y = y(:);
+if ~isequal(size(x),size(y))  % 详解: 条件判断：if (~isequal(size(x),size(y)))
+    error('X and Y vectors must be the same size.')  % 详解: 调用函数：error('X and Y vectors must be the same size.')
+end  % 详解: 执行语句
 
-% Construct Vandermonde matrix.
-V(:,n+1) = ones(length(x),1);
-for j = n:-1:1
-    V(:,j) = x.*V(:,j+1);
-end
+x = x(:);  % 详解: 赋值：将 x(...) 的结果保存到 x
+y = y(:);  % 详解: 赋值：将 y(...) 的结果保存到 y
 
-% Solve least squares problem, and save the Cholesky factor.
-[Q,R] = qr(V,0);
-p = R\(Q'*y);    % Same as p = V\y;
-r = y - V*p;
-p = p.';          % Polynomial coefficients are row vectors by convention.
+V(:,n+1) = ones(length(x),1);  % 详解: 调用函数：V(:,n+1) = ones(length(x),1)
+for j = n:-1:1  % 详解: for 循环：迭代变量 j 遍历 n:-1:1
+    V(:,j) = x.*V(:,j+1);  % 详解: 调用函数：V(:,j) = x.*V(:,j+1)
+end  % 详解: 执行语句
 
-% S is a structure containing three elements: the Cholesky factor of the
-% Vandermonde matrix, the degrees of freedom and the norm of the residuals.
+[Q,R] = qr(V,0);  % 详解: 执行语句
+p = R\(Q'*y);    % Same as p = V\y;  % 中文: x = [1 2 4 5]; y = [1 3 4 2];  % 详解: 赋值：计算表达式并保存到 p  % 详解: 赋值：计算表达式并保存到 p
+r = y - V*p;  % 详解: 赋值：计算表达式并保存到 r
+p = p.';          % Polynomial coefficients are row vectors by convention.  % 中文: p =样条（x，y）;  % 详解: 赋值：计算表达式并保存到 p  % 详解: 赋值：计算表达式并保存到 p
 
-S.R = R;
-S.df = length(y) - (n+1);
-S.normr = norm(r);
+
+S.R = R;  % 详解: 赋值：计算表达式并保存到 S.R
+S.df = length(y) - (n+1);  % 详解: 赋值：将 length(...) 的结果保存到 S.df
+S.normr = norm(r);  % 详解: 赋值：将 norm(...) 的结果保存到 S.normr
+
+
+
+

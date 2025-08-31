@@ -1,16 +1,13 @@
-function p = randperm(n);
-%P=randperm(n) ����1,2��,n��һ���������
-%
-%RANDPERM Random permutation.
-%   RANDPERM(n) is a random permutation of the integers from 1 to n.
-%   For example, RANDPERM(6) might be [2 4 5 6 1 3].
-%   
-%   Note that RANDPERM calls RAND and therefore changes RAND's
-%   seed value.
-%
-%   See also PERMUTE.
+﻿% 文件: RANDPERM.M
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-%   Copyright (c) 1984-98 by The MathWorks, Inc.
-%   $Revision: 5.4 $  $Date: 1997/11/21 23:44:34 $
+function p = randperm(n);  % 详解: 执行语句
 
-[ignore,p] = sort(rand(1,n));
+
+[ignore,p] = sort(rand(1,n));  % 详解: 生成随机数/矩阵
+
+
+
+

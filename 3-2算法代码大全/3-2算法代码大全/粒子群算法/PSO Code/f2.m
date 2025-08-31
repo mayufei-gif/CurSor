@@ -1,8 +1,16 @@
-function f2=f2(x)
-Bound=[-10 10];
+﻿% 文件: f2.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-if nargin==0
-    f2 = Bound;
-else
-    f2=sum(abs(x))+prod(abs(x));
-end
+function f2=f2(x)  % 详解: 执行语句
+Bound=[-10 10];  % 详解: 赋值：计算表达式并保存到 Bound
+
+if nargin==0  % 详解: 条件判断：if (nargin==0)
+    f2 = Bound;  % 详解: 赋值：计算表达式并保存到 f2
+else  % 详解: 条件判断：else 分支
+    f2=sum(abs(x))+prod(abs(x));  % 详解: 赋值：将 sum(...) 的结果保存到 f2
+end  % 详解: 执行语句
+
+
+

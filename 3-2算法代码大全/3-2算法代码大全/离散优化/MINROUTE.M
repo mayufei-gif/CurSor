@@ -1,34 +1,30 @@
-function [S,D]=minRoute(i,m,W)
-%Í¼ÓëÍøÂçÂÛÖĞÇó×î¶ÌÂ·¾¶µÄDijkstraËã·¨ M-º¯Êı
-%¸ñÊ½ [S,D]=minroute(i,n,W)
-%    iÎª×î¶ÌÂ·¾¶µÄÆğÊ¼µã,mÎªÍ¼¶¥µãÊı,WÎªÍ¼µÄ´øÈ¨ÁÚ½Ó¾ØÕó£¬
-%    ²»¹¹³É±ßµÄÁ½¶¥µãÖ®¼äµÄÈ¨ÓÃinf±íÊ¾¡£ÏÔÊ¾½á¹ûÎª£ºSµÄÃ¿
-%    Ò»ÁĞ´ÓÉÏµ½ÏÂ¼ÇÂ¼ÁË´ÓÊ¼µãµ½ÖÕµãµÄ×î¶ÌÂ·¾¶Ëù¾­¶¥µãµÄĞòºÅ£»
-%    DÊÇÒ»ĞĞÏòÁ¿£¬¼ÇÂ¼ÁËSÖĞËùÊ¾Â·¾¶µÄ´óĞ¡;
-%ÀıÈç
-%    clear;w=inf*ones(6);w(1,3)=10;w(1,5)=30;
-%    w(1,6)=100;w(2,3)=5;w(3,4)=50;w(4,6)=10;
-%    w(5,4)=20;w(5,6)=60;
-%    i=1;[s,d]=minroute(i,6,w)
+ï»¿% æ–‡ä»¶: MINROUTE.M
+% è¯´æ˜: è‡ªåŠ¨æ·»åŠ çš„æ³¨é‡Šå ä½ï¼Œè¯·æ ¹æ®éœ€è¦è¡¥å……ã€‚
+% ç”Ÿæˆ: 2025-08-31 23:06
+% æ³¨é‡Š: æœ¬æ–‡ä»¶å¤´ç”±è„šæœ¬è‡ªåŠ¨æ·»åŠ 
 
-% By X.D. Ding June 2000
+function [S,D]=minRoute(i,m,W)  % è¯¦è§£: å‡½æ•°å®šä¹‰ï¼šminRoute(i,m,W), è¿”å›ï¼šS,D
 
-dd=[];tt=[];ss=[];ss(1,1)=i;V=1:m;V(i)=[];dd=[0;i];
-% ddµÄµÚ¶şĞĞÊÇÃ¿´ÎÇó³öµÄ×î¶ÌÂ·¾¶µÄÖÕµã£¬µÚÒ»ĞĞÊÇ×î¶ÌÂ·¾¶µÄÖµ
-kk=2;[mdd,ndd]=size(dd);
-while ~isempty(V)
-   [tmpd,j]=min(W(i,V));tmpj=V(j);
-   for k=2:ndd
-      [tmp1,jj]=min(dd(1,k)+W(dd(2,k),V));
-      tmp2=V(jj);tt(k-1,:)=[tmp1,tmp2,jj];
-   end
-   tmp=[tmpd,tmpj,j;tt];[tmp3,tmp4]=min(tmp(:,1));
-   if tmp3==tmpd, ss(1:2,kk)=[i;tmp(tmp4,2)];
-   else,tmp5=find(ss(:,tmp4)~=0);tmp6=length(tmp5);
-      if dd(2,tmp4)==ss(tmp6,tmp4)
-         ss(1:tmp6+1,kk)=[ss(tmp5,tmp4);tmp(tmp4,2)];
-         else, ss(1:3,kk)=[i;dd(2,tmp4);tmp(tmp4,2)];
-   end;end
-   dd=[dd,[tmp3;tmp(tmp4,2)]];V(tmp(tmp4,3))=[];
-   [mdd,ndd]=size(dd);kk=kk+1;
-end; S=ss; D=dd(1,:);             
+
+dd=[];tt=[];ss=[];ss(1,1)=i;V=1:m;V(i)=[];dd=[0;i];  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° dd
+kk=2;[mdd,ndd]=size(dd);  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° kk
+while ~isempty(V)  % è¯¦è§£: while å¾ªç¯ï¼šå½“ (~isempty(V)) ä¸ºçœŸæ—¶è¿­ä»£
+   [tmpd,j]=min(W(i,V));tmpj=V(j);  % è¯¦è§£: ç»Ÿè®¡ï¼šæœ€å¤§/æœ€å°å€¼
+   for k=2:ndd  % è¯¦è§£: for å¾ªç¯ï¼šè¿­ä»£å˜é‡ k éå† 2:ndd
+      [tmp1,jj]=min(dd(1,k)+W(dd(2,k),V));  % è¯¦è§£: ç»Ÿè®¡ï¼šæœ€å¤§/æœ€å°å€¼
+      tmp2=V(jj);tt(k-1,:)=[tmp1,tmp2,jj];  % è¯¦è§£: èµ‹å€¼ï¼šå°† V(...) çš„ç»“æœä¿å­˜åˆ° tmp2
+   end  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+   tmp=[tmpd,tmpj,j;tt];[tmp3,tmp4]=min(tmp(:,1));  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° tmp
+   if tmp3==tmpd, ss(1:2,kk)=[i;tmp(tmp4,2)];  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šif (tmp3==tmpd, ss(1:2,kk)=[i;tmp(tmp4,2)];)
+   else,tmp5=find(ss(:,tmp4)~=0);tmp6=length(tmp5);  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šelse åˆ†æ”¯
+      if dd(2,tmp4)==ss(tmp6,tmp4)  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šif (dd(2,tmp4)==ss(tmp6,tmp4))
+         ss(1:tmp6+1,kk)=[ss(tmp5,tmp4);tmp(tmp4,2)];  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+         else, ss(1:3,kk)=[i;dd(2,tmp4);tmp(tmp4,2)];  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šelse åˆ†æ”¯
+   end;end  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+   dd=[dd,[tmp3;tmp(tmp4,2)]];V(tmp(tmp4,3))=[];  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° dd
+   [mdd,ndd]=size(dd);kk=kk+1;  % è¯¦è§£: è·å–å‘é‡/çŸ©é˜µå°ºå¯¸
+end; S=ss; D=dd(1,:);  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+
+
+
+

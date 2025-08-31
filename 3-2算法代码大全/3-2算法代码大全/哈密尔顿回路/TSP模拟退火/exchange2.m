@@ -1,27 +1,35 @@
-function r=exchange2(R)
-N=length(R);
-I=1+fix(unifrnd(0,N));
-J=1+fix(unifrnd(0,N-1));
-if I==J
-    J=J+1;
-end
-if J<I
-    I=I+J;
-    J=I-J;
-    I=I-J;
-end
-r=R;
-if J-I~=1&J-I~=N-1
-    for p=1:(J-I)
-        r(I+p)=R(J-p+1);
-    end
-end
-if J-I==1
-    r(I)=R(J);
-    r(J)=R(I);
-end
-if J-I==N-1
-    for p=1:(N-2)
-        r(p+2)=R(N+1-p)
-    end
-end
+﻿% 文件: exchange2.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
+
+function r=exchange2(R)  % 详解: 执行语句
+N=length(R);  % 详解: 赋值：将 length(...) 的结果保存到 N
+I=1+fix(unifrnd(0,N));  % 详解: 赋值：计算表达式并保存到 I
+J=1+fix(unifrnd(0,N-1));  % 详解: 赋值：计算表达式并保存到 J
+if I==J  % 详解: 条件判断：if (I==J)
+    J=J+1;  % 详解: 赋值：计算表达式并保存到 J
+end  % 详解: 执行语句
+if J<I  % 详解: 条件判断：if (J<I)
+    I=I+J;  % 详解: 赋值：计算表达式并保存到 I
+    J=I-J;  % 详解: 赋值：计算表达式并保存到 J
+    I=I-J;  % 详解: 赋值：计算表达式并保存到 I
+end  % 详解: 执行语句
+r=R;  % 详解: 赋值：计算表达式并保存到 r
+if J-I~=1&J-I~=N-1  % 详解: 条件判断：if (J-I~=1&J-I~=N-1)
+    for p=1:(J-I)  % 详解: for 循环：迭代变量 p 遍历 1:(J-I)
+        r(I+p)=R(J-p+1);  % 详解: 调用函数：r(I+p)=R(J-p+1)
+    end  % 详解: 执行语句
+end  % 详解: 执行语句
+if J-I==1  % 详解: 条件判断：if (J-I==1)
+    r(I)=R(J);  % 详解: 调用函数：r(I)=R(J)
+    r(J)=R(I);  % 详解: 调用函数：r(J)=R(I)
+end  % 详解: 执行语句
+if J-I==N-1  % 详解: 条件判断：if (J-I==N-1)
+    for p=1:(N-2)  % 详解: for 循环：迭代变量 p 遍历 1:(N-2)
+        r(p+2)=R(N+1-p)  % 详解: 调用函数：r(p+2)=R(N+1-p)
+    end  % 详解: 执行语句
+end  % 详解: 执行语句
+
+
+

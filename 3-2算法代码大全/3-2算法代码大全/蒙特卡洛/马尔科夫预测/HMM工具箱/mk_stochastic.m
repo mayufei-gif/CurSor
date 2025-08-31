@@ -1,27 +1,28 @@
-function [T,Z] = mk_stochastic(T)
-% MK_STOCHASTIC Ensure the argument is a stochastic matrix, i.e., the sum over the last dimension is 1.
-% [T,Z] = mk_stochastic(T)
-%
-% If T is a vector, it will sum to 1.
-% If T is a matrix, each row will sum to 1.
-% If T is a 3D array, then sum_k T(i,j,k) = 1 for all i,j.
+﻿% 文件: mk_stochastic.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-% Set zeros to 1 before dividing
-% This is valid since S(j) = 0 iff T(i,j) = 0 for all j
+function [T,Z] = mk_stochastic(T)  % 详解: 函数定义：mk_stochastic(T), 返回：T,Z
 
-if (ndims(T)==2) & (size(T,1)==1 | size(T,2)==1) % isvector
-  [T,Z] = normalise(T);
-elseif ndims(T)==2 % matrix
-  Z = sum(T,2); 
-  S = Z + (Z==0);
-  norm = repmat(S, 1, size(T,2));
-  T = T ./ norm;
-else % multi-dimensional array
-  ns = size(T);
-  T = reshape(T, prod(ns(1:end-1)), ns(end));
-  Z = sum(T,2);
-  S = Z + (Z==0);
-  norm = repmat(S, 1, ns(end));
-  T = T ./ norm;
-  T = reshape(T, ns);
-end
+
+if (ndims(T)==2) & (size(T,1)==1 | size(T,2)==1)  % 详解: 条件判断：if ((ndims(T)==2) & (size(T,1)==1 | size(T,2)==1))
+  [T,Z] = normalise(T);  % 详解: 执行语句
+elseif ndims(T)==2  % 详解: 条件判断：elseif (ndims(T)==2)
+  Z = sum(T,2);  % 详解: 赋值：将 sum(...) 的结果保存到 Z
+  S = Z + (Z==0);  % 详解: 赋值：计算表达式并保存到 S
+  norm = repmat(S, 1, size(T,2));  % 详解: 赋值：将 repmat(...) 的结果保存到 norm
+  T = T ./ norm;  % 详解: 赋值：计算表达式并保存到 T
+else  % 详解: 条件判断：else 分支
+  ns = size(T);  % 详解: 赋值：将 size(...) 的结果保存到 ns
+  T = reshape(T, prod(ns(1:end-1)), ns(end));  % 详解: 赋值：将 reshape(...) 的结果保存到 T
+  Z = sum(T,2);  % 详解: 赋值：将 sum(...) 的结果保存到 Z
+  S = Z + (Z==0);  % 详解: 赋值：计算表达式并保存到 S
+  norm = repmat(S, 1, ns(end));  % 详解: 赋值：将 repmat(...) 的结果保存到 norm
+  T = T ./ norm;  % 详解: 赋值：计算表达式并保存到 T
+  T = reshape(T, ns);  % 详解: 赋值：将 reshape(...) 的结果保存到 T
+end  % 详解: 执行语句
+
+
+
+

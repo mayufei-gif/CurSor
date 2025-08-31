@@ -1,40 +1,38 @@
-function M = sample_discrete(prob, r, c)
-% SAMPLE_DISCRETE Like the built in 'rand', except we draw from a non-uniform discrete distrib.
-% M = sample_discrete(prob, r, c)
-%
-% Example: sample_discrete([0.8 0.2], 1, 10) generates a row vector of 10 random integers from {1,2},
-% where the prob. of being 1 is 0.8 and the prob of being 2 is 0.2.
+﻿% 文件: sample_discrete.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-n = length(prob);
+function M = sample_discrete(prob, r, c)  % 详解: 执行语句
 
-if nargin == 1
-  r = 1; c = 1;
-elseif nargin == 2
-  c == r;
-end
+n = length(prob);  % 详解: 赋值：将 length(...) 的结果保存到 n
 
-R = rand(r, c);
-M = ones(r, c);
-cumprob = cumsum(prob(:));
+if nargin == 1  % 详解: 条件判断：if (nargin == 1)
+  r = 1; c = 1;  % 详解: 赋值：计算表达式并保存到 r
+elseif nargin == 2  % 详解: 条件判断：elseif (nargin == 2)
+  c == r;  % 详解: 赋值：计算表达式并保存到 c
+end  % 详解: 执行语句
 
-if n < r*c
-  for i = 1:n-1
-    M = M + (R > cumprob(i));
-  end
-else
-  % loop over the smaller index - can be much faster if length(prob) >> r*c
-  cumprob2 = cumprob(1:end-1);
-  for i=1:r
-    for j=1:c
-      M(i,j) = sum(R(i,j) > cumprob2)+1;
-    end
-  end
-end
+R = rand(r, c);  % 详解: 赋值：将 rand(...) 的结果保存到 R
+M = ones(r, c);  % 详解: 赋值：将 ones(...) 的结果保存到 M
+cumprob = cumsum(prob(:));  % 详解: 赋值：将 cumsum(...) 的结果保存到 cumprob
+
+if n < r*c  % 详解: 条件判断：if (n < r*c)
+  for i = 1:n-1  % 详解: for 循环：迭代变量 i 遍历 1:n-1
+    M = M + (R > cumprob(i));  % 详解: 赋值：计算表达式并保存到 M
+  end  % 详解: 执行语句
+else  % 详解: 条件判断：else 分支
+  cumprob2 = cumprob(1:end-1);  % 详解: 赋值：将 cumprob(...) 的结果保存到 cumprob2
+  for i=1:r  % 详解: for 循环：迭代变量 i 遍历 1:r
+    for j=1:c  % 详解: for 循环：迭代变量 j 遍历 1:c
+      M(i,j) = sum(R(i,j) > cumprob2)+1;  % 详解: 统计：求和/均值/中位数
+    end  % 详解: 执行语句
+  end  % 详解: 执行语句
+end  % 详解: 执行语句
 
 
-% Slower, even though vectorized
-%cumprob = reshape(cumsum([0 prob(1:end-1)]), [1 1 n]);
-%M = sum(R(:,:,ones(n,1)) > cumprob(ones(r,1),ones(c,1),:), 3);
 
-% convert using a binning algorithm
-%M=bindex(R,cumprob);
+
+
+
+

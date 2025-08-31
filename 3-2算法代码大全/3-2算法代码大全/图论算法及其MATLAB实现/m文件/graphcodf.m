@@ -1,89 +1,89 @@
-function [k C W]=graphcodf(M)
+﻿% 文件: graphcodf.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-% function [k C W]=graphcodf(M)
-% ��ͼ�ϵ�ĳ������Ⱦɫ��Ȼ����䲻���ڵĶ���Ⱦɫ���ٶ����������ÿ���߽���Ⱦɫ�������������
-% �߼����е�ÿ���ߵĲ����ڵı߽���Ⱦɫ���ظ����Ϲ��̡��õ�ͼ��ȫȾɫ������
-% kΪȫȾɫ����CΪͼ�����Ⱦɫ������WΪͼ�߼��ϵ�Ⱦɫ������
-% �ߵ�Ⱦɫ������ʵ���Ը���Ϊһ������
-% MΪ����ͼ���ڽӾ���
+function [k C W]=graphcodf(M)  % 详解: 函数定义：graphcodf(M), 返回：k C W
 
 
-% making matrix
-G=M;
-n=size(G,1);
+
+G=M;  % 详解: 赋值：计算表达式并保存到 G
+n=size(G,1);  % 详解: 赋值：将 size(...) 的结果保存到 n
 
 
-W=G;
-for i=1:n
-    for j=1:(i-1)
-        W(i,j)=0;
-    end
-end
-C=zeros(1,n);
-i=1;k=1;
-Z=[1:n];
-while sum(find(C==0))
-% ��û��Ⱦɫ�Ķ���Ⱦɫ
-    if C(1,i)==0
-        C(1,i)=k;
-        Sn=find(G(i,:)~=0);
-        flag=1;
-        while flag
-           tc=setdiff(Z,Sn);
-           if isempty(tc)
-               flag=0;
-           else
-               c=G(tc(1),:);
-               c(1,tc(1))=1;
-               C(tc(1))=k;
-               Sn1=find(c~=0);
-               Sn=union(Sn,Sn1);
-           end
-        end
-    end
-% ����Ӧ�ı߼��Ͻ���Ⱦɫ
-for j=(i+1):n
-    W1=W;
-    if W(i,j)==1
-        k=k+1;
-           W(i,j)=k;
-           W1(:,i)=0;W1(:,j)=0;
-           W1(i,:)=0;W1(j,:)=0;
-           m=0;
-        while sum(sum(W1))~=0 & m==0
-           c2=find(W1~=0);
-           c3=find(W==1);
-           c4=intersect(c2,c3);
-           if ~isempty(c4)
-               k1=floor(c4(1)/n);
-               k2=mod(c4(1),n);
-               if k2==0
-                   k2=n;
-               end
-               W1(k2,:)=0;W1(:,k2)=0;
-               W1((k1+1),:)=0;W1(:,(k1+1))=0;
-               if k1+1<k2
-                   W((k1+1),k2)=k;
-               else
-                   W(k2,(k1+1))=k;
-               end
-           else
-               m=1;
-           end
-        end
-    end
-end
-i=i+1;k=k+1;
-end
-k=k-1;m=0;
-for i=1:k
-    t1=find(C==i);
-    t2=find(W==i);
-    t3=sum(t1);
-    t4=sum(sum(t2));
-    t5=t3+t4;
-    if t5~=0
-        m=m+1;
-    end
-end
-k=m;
+W=G;  % 详解: 赋值：计算表达式并保存到 W
+for i=1:n  % 详解: for 循环：迭代变量 i 遍历 1:n
+    for j=1:(i-1)  % 详解: for 循环：迭代变量 j 遍历 1:(i-1)
+        W(i,j)=0;  % 详解: 执行语句
+    end  % 详解: 执行语句
+end  % 详解: 执行语句
+C=zeros(1,n);  % 详解: 赋值：将 zeros(...) 的结果保存到 C
+i=1;k=1;  % 详解: 赋值：计算表达式并保存到 i
+Z=[1:n];  % 详解: 赋值：计算表达式并保存到 Z
+while sum(find(C==0))  % 详解: while 循环：当 (sum(find(C==0))) 为真时迭代
+    if C(1,i)==0  % 详解: 条件判断：if (C(1,i)==0)
+        C(1,i)=k;  % 详解: 执行语句
+        Sn=find(G(i,:)~=0);  % 详解: 赋值：将 find(...) 的结果保存到 Sn
+        flag=1;  % 详解: 赋值：计算表达式并保存到 flag
+        while flag  % 详解: while 循环：当 (flag) 为真时迭代
+           tc=setdiff(Z,Sn);  % 详解: 赋值：将 setdiff(...) 的结果保存到 tc
+           if isempty(tc)  % 详解: 条件判断：if (isempty(tc))
+               flag=0;  % 详解: 赋值：计算表达式并保存到 flag
+           else  % 详解: 条件判断：else 分支
+               c=G(tc(1),:);  % 详解: 赋值：将 G(...) 的结果保存到 c
+               c(1,tc(1))=1;  % 详解: 执行语句
+               C(tc(1))=k;  % 详解: 执行语句
+               Sn1=find(c~=0);  % 详解: 赋值：将 find(...) 的结果保存到 Sn1
+               Sn=union(Sn,Sn1);  % 详解: 赋值：将 union(...) 的结果保存到 Sn
+           end  % 详解: 执行语句
+        end  % 详解: 执行语句
+    end  % 详解: 执行语句
+for j=(i+1):n  % 详解: for 循环：迭代变量 j 遍历 (i+1):n
+    W1=W;  % 详解: 赋值：计算表达式并保存到 W1
+    if W(i,j)==1  % 详解: 条件判断：if (W(i,j)==1)
+        k=k+1;  % 详解: 赋值：计算表达式并保存到 k
+           W(i,j)=k;  % 详解: 执行语句
+           W1(:,i)=0;W1(:,j)=0;  % 详解: 执行语句
+           W1(i,:)=0;W1(j,:)=0;  % 详解: 执行语句
+           m=0;  % 详解: 赋值：计算表达式并保存到 m
+        while sum(sum(W1))~=0 & m==0  % 详解: while 循环：当 (sum(sum(W1))~=0 & m==0) 为真时迭代
+           c2=find(W1~=0);  % 详解: 赋值：将 find(...) 的结果保存到 c2
+           c3=find(W==1);  % 详解: 赋值：将 find(...) 的结果保存到 c3
+           c4=intersect(c2,c3);  % 详解: 赋值：将 intersect(...) 的结果保存到 c4
+           if ~isempty(c4)  % 详解: 条件判断：if (~isempty(c4))
+               k1=floor(c4(1)/n);  % 详解: 赋值：将 floor(...) 的结果保存到 k1
+               k2=mod(c4(1),n);  % 详解: 赋值：将 mod(...) 的结果保存到 k2
+               if k2==0  % 详解: 条件判断：if (k2==0)
+                   k2=n;  % 详解: 赋值：计算表达式并保存到 k2
+               end  % 详解: 执行语句
+               W1(k2,:)=0;W1(:,k2)=0;  % 详解: 执行语句
+               W1((k1+1),:)=0;W1(:,(k1+1))=0;  % 详解: 执行语句
+               if k1+1<k2  % 详解: 条件判断：if (k1+1<k2)
+                   W((k1+1),k2)=k;  % 详解: 执行语句
+               else  % 详解: 条件判断：else 分支
+                   W(k2,(k1+1))=k;  % 详解: 执行语句
+               end  % 详解: 执行语句
+           else  % 详解: 条件判断：else 分支
+               m=1;  % 详解: 赋值：计算表达式并保存到 m
+           end  % 详解: 执行语句
+        end  % 详解: 执行语句
+    end  % 详解: 执行语句
+end  % 详解: 执行语句
+i=i+1;k=k+1;  % 详解: 赋值：计算表达式并保存到 i
+end  % 详解: 执行语句
+k=k-1;m=0;  % 详解: 赋值：计算表达式并保存到 k
+for i=1:k  % 详解: for 循环：迭代变量 i 遍历 1:k
+    t1=find(C==i);  % 详解: 赋值：将 find(...) 的结果保存到 t1
+    t2=find(W==i);  % 详解: 赋值：将 find(...) 的结果保存到 t2
+    t3=sum(t1);  % 详解: 赋值：将 sum(...) 的结果保存到 t3
+    t4=sum(sum(t2));  % 详解: 赋值：将 sum(...) 的结果保存到 t4
+    t5=t3+t4;  % 详解: 赋值：计算表达式并保存到 t5
+    if t5~=0  % 详解: 条件判断：if (t5~=0)
+        m=m+1;  % 详解: 赋值：计算表达式并保存到 m
+    end  % 详解: 执行语句
+end  % 详解: 执行语句
+k=m;  % 详解: 赋值：计算表达式并保存到 k
+
+
+
+

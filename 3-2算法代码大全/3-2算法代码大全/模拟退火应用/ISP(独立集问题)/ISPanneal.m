@@ -1,42 +1,50 @@
+﻿% 文件: ISPanneal.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
+
 %function [e,f]=ISPanneal(L,s,t,dt,lamda,w,N)
 %
-%����������(Independent Set Problem)���˻��㷨
-%����ͼG=(V,E),Ҫ��V��������������������V'����V,
-%�������е��������㶼������
+%独立集问题(Independent Set Problem)的退火算法
+%设有图G=(V,E),要找V的最大独立集，即找最大的V'属于V,
+%满足其中的任意两点都不关联
 %
-%NΪ�����ģ�����ڵ������wΪȨ����
-%eΪ��0��1ΪԪ�ص����飬����ʾ�����Ӽ�
-%lamda��һ������1�ķ���������
+%N为问题规模，即节点个数；w为权矩阵
+%e为以0、1为元素的数组，来表示两个子集
+%lamda是一个大于1的罚函数因子
 %
-%L��ȡ�ϴ�ֵ����500��1000��
-%sȡ1��2�ȣ�tΪ��ʼ�¶ȣ��ο���ΧΪ0.5--2��
-%dtΪ˥�����ӣ�һ�㲻С��0.9;
-%L��s��t��dtӦͨ�����������ȷ�����Ի���Ż��Ľ��
-%�ο�������ֵ�����㷨--ģ���˻��㷨����ѧ������
+%L可取较大值，如500、1000；
+%s取1、2等；t为初始温度，参考范围为0.5--2；
+%dt为衰减因子，一般不小于0.9;
+%L、s、t、dt应通过多次试验来确定，以获得优化的结果
+%参考《非数值并行算法--模拟退火算法》科学出版社
 
-function [e,f]=ISPanneal(L,s,t,dt,lamda,w,N)
-f=0;
-e=zeros(1,N);
+function [e,f]=ISPanneal(L,s,t,dt,lamda,w,N)  % 详解: 函数定义：ISPanneal(L,s,t,dt,lamda,w,N), 返回：e,f
+f=0;  % 详解: 赋值：计算表达式并保存到 f
+e=zeros(1,N);  % 详解: 赋值：将 zeros(...) 的结果保存到 e
 
-s0=0;
-while 1
-    a=0;
-    for k=1:L
-        [u,df]=ISPgen(e,N,w,lamda);
-        if ISPacc(df,t)
-              e(u)=1-e(u);
-              f=f+df;
-              a=1;
-        end
-    end
-    disp(e);disp(f);
-    t=t*dt
-    if a==0
-        s0=s0+1;
-    else 
-        s0=0;
-    end
-    if s0==s
-        break;
-    end
-end
+s0=0;  % 详解: 赋值：计算表达式并保存到 s0
+while 1  % 详解: while 循环：当 (1) 为真时迭代
+    a=0;  % 详解: 赋值：计算表达式并保存到 a
+    for k=1:L  % 详解: for 循环：迭代变量 k 遍历 1:L
+        [u,df]=ISPgen(e,N,w,lamda);  % 详解: 执行语句
+        if ISPacc(df,t)  % 详解: 条件判断：if (ISPacc(df,t))
+              e(u)=1-e(u);  % 详解: 调用函数：e(u)=1-e(u)
+              f=f+df;  % 详解: 赋值：计算表达式并保存到 f
+              a=1;  % 详解: 赋值：计算表达式并保存到 a
+        end  % 详解: 执行语句
+    end  % 详解: 执行语句
+    disp(e);disp(f);  % 详解: 调用函数：disp(e);disp(f)
+    t=t*dt  % 详解: 赋值：计算表达式并保存到 t
+    if a==0  % 详解: 条件判断：if (a==0)
+        s0=s0+1;  % 详解: 赋值：计算表达式并保存到 s0
+    else  % 详解: 条件判断：else 分支
+        s0=0;  % 详解: 赋值：计算表达式并保存到 s0
+    end  % 详解: 执行语句
+    if s0==s  % 详解: 条件判断：if (s0==s)
+        break;  % 详解: 跳出循环：break
+    end  % 详解: 执行语句
+end  % 详解: 执行语句
+
+
+

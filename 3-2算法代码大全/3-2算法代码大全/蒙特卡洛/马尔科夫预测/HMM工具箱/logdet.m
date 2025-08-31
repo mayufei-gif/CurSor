@@ -1,8 +1,14 @@
-function y = logdet(A)
-% log(det(A)) where A is positive-definite.
-% This is faster and more stable than using log(det(A)).
+﻿% 文件: logdet.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-%  From Tom Minka's lightspeed toolbox
+function y = logdet(A)  % 详解: 执行语句
 
-U = chol(A);
-y = 2*sum(log(diag(U)));
+
+U = chol(A);  % 详解: 赋值：将 chol(...) 的结果保存到 U
+y = 2*sum(log(diag(U)));  % 详解: 赋值：计算表达式并保存到 y
+
+
+
+

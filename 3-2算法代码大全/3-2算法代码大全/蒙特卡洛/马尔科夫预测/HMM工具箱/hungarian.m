@@ -1,464 +1,301 @@
-function [C,T]=hungarian(A)
-%HUNGARIAN Solve the Assignment problem using the Hungarian method.
-%
-%[C,T]=hungarian(A)
-%A - a square cost matrix.
-%C - the optimal assignment.
-%T - the cost of the optimal assignment.
+﻿% 文件: hungarian.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-% Adapted from the FORTRAN IV code in Carpaneto and Toth, "Algorithm 548:
-% Solution of the assignment problem [H]", ACM Transactions on
-% Mathematical Software, 6(1):104-111, 1980.
+function [C,T]=hungarian(A)  % 详解: 函数定义：hungarian(A), 返回：C,T
 
-% v1.0  96-06-14. Niclas Borlin, niclas@cs.umu.se.
-%                 Department of Computing Science, Ume� University,
-%                 Sweden. 
-%                 All standard disclaimers apply.
 
-% A substantial effort was put into this code. If you use it for a
-% publication or otherwise, please include an acknowledgement or at least
-% notify me by email. /Niclas
 
-[m,n]=size(A);
 
-if (m~=n)
-    error('HUNGARIAN: Cost matrix must be square!');
-end
+[m,n]=size(A);  % 详解: 获取向量/矩阵尺寸
 
-% Save original cost matrix.
-orig=A;
+if (m~=n)  % 详解: 条件判断：if ((m~=n))
+    error('HUNGARIAN: Cost matrix must be square!');  % 详解: 调用函数：error('HUNGARIAN: Cost matrix must be square!')
+end  % 详解: 执行语句
 
-% Reduce matrix.
-A=hminired(A);
+orig=A;  % 详解: 赋值：计算表达式并保存到 orig
 
-% Do an initial assignment.
-[A,C,U]=hminiass(A);
+A=hminired(A);  % 详解: 赋值：将 hminired(...) 的结果保存到 A
 
-% Repeat while we have unassigned rows.
-while (U(n+1))
-    % Start with no path, no unchecked zeros, and no unexplored rows.
-    LR=zeros(1,n);
-    LC=zeros(1,n);
-    CH=zeros(1,n);
-    RH=[zeros(1,n) -1];
+[A,C,U]=hminiass(A);  % 详解: 执行语句
+
+while (U(n+1))  % 详解: while 循环：当 ((U(n+1))) 为真时迭代
+    LR=zeros(1,n);  % 详解: 赋值：将 zeros(...) 的结果保存到 LR
+    LC=zeros(1,n);  % 详解: 赋值：将 zeros(...) 的结果保存到 LC
+    CH=zeros(1,n);  % 详解: 赋值：将 zeros(...) 的结果保存到 CH
+    RH=[zeros(1,n) -1];  % 详解: 赋值：计算表达式并保存到 RH
     
-    % No labelled columns.
-    SLC=[];
+    SLC=[];  % 详解: 赋值：计算表达式并保存到 SLC
     
-    % Start path in first unassigned row.
-    r=U(n+1);
-    % Mark row with end-of-path label.
-    LR(r)=-1;
-    % Insert row first in labelled row set.
-    SLR=r;
+    r=U(n+1);  % 详解: 赋值：将 U(...) 的结果保存到 r
+    LR(r)=-1;  % 详解: 执行语句
+    SLR=r;  % 详解: 赋值：计算表达式并保存到 SLR
     
-    % Repeat until we manage to find an assignable zero.
-    while (1)
-        % If there are free zeros in row r
-        if (A(r,n+1)~=0)
-            % ...get column of first free zero.
-            l=-A(r,n+1);
+    while (1)  % 详解: while 循环：当 ((1)) 为真时迭代
+        if (A(r,n+1)~=0)  % 详解: 条件判断：if ((A(r,n+1)~=0))
+            l=-A(r,n+1);  % 详解: 赋值：计算表达式并保存到 l
             
-            % If there are more free zeros in row r and row r in not
-            % yet marked as unexplored..
-            if (A(r,l)~=0 & RH(r)==0)
-                % Insert row r first in unexplored list.
-                RH(r)=RH(n+1);
-                RH(n+1)=r;
+            if (A(r,l)~=0 & RH(r)==0)  % 详解: 条件判断：if ((A(r,l)~=0 & RH(r)==0))
+                RH(r)=RH(n+1);  % 详解: 调用函数：RH(r)=RH(n+1)
+                RH(n+1)=r;  % 详解: 执行语句
                 
-                % Mark in which column the next unexplored zero in this row
-                % is.
-                CH(r)=-A(r,l);
-            end
-        else
-            % If all rows are explored..
-            if (RH(n+1)<=0)
-                % Reduce matrix.
-                [A,CH,RH]=hmreduce(A,CH,RH,LC,LR,SLC,SLR);
-            end
+                CH(r)=-A(r,l);  % 详解: 调用函数：CH(r)=-A(r,l)
+            end  % 详解: 执行语句
+        else  % 详解: 条件判断：else 分支
+            if (RH(n+1)<=0)  % 详解: 条件判断：if ((RH(n+1)<=0))
+                [A,CH,RH]=hmreduce(A,CH,RH,LC,LR,SLC,SLR);  % 详解: 执行语句
+            end  % 详解: 执行语句
             
-            % Re-start with first unexplored row.
-            r=RH(n+1);
-            % Get column of next free zero in row r.
-            l=CH(r);
-            % Advance "column of next free zero".
-            CH(r)=-A(r,l);
-            % If this zero is last in the list..
-            if (A(r,l)==0)
-                % ...remove row r from unexplored list.
-                RH(n+1)=RH(r);
-                RH(r)=0;
-            end
-        end
+            r=RH(n+1);  % 详解: 赋值：将 RH(...) 的结果保存到 r
+            l=CH(r);  % 详解: 赋值：将 CH(...) 的结果保存到 l
+            CH(r)=-A(r,l);  % 详解: 调用函数：CH(r)=-A(r,l)
+            if (A(r,l)==0)  % 详解: 条件判断：if ((A(r,l)==0))
+                RH(n+1)=RH(r);  % 详解: 调用函数：RH(n+1)=RH(r)
+                RH(r)=0;  % 详解: 执行语句
+            end  % 详解: 执行语句
+        end  % 详解: 执行语句
         
-        % While the column l is labelled, i.e. in path.
-        while (LC(l)~=0)
-            % If row r is explored..
-            if (RH(r)==0)
-                % If all rows are explored..
-                if (RH(n+1)<=0)
-                    % Reduce cost matrix.
-                    [A,CH,RH]=hmreduce(A,CH,RH,LC,LR,SLC,SLR);
-                end
+        while (LC(l)~=0)  % 详解: while 循环：当 ((LC(l)~=0)) 为真时迭代
+            if (RH(r)==0)  % 详解: 条件判断：if ((RH(r)==0))
+                if (RH(n+1)<=0)  % 详解: 条件判断：if ((RH(n+1)<=0))
+                    [A,CH,RH]=hmreduce(A,CH,RH,LC,LR,SLC,SLR);  % 详解: 执行语句
+                end  % 详解: 执行语句
                 
-                % Re-start with first unexplored row.
-                r=RH(n+1);
-            end
+                r=RH(n+1);  % 详解: 赋值：将 RH(...) 的结果保存到 r
+            end  % 详解: 执行语句
             
-            % Get column of next free zero in row r.
-            l=CH(r);
+            l=CH(r);  % 详解: 赋值：将 CH(...) 的结果保存到 l
             
-            % Advance "column of next free zero".
-            CH(r)=-A(r,l);
+            CH(r)=-A(r,l);  % 详解: 调用函数：CH(r)=-A(r,l)
             
-            % If this zero is last in list..
-            if(A(r,l)==0)
-                % ...remove row r from unexplored list.
-                RH(n+1)=RH(r);
-                RH(r)=0;
-            end
-        end
+            if(A(r,l)==0)  % 详解: 调用函数：if(A(r,l)==0)
+                RH(n+1)=RH(r);  % 详解: 调用函数：RH(n+1)=RH(r)
+                RH(r)=0;  % 详解: 执行语句
+            end  % 详解: 执行语句
+        end  % 详解: 执行语句
         
-        % If the column found is unassigned..
-        if (C(l)==0)
-            % Flip all zeros along the path in LR,LC.
-            [A,C,U]=hmflip(A,C,LC,LR,U,l,r);
-            % ...and exit to continue with next unassigned row.
-            break;
-        else
-            % ...else add zero to path.
+        if (C(l)==0)  % 详解: 条件判断：if ((C(l)==0))
+            [A,C,U]=hmflip(A,C,LC,LR,U,l,r);  % 详解: 执行语句
+            break;  % 详解: 跳出循环：break
+        else  % 详解: 条件判断：else 分支
             
-            % Label column l with row r.
-            LC(l)=r;
+            LC(l)=r;  % 详解: 执行语句
             
-            % Add l to the set of labelled columns.
-            SLC=[SLC l];
+            SLC=[SLC l];  % 详解: 赋值：计算表达式并保存到 SLC
             
-            % Continue with the row assigned to column l.
-            r=C(l);
+            r=C(l);  % 详解: 赋值：将 C(...) 的结果保存到 r
             
-            % Label row r with column l.
-            LR(r)=l;
+            LR(r)=l;  % 详解: 执行语句
             
-            % Add r to the set of labelled rows.
-            SLR=[SLR r];
-        end
-    end
-end
+            SLR=[SLR r];  % 详解: 赋值：计算表达式并保存到 SLR
+        end  % 详解: 执行语句
+    end  % 详解: 执行语句
+end  % 详解: 执行语句
 
-% Calculate the total cost.
-T=sum(orig(logical(sparse(C,1:size(orig,2),1))));
+T=sum(orig(logical(sparse(C,1:size(orig,2),1))));  % 详解: 赋值：将 sum(...) 的结果保存到 T
 
 
-function A=hminired(A)
-%HMINIRED Initial reduction of cost matrix for the Hungarian method.
-%
-%B=assredin(A)
-%A - the unreduced cost matris.
-%B - the reduced cost matrix with linked zeros in each row.
-
-% v1.0  96-06-13. Niclas Borlin, niclas@cs.umu.se.
-
-[m,n]=size(A);
-
-% Subtract column-minimum values from each column.
-colMin=min(A);
-A=A-colMin(ones(n,1),:);
-
-% Subtract row-minimum values from each row.
-rowMin=min(A')';
-A=A-rowMin(:,ones(1,n));
-
-% Get positions of all zeros.
-[i,j]=find(A==0);
-
-% Extend A to give room for row zero list header column.
-A(1,n+1)=0;
-for k=1:n
-    % Get all column in this row. 
-    cols=j(k==i)';
-    % Insert pointers in matrix.
-    A(k,[n+1 cols])=[-cols 0];
-end
+function A=hminired(A)  % 详解: 执行语句
 
 
-function [A,C,U]=hminiass(A)
-%HMINIASS Initial assignment of the Hungarian method.
-%
-%[B,C,U]=hminiass(A)
-%A - the reduced cost matrix.
-%B - the reduced cost matrix, with assigned zeros removed from lists.
-%C - a vector. C(J)=I means row I is assigned to column J,
-%              i.e. there is an assigned zero in position I,J.
-%U - a vector with a linked list of unassigned rows.
+[m,n]=size(A);  % 详解: 获取向量/矩阵尺寸
 
-% v1.0  96-06-14. Niclas Borlin, niclas@cs.umu.se.
+colMin=min(A);  % 详解: 赋值：将 min(...) 的结果保存到 colMin
+A=A-colMin(ones(n,1),:);  % 详解: 赋值：计算表达式并保存到 A
 
-[n,np1]=size(A);
+rowMin=min(A')';  % 详解: 赋值：将 min(...) 的结果保存到 rowMin
+A=A-rowMin(:,ones(1,n));  % 详解: 赋值：计算表达式并保存到 A
 
-% Initalize return vectors.
-C=zeros(1,n);
-U=zeros(1,n+1);
+[i,j]=find(A==0);  % 详解: 执行语句
 
-% Initialize last/next zero "pointers".
-LZ=zeros(1,n);
-NZ=zeros(1,n);
+A(1,n+1)=0;  % 详解: 执行语句
+for k=1:n  % 详解: for 循环：迭代变量 k 遍历 1:n
+    cols=j(k==i)';  % 赋值：设置变量 cols  % 详解: 赋值：将 j(...) 的结果保存到 cols  % 详解: 赋值：将 j(...) 的结果保存到 cols
+    A(k,[n+1 cols])=[-cols 0];  % 详解: 执行语句
+end  % 详解: 执行语句
 
-for i=1:n
-    % Set j to first unassigned zero in row i.
-	lj=n+1;
-	j=-A(i,lj);
 
-    % Repeat until we have no more zeros (j==0) or we find a zero
-	% in an unassigned column (c(j)==0).
+function [A,C,U]=hminiass(A)  % 详解: 函数定义：hminiass(A), 返回：A,C,U
+
+
+[n,np1]=size(A);  % 详解: 获取向量/矩阵尺寸
+
+C=zeros(1,n);  % 详解: 赋值：将 zeros(...) 的结果保存到 C
+U=zeros(1,n+1);  % 详解: 赋值：将 zeros(...) 的结果保存到 U
+
+LZ=zeros(1,n);  % 详解: 赋值：将 zeros(...) 的结果保存到 LZ
+NZ=zeros(1,n);  % 详解: 赋值：将 zeros(...) 的结果保存到 NZ
+
+for i=1:n  % 详解: for 循环：迭代变量 i 遍历 1:n
+	lj=n+1;  % 详解: 赋值：计算表达式并保存到 lj
+	j=-A(i,lj);  % 详解: 赋值：计算表达式并保存到 j
+
     
-	while (C(j)~=0)
-		% Advance lj and j in zero list.
-		lj=j;
-		j=-A(i,lj);
+	while (C(j)~=0)  % 详解: while 循环：当 ((C(j)~=0)) 为真时迭代
+		lj=j;  % 详解: 赋值：计算表达式并保存到 lj
+		j=-A(i,lj);  % 详解: 赋值：计算表达式并保存到 j
 	
-		% Stop if we hit end of list.
-		if (j==0)
-			break;
-		end
-	end
+		if (j==0)  % 详解: 条件判断：if ((j==0))
+			break;  % 详解: 跳出循环：break
+		end  % 详解: 执行语句
+	end  % 详解: 执行语句
 
-	if (j~=0)
-		% We found a zero in an unassigned column.
+	if (j~=0)  % 详解: 条件判断：if ((j~=0))
 		
-		% Assign row i to column j.
-		C(j)=i;
+		C(j)=i;  % 详解: 执行语句
 		
-		% Remove A(i,j) from unassigned zero list.
-		A(i,lj)=A(i,j);
+		A(i,lj)=A(i,j);  % 详解: 调用函数：A(i,lj)=A(i,j)
 
-		% Update next/last unassigned zero pointers.
-		NZ(i)=-A(i,j);
-		LZ(i)=lj;
+		NZ(i)=-A(i,j);  % 详解: 调用函数：NZ(i)=-A(i,j)
+		LZ(i)=lj;  % 详解: 执行语句
 
-		% Indicate A(i,j) is an assigned zero.
-		A(i,j)=0;
-	else
-		% We found no zero in an unassigned column.
+		A(i,j)=0;  % 详解: 执行语句
+	else  % 详解: 条件判断：else 分支
 
-		% Check all zeros in this row.
 
-		lj=n+1;
-		j=-A(i,lj);
+		lj=n+1;  % 详解: 赋值：计算表达式并保存到 lj
+		j=-A(i,lj);  % 详解: 赋值：计算表达式并保存到 j
 		
-		% Check all zeros in this row for a suitable zero in another row.
-		while (j~=0)
-			% Check the in the row assigned to this column.
-			r=C(j);
+		while (j~=0)  % 详解: while 循环：当 ((j~=0)) 为真时迭代
+			r=C(j);  % 详解: 赋值：将 C(...) 的结果保存到 r
 			
-			% Pick up last/next pointers.
-			lm=LZ(r);
-			m=NZ(r);
+			lm=LZ(r);  % 详解: 赋值：将 LZ(...) 的结果保存到 lm
+			m=NZ(r);  % 详解: 赋值：将 NZ(...) 的结果保存到 m
 			
-			% Check all unchecked zeros in free list of this row.
-			while (m~=0)
-				% Stop if we find an unassigned column.
-				if (C(m)==0)
-					break;
-				end
+			while (m~=0)  % 详解: while 循环：当 ((m~=0)) 为真时迭代
+				if (C(m)==0)  % 详解: 条件判断：if ((C(m)==0))
+					break;  % 详解: 跳出循环：break
+				end  % 详解: 执行语句
 				
-				% Advance one step in list.
-				lm=m;
-				m=-A(r,lm);
-			end
+				lm=m;  % 详解: 赋值：计算表达式并保存到 lm
+				m=-A(r,lm);  % 详解: 赋值：计算表达式并保存到 m
+			end  % 详解: 执行语句
 			
-			if (m==0)
-				% We failed on row r. Continue with next zero on row i.
-				lj=j;
-				j=-A(i,lj);
-			else
-				% We found a zero in an unassigned column.
+			if (m==0)  % 详解: 条件判断：if ((m==0))
+				lj=j;  % 详解: 赋值：计算表达式并保存到 lj
+				j=-A(i,lj);  % 详解: 赋值：计算表达式并保存到 j
+			else  % 详解: 条件判断：else 分支
 			
-				% Replace zero at (r,m) in unassigned list with zero at (r,j)
-				A(r,lm)=-j;
-				A(r,j)=A(r,m);
+				A(r,lm)=-j;  % 详解: 执行语句
+				A(r,j)=A(r,m);  % 详解: 调用函数：A(r,j)=A(r,m)
 			
-				% Update last/next pointers in row r.
-				NZ(r)=-A(r,m);
-				LZ(r)=j;
+				NZ(r)=-A(r,m);  % 详解: 调用函数：NZ(r)=-A(r,m)
+				LZ(r)=j;  % 详解: 执行语句
 			
-				% Mark A(r,m) as an assigned zero in the matrix . . .
-				A(r,m)=0;
+				A(r,m)=0;  % 详解: 执行语句
 			
-				% ...and in the assignment vector.
-				C(m)=r;
+				C(m)=r;  % 详解: 执行语句
 			
-				% Remove A(i,j) from unassigned list.
-				A(i,lj)=A(i,j);
+				A(i,lj)=A(i,j);  % 详解: 调用函数：A(i,lj)=A(i,j)
 			
-				% Update last/next pointers in row r.
-				NZ(i)=-A(i,j);
-				LZ(i)=lj;
+				NZ(i)=-A(i,j);  % 详解: 调用函数：NZ(i)=-A(i,j)
+				LZ(i)=lj;  % 详解: 执行语句
 			
-				% Mark A(r,m) as an assigned zero in the matrix . . .
-				A(i,j)=0;
+				A(i,j)=0;  % 详解: 执行语句
 			
-				% ...and in the assignment vector.
-				C(j)=i;
+				C(j)=i;  % 详解: 执行语句
 				
-				% Stop search.
-				break;
-			end
-		end
-	end
-end
-
-% Create vector with list of unassigned rows.
-
-% Mark all rows have assignment.
-r=zeros(1,n);
-rows=C(C~=0);
-r(rows)=rows;
-empty=find(r==0);
-
-% Create vector with linked list of unassigned rows.
-U=zeros(1,n+1);
-U([n+1 empty])=[empty 0];
+				break;  % 详解: 跳出循环：break
+			end  % 详解: 执行语句
+		end  % 详解: 执行语句
+	end  % 详解: 执行语句
+end  % 详解: 执行语句
 
 
-function [A,C,U]=hmflip(A,C,LC,LR,U,l,r)
-%HMFLIP Flip assignment state of all zeros along a path.
-%
-%[A,C,U]=hmflip(A,C,LC,LR,U,l,r)
-%Input:
-%A   - the cost matrix.
-%C   - the assignment vector.
-%LC  - the column label vector.
-%LR  - the row label vector.
-%U   - the 
-%r,l - position of last zero in path.
-%Output:
-%A   - updated cost matrix.
-%C   - updated assignment vector.
-%U   - updated unassigned row list vector.
+r=zeros(1,n);  % 详解: 赋值：将 zeros(...) 的结果保存到 r
+rows=C(C~=0);  % 详解: 赋值：将 C(...) 的结果保存到 rows
+r(rows)=rows;  % 详解: 执行语句
+empty=find(r==0);  % 详解: 赋值：将 find(...) 的结果保存到 empty
 
-% v1.0  96-06-14. Niclas Borlin, niclas@cs.umu.se.
+U=zeros(1,n+1);  % 详解: 赋值：将 zeros(...) 的结果保存到 U
+U([n+1 empty])=[empty 0];  % 详解: 执行语句
 
-n=size(A,1);
 
-while (1)
-    % Move assignment in column l to row r.
-    C(l)=r;
+function [A,C,U]=hmflip(A,C,LC,LR,U,l,r)  % 详解: 函数定义：hmflip(A,C,LC,LR,U,l,r), 返回：A,C,U
+
+
+n=size(A,1);  % 详解: 赋值：将 size(...) 的结果保存到 n
+
+while (1)  % 详解: while 循环：当 ((1)) 为真时迭代
+    C(l)=r;  % 详解: 执行语句
     
-    % Find zero to be removed from zero list..
     
-    % Find zero before this.
-    m=find(A(r,:)==-l);
+    m=find(A(r,:)==-l);  % 详解: 赋值：将 find(...) 的结果保存到 m
     
-    % Link past this zero.
-    A(r,m)=A(r,l);
+    A(r,m)=A(r,l);  % 详解: 调用函数：A(r,m)=A(r,l)
     
-    A(r,l)=0;
+    A(r,l)=0;  % 详解: 执行语句
     
-    % If this was the first zero of the path..
-    if (LR(r)<0)
-        ...remove row from unassigned row list and return.
-        U(n+1)=U(r);
-        U(r)=0;
-        return;
-    else
+    if (LR(r)<0)  % 详解: 条件判断：if ((LR(r)<0))
+        ...remove row from unassigned row list and return.  % 详解: 执行语句
+        U(n+1)=U(r);  % 详解: 调用函数：U(n+1)=U(r)
+        U(r)=0;  % 详解: 执行语句
+        return;  % 详解: 返回：从当前函数返回
+    else  % 详解: 条件判断：else 分支
         
-        % Move back in this row along the path and get column of next zero.
-        l=LR(r);
+        l=LR(r);  % 详解: 赋值：将 LR(...) 的结果保存到 l
         
-        % Insert zero at (r,l) first in zero list.
-        A(r,l)=A(r,n+1);
-        A(r,n+1)=-l;
+        A(r,l)=A(r,n+1);  % 详解: 调用函数：A(r,l)=A(r,n+1)
+        A(r,n+1)=-l;  % 详解: 执行语句
         
-        % Continue back along the column to get row of next zero in path.
-        r=LC(l);
-    end
-end
+        r=LC(l);  % 详解: 赋值：将 LC(...) 的结果保存到 r
+    end  % 详解: 执行语句
+end  % 详解: 执行语句
 
 
-function [A,CH,RH]=hmreduce(A,CH,RH,LC,LR,SLC,SLR)
-%HMREDUCE Reduce parts of cost matrix in the Hungerian method.
-%
-%[A,CH,RH]=hmreduce(A,CH,RH,LC,LR,SLC,SLR)
-%Input:
-%A   - Cost matrix.
-%CH  - vector of column of 'next zeros' in each row.
-%RH  - vector with list of unexplored rows.
-%LC  - column labels.
-%RC  - row labels.
-%SLC - set of column labels.
-%SLR - set of row labels.
-%
-%Output:
-%A   - Reduced cost matrix.
-%CH  - Updated vector of 'next zeros' in each row.
-%RH  - Updated vector of unexplored rows.
+function [A,CH,RH]=hmreduce(A,CH,RH,LC,LR,SLC,SLR)  % 详解: 函数定义：hmreduce(A,CH,RH,LC,LR,SLC,SLR), 返回：A,CH,RH
 
-% v1.0  96-06-14. Niclas Borlin, niclas@cs.umu.se.
 
-n=size(A,1);
+n=size(A,1);  % 详解: 赋值：将 size(...) 的结果保存到 n
 
-% Find which rows are covered, i.e. unlabelled.
-coveredRows=LR==0;
+coveredRows=LR==0;  % 详解: 赋值：计算表达式并保存到 coveredRows
 
-% Find which columns are covered, i.e. labelled.
-coveredCols=LC~=0;
+coveredCols=LC~=0;  % 详解: 赋值：计算表达式并保存到 coveredCols
 
-r=find(~coveredRows);
-c=find(~coveredCols);
+r=find(~coveredRows);  % 详解: 赋值：将 find(...) 的结果保存到 r
+c=find(~coveredCols);  % 详解: 赋值：将 find(...) 的结果保存到 c
 
-% Get minimum of uncovered elements.
-m=min(min(A(r,c)));
+m=min(min(A(r,c)));  % 详解: 赋值：将 min(...) 的结果保存到 m
 
-% Subtract minimum from all uncovered elements.
-A(r,c)=A(r,c)-m;
+A(r,c)=A(r,c)-m;  % 详解: 执行语句
 
-% Check all uncovered columns..
-for j=c
-    % ...and uncovered rows in path order..
-    for i=SLR
-        % If this is a (new) zero..
-        if (A(i,j)==0)
-            % If the row is not in unexplored list..
-            if (RH(i)==0)
-                % ...insert it first in unexplored list.
-                RH(i)=RH(n+1);
-                RH(n+1)=i;
-                % Mark this zero as "next free" in this row.
-                CH(i)=j;
-            end
-            % Find last unassigned zero on row I.
-            row=A(i,:);
-            colsInList=-row(row<0);
-            if (length(colsInList)==0)
-                % No zeros in the list.
-                l=n+1;
-            else
-                l=colsInList(row(colsInList)==0);
-            end
-            % Append this zero to end of list.
-            A(i,l)=-j;
-        end
-    end
-end
+for j=c  % 详解: for 循环：迭代变量 j 遍历 c
+    for i=SLR  % 详解: for 循环：迭代变量 i 遍历 SLR
+        if (A(i,j)==0)  % 详解: 条件判断：if ((A(i,j)==0))
+            if (RH(i)==0)  % 详解: 条件判断：if ((RH(i)==0))
+                RH(i)=RH(n+1);  % 详解: 调用函数：RH(i)=RH(n+1)
+                RH(n+1)=i;  % 详解: 执行语句
+                CH(i)=j;  % 详解: 执行语句
+            end  % 详解: 执行语句
+            row=A(i,:);  % 详解: 赋值：将 A(...) 的结果保存到 row
+            colsInList=-row(row<0);  % 详解: 赋值：计算表达式并保存到 colsInList
+            if (length(colsInList)==0)  % 详解: 条件判断：if ((length(colsInList)==0))
+                l=n+1;  % 详解: 赋值：计算表达式并保存到 l
+            else  % 详解: 条件判断：else 分支
+                l=colsInList(row(colsInList)==0);  % 详解: 赋值：将 colsInList(...) 的结果保存到 l
+            end  % 详解: 执行语句
+            A(i,l)=-j;  % 详解: 执行语句
+        end  % 详解: 执行语句
+    end  % 详解: 执行语句
+end  % 详解: 执行语句
 
-% Add minimum to all doubly covered elements.
-r=find(coveredRows);
-c=find(coveredCols);
+r=find(coveredRows);  % 详解: 赋值：将 find(...) 的结果保存到 r
+c=find(coveredCols);  % 详解: 赋值：将 find(...) 的结果保存到 c
 
-% Take care of the zeros we will remove.
-[i,j]=find(A(r,c)<=0);
+[i,j]=find(A(r,c)<=0);  % 详解: 执行语句
 
-i=r(i);
-j=c(j);
+i=r(i);  % 详解: 赋值：将 r(...) 的结果保存到 i
+j=c(j);  % 详解: 赋值：将 c(...) 的结果保存到 j
 
-for k=1:length(i)
-    % Find zero before this in this row.
-    lj=find(A(i(k),:)==-j(k));
-    % Link past it.
-    A(i(k),lj)=A(i(k),j(k));
-    % Mark it as assigned.
-    A(i(k),j(k))=0;
-end
+for k=1:length(i)  % 详解: for 循环：迭代变量 k 遍历 1:length(i)
+    lj=find(A(i(k),:)==-j(k));  % 详解: 赋值：将 find(...) 的结果保存到 lj
+    A(i(k),lj)=A(i(k),j(k));  % 详解: 调用函数：A(i(k),lj)=A(i(k),j(k))
+    A(i(k),j(k))=0;  % 详解: 执行语句
+end  % 详解: 执行语句
 
-A(r,c)=A(r,c)+m;
+A(r,c)=A(r,c)+m;  % 详解: 执行语句
+
+
+
+

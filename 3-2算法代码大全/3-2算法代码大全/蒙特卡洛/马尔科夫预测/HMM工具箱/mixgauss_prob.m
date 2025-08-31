@@ -1,133 +1,85 @@
-function [B, B2] = mixgauss_prob(data, mu, Sigma, mixmat, unit_norm)
-% EVAL_PDF_COND_MOG Evaluate the pdf of a conditional mixture of Gaussians
-% function [B, B2] = eval_pdf_cond_mog(data, mu, Sigma, mixmat, unit_norm)
-%
-% Notation: Y is observation, M is mixture component, and both may be conditioned on Q.
-% If Q does not exist, ignore references to Q=j below.
-% Alternatively, you may ignore M if this is a conditional Gaussian.
-%
-% INPUTS:
-% data(:,t) = t'th observation vector 
-%
-% mu(:,k) = E[Y(t) | M(t)=k] 
-% or mu(:,j,k) = E[Y(t) | Q(t)=j, M(t)=k]
-%
-% Sigma(:,:,j,k) = Cov[Y(t) | Q(t)=j, M(t)=k]
-% or there are various faster, special cases:
-%   Sigma() - scalar, spherical covariance independent of M,Q.
-%   Sigma(:,:) diag or full, tied params independent of M,Q. 
-%   Sigma(:,:,j) tied params independent of M. 
-%
-% mixmat(k) = Pr(M(t)=k) = prior
-% or mixmat(j,k) = Pr(M(t)=k | Q(t)=j) 
-% Not needed if M is not defined.
-%
-% unit_norm - optional; if 1, means data(:,i) AND mu(:,i) each have unit norm (slightly faster)
-%
-% OUTPUT:
-% B(t) = Pr(y(t)) 
-% or
-% B(i,t) = Pr(y(t) | Q(t)=i) 
-% B2(i,k,t) = Pr(y(t) | Q(t)=i, M(t)=k) 
-%
-% If the number of mixture components differs depending on Q, just set the trailing
-% entries of mixmat to 0, e.g., 2 components if Q=1, 3 components if Q=2,
-% then set mixmat(1,3)=0. In this case, B2(1,3,:)=1.0.
+﻿% 文件: mixgauss_prob.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
+
+function [B, B2] = mixgauss_prob(data, mu, Sigma, mixmat, unit_norm)  % 详解: 函数定义：mixgauss_prob(data, mu, Sigma, mixmat, unit_norm), 返回：B, B2
 
 
 
 
-if isvector(mu) & size(mu,2)==1
-  d = length(mu);
-  Q = 1; M = 1;
-elseif ndims(mu)==2
-  [d Q] = size(mu);
-  M = 1;
-else
-  [d Q M] = size(mu);
-end
-[d T] = size(data);
+if isvector(mu) & size(mu,2)==1  % 详解: 条件判断：if (isvector(mu) & size(mu,2)==1)
+  d = length(mu);  % 详解: 赋值：将 length(...) 的结果保存到 d
+  Q = 1; M = 1;  % 详解: 赋值：计算表达式并保存到 Q
+elseif ndims(mu)==2  % 详解: 条件判断：elseif (ndims(mu)==2)
+  [d Q] = size(mu);  % 详解: 获取向量/矩阵尺寸
+  M = 1;  % 详解: 赋值：计算表达式并保存到 M
+else  % 详解: 条件判断：else 分支
+  [d Q M] = size(mu);  % 详解: 获取向量/矩阵尺寸
+end  % 详解: 执行语句
+[d T] = size(data);  % 详解: 获取向量/矩阵尺寸
 
-if nargin < 4, mixmat = ones(Q,1); end
-if nargin < 5, unit_norm = 0; end
+if nargin < 4, mixmat = ones(Q,1); end  % 详解: 条件判断：if (nargin < 4, mixmat = ones(Q,1); end)
+if nargin < 5, unit_norm = 0; end  % 详解: 条件判断：if (nargin < 5, unit_norm = 0; end)
 
-%B2 = zeros(Q,M,T); % ATB: not needed allways
-%B = zeros(Q,T);
 
-if isscalar(Sigma)
-  mu = reshape(mu, [d Q*M]);
-  if unit_norm % (p-q)'(p-q) = p'p + q'q - 2p'q = n+m -2p'q since p(:,i)'p(:,i)=1
-    %avoid an expensive repmat
-    disp('unit norm')
-    %tic; D = 2 -2*(data'*mu)'; toc 
-    D = 2 - 2*(mu'*data);
-    tic; D2 = sqdist(data, mu)'; toc
-    assert(approxeq(D,D2)) 
-  else
-    D = sqdist(data, mu)';
-  end
-  clear mu data % ATB: clear big old data
-  % D(qm,t) = sq dist between data(:,t) and mu(:,qm)
-  logB2 = -(d/2)*log(2*pi*Sigma) - (1/(2*Sigma))*D; % det(sigma*I) = sigma^d
-  B2 = reshape(exp(logB2), [Q M T]);
-  clear logB2 % ATB: clear big old data
+if isscalar(Sigma)  % 详解: 条件判断：if (isscalar(Sigma))
+  mu = reshape(mu, [d Q*M]);  % 详解: 赋值：将 reshape(...) 的结果保存到 mu
+  if unit_norm  % 详解: 条件判断：if (unit_norm)
+    disp('unit norm')  % 详解: 调用函数：disp('unit norm')
+    D = 2 - 2*(mu'*data);  % 赋值：设置变量 D  % 详解: 赋值：计算表达式并保存到 D  % 详解: 赋值：计算表达式并保存到 D
+    tic; D2 = sqdist(data, mu)'; toc  % 执行语句  % 详解: 执行语句  % 详解: 执行语句
+    assert(approxeq(D,D2))  % 详解: 调用函数：assert(approxeq(D,D2))
+  else  % 详解: 条件判断：else 分支
+    D = sqdist(data, mu)';  % 赋值：设置变量 D  % 详解: 赋值：将 sqdist(...) 的结果保存到 D  % 详解: 赋值：将 sqdist(...) 的结果保存到 D
+  end  % 详解: 执行语句
+  clear mu data  % 详解: 执行语句
+  logB2 = -(d/2)*log(2*pi*Sigma) - (1/(2*Sigma))*D;  % 详解: 赋值：计算表达式并保存到 logB2
+  B2 = reshape(exp(logB2), [Q M T]);  % 详解: 赋值：将 reshape(...) 的结果保存到 B2
+  clear logB2  % 详解: 执行语句
   
-elseif ndims(Sigma)==2 % tied full
-  mu = reshape(mu, [d Q*M]);
-  D = sqdist(data, mu, inv(Sigma))';
-  % D(qm,t) = sq dist between data(:,t) and mu(:,qm)
-  logB2 = -(d/2)*log(2*pi) - 0.5*logdet(Sigma) - 0.5*D;
-  %denom = sqrt(det(2*pi*Sigma));
-  %numer = exp(-0.5 * D);
-  %B2 = numer/denom;
-  B2 = reshape(exp(logB2), [Q M T]);
+elseif ndims(Sigma)==2  % 详解: 条件判断：elseif (ndims(Sigma)==2)
+  mu = reshape(mu, [d Q*M]);  % 详解: 赋值：将 reshape(...) 的结果保存到 mu
+  D = sqdist(data, mu, inv(Sigma))';  % 矩阵求逆  % 详解: 赋值：将 sqdist(...) 的结果保存到 D  % 详解: 赋值：将 sqdist(...) 的结果保存到 D
+  logB2 = -(d/2)*log(2*pi) - 0.5*logdet(Sigma) - 0.5*D;  % 详解: 赋值：计算表达式并保存到 logB2
+  B2 = reshape(exp(logB2), [Q M T]);  % 详解: 赋值：将 reshape(...) 的结果保存到 B2
   
-elseif ndims(Sigma)==3 % tied across M
-  B2 = zeros(Q,M,T);
-  for j=1:Q
-    % D(m,t) = sq dist between data(:,t) and mu(:,j,m)
-    if isposdef(Sigma(:,:,j))
-      D = sqdist(data, permute(mu(:,j,:), [1 3 2]), inv(Sigma(:,:,j)))';
-      logB2 = -(d/2)*log(2*pi) - 0.5*logdet(Sigma(:,:,j)) - 0.5*D;
-      B2(j,:,:) = exp(logB2);
-    else
-      error(sprintf('mixgauss_prob: Sigma(:,:,q=%d) not psd\n', j));
-    end
-  end
+elseif ndims(Sigma)==3  % 详解: 条件判断：elseif (ndims(Sigma)==3)
+  B2 = zeros(Q,M,T);  % 详解: 赋值：将 zeros(...) 的结果保存到 B2
+  for j=1:Q  % 详解: for 循环：迭代变量 j 遍历 1:Q
+    if isposdef(Sigma(:,:,j))  % 详解: 条件判断：if (isposdef(Sigma(:,:,j)))
+      D = sqdist(data, permute(mu(:,j,:), [1 3 2]), inv(Sigma(:,:,j)))';  % 矩阵求逆  % 详解: 赋值：将 sqdist(...) 的结果保存到 D  % 详解: 赋值：将 sqdist(...) 的结果保存到 D
+      logB2 = -(d/2)*log(2*pi) - 0.5*logdet(Sigma(:,:,j)) - 0.5*D;  % 详解: 赋值：计算表达式并保存到 logB2
+      B2(j,:,:) = exp(logB2);  % 详解: 调用函数：B2(j,:,:) = exp(logB2)
+    else  % 详解: 条件判断：else 分支
+      error(sprintf('mixgauss_prob: Sigma(:,:,q=%d) not psd\n', j));  % 详解: 调用函数：error(sprintf('mixgauss_prob: Sigma(:,:,q=%d) not psd\n', j))
+    end  % 详解: 执行语句
+  end  % 详解: 执行语句
   
-else % general case
-  B2 = zeros(Q,M,T);
-  for j=1:Q
-    for k=1:M
-      %if mixmat(j,k) > 0
-      B2(j,k,:) = gaussian_prob(data, mu(:,j,k), Sigma(:,:,j,k));
-      %end
-    end
-  end
-end
+else  % 详解: 条件判断：else 分支
+  B2 = zeros(Q,M,T);  % 详解: 赋值：将 zeros(...) 的结果保存到 B2
+  for j=1:Q  % 详解: for 循环：迭代变量 j 遍历 1:Q
+    for k=1:M  % 详解: for 循环：迭代变量 k 遍历 1:M
+      B2(j,k,:) = gaussian_prob(data, mu(:,j,k), Sigma(:,:,j,k));  % 详解: 调用函数：B2(j,k,:) = gaussian_prob(data, mu(:,j,k), Sigma(:,:,j,k))
+    end  % 详解: 执行语句
+  end  % 详解: 执行语句
+end  % 详解: 执行语句
 
-% B(j,t) = sum_k B2(j,k,t) * Pr(M(t)=k | Q(t)=j) 
 
-% The repmat is actually slower than the for-loop, because it uses too much memory
-% (this is true even for small T).
 
-%B = squeeze(sum(B2 .* repmat(mixmat, [1 1 T]), 2));
-%B = reshape(B, [Q T]); % undo effect of squeeze in case Q = 1
   
-B = zeros(Q,T);
-if Q < T
-  for q=1:Q
-    %B(q,:) = mixmat(q,:) * squeeze(B2(q,:,:)); % squeeze chnages order if M=1
-    B(q,:) = mixmat(q,:) * permute(B2(q,:,:), [2 3 1]); % vector * matrix sums over m
-  end
-else
-  for t=1:T
-    B(:,t) = sum(mixmat .* B2(:,:,t), 2); % sum over m
-  end
-end
-%t=toc;fprintf('%5.3f\n', t)
+B = zeros(Q,T);  % 详解: 赋值：将 zeros(...) 的结果保存到 B
+if Q < T  % 详解: 条件判断：if (Q < T)
+  for q=1:Q  % 详解: for 循环：迭代变量 q 遍历 1:Q
+    B(q,:) = mixmat(q,:) * permute(B2(q,:,:), [2 3 1]);  % 详解: 调用函数：B(q,:) = mixmat(q,:) * permute(B2(q,:,:), [2 3 1])
+  end  % 详解: 执行语句
+else  % 详解: 条件判断：else 分支
+  for t=1:T  % 详解: for 循环：迭代变量 t 遍历 1:T
+    B(:,t) = sum(mixmat .* B2(:,:,t), 2);  % 详解: 调用函数：B(:,t) = sum(mixmat .* B2(:,:,t), 2)
+  end  % 详解: 执行语句
+end  % 详解: 执行语句
 
-%tic
-%A = squeeze(sum(B2 .* repmat(mixmat, [1 1 T]), 2));
-%t=toc;fprintf('%5.3f\n', t)
-%assert(approxeq(A,B)) % may be false because of round off error
+
+
+
+

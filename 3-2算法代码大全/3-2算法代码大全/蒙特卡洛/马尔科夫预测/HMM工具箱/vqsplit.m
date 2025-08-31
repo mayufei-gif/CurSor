@@ -1,310 +1,246 @@
-function [m, p, DistHist,minIndx]=vqsplit(X,L)
-% Vector Quantization: K-Means Algorithm with Spliting Method for Training
-% NOT TESTED FOR CODEBOOK SIZES OTHER THAN POWERS OF BASE 2, E.G. 256, 512, ETC
-% (Saves output to a mat file (CBTEMP.MAT) after each itteration, so that if
-% it is going too slow you can break it (CTRL+C) without losing your work
-% so far.)
-% [M, P, DH]=VQSPLIT(X,L)
-% 
-% or
-% [M_New, P, DH]=VQSPLIT(X,M_Old)   In this case M_Old is a codebook and is
-%                                   retrained on data X
-% 
-% inputs:
-% X: a matrix each column of which is a data vector
-% L: codebook size (preferably a power of 2 e.g. 16,32 256, 1024) (Never
-% tested for other values!
-% 
-% Outputs:
-% M: the codebook as the centroids of the clusters
-% P: Weight of each cluster the number of its vectors divided by total
-%       number of vectors
-% DH: The total distortion history, a vector containing the overall
-% distortion of each itteration
-%
-% Method:
-% The mean vector is split to two. the model is trained on those two vectors
-% until the distortion does not vary much, then those are split to two and
-% so on. until the disired number of clusters is reached.
-% Algorithm:
-% 1. Find the Mean
-% 2. Split each centroid to two
-% 3. Assign Each Data to a centroid
-% 4. Find the Centroids
-% 5. Calculate The Total Distance
-% 6. If the Distance has not changed much
-%       if the number of Centroids is smaller than L2 Goto Step 2
-%       else Goto 7
-%    Else (the Distance has changed substantialy) Goto Step 3
-% 7. If the number of Centroids is larger than L
-%    Discard the Centroid with (highest distortion OR lowest population)
-%    Goto 3
-% 8. Calculate the Variances and Cluster Weights if required
-% 9. End
-%
-% Esfandiar Zavarehei, Brunel University
-% May-2006
+﻿% 文件: vqsplit.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-e=.01; % X---> [X-e*X and X+e*X] Percentage for Spliting
-eRed=0.75; % Rate of reduction of split size, e, after each spliting. i.e. e=e*eRed;
-DT=.005; % The threshold in improvement in Distortion before terminating and spliting again
-DTRed=0.75; % Rate of reduction of Improvement Threshold, DT, after each spliting
-MinPop=0.10; % The population of each cluster should be at least 10 percent of its quota (N/LC)
-             % Otherwise that codeword is replaced with another codeword
+function [m, p, DistHist,minIndx]=vqsplit(X,L)  % 详解: 函数定义：vqsplit(X,L), 返回：m, p, DistHist,minIndx
+
+e=.01;  % 详解: 赋值：计算表达式并保存到 e
+eRed=0.75;  % 详解: 赋值：计算表达式并保存到 eRed
+DT=.005;  % 详解: 赋值：计算表达式并保存到 DT
+DTRed=0.75;  % 详解: 赋值：计算表达式并保存到 DTRed
+MinPop=0.10;  % 详解: 赋值：计算表达式并保存到 MinPop
 
 
-d=size(X,1); % Dimension
-N=size(X,2); % Number of Data points
-isFirstRound=1; % First Itteration after Spliting
+d=size(X,1);  % 详解: 赋值：将 size(...) 的结果保存到 d
+N=size(X,2);  % 详解: 赋值：将 size(...) 的结果保存到 N
+isFirstRound=1;  % 详解: 赋值：计算表达式并保存到 isFirstRound
 
-if numel(L)==1
-    M=mean(X,2); % Mean Vector
-    CB=[M*(1+e) M*(1-e)]; % Split to two vectors
-else
-    CB=L; % If the codebook is passed to the function just train it
-    L=size(CB,2);
-    e=e*(eRed^fix(log2(L)));
-    DT=DT*(DTRed^fix(log2(L)));
-end
+if numel(L)==1  % 详解: 条件判断：if (numel(L)==1)
+    M=mean(X,2);  % 详解: 赋值：将 mean(...) 的结果保存到 M
+    CB=[M*(1+e) M*(1-e)];  % 详解: 赋值：计算表达式并保存到 CB
+else  % 详解: 条件判断：else 分支
+    CB=L;  % 详解: 赋值：计算表达式并保存到 CB
+    L=size(CB,2);  % 详解: 赋值：将 size(...) 的结果保存到 L
+    e=e*(eRed^fix(log2(L)));  % 详解: 赋值：计算表达式并保存到 e
+    DT=DT*(DTRed^fix(log2(L)));  % 详解: 赋值：计算表达式并保存到 DT
+end  % 详解: 执行语句
 
-LC=size(CB,2); % Current size of the codebook
+LC=size(CB,2);  % 详解: 赋值：将 size(...) 的结果保存到 LC
 
-Iter=0;
-Split=0;
-IsThereABestCB=0;
-maxIterInEachSize=20; % The maximum number of training itterations at each 
-                      % codebook size (The codebook size starts from one 
-                      % and increases thereafter)
-EachSizeIterCounter=0;
-while 1
-    %Distance Calculation
-    [minIndx, dst]=VQIndex(X,CB); % Find the closest codewords to each data vector
+Iter=0;  % 详解: 赋值：计算表达式并保存到 Iter
+Split=0;  % 详解: 赋值：计算表达式并保存到 Split
+IsThereABestCB=0;  % 详解: 赋值：计算表达式并保存到 IsThereABestCB
+maxIterInEachSize=20;  % 详解: 赋值：计算表达式并保存到 maxIterInEachSize
+EachSizeIterCounter=0;  % 详解: 赋值：计算表达式并保存到 EachSizeIterCounter
+while 1  % 详解: while 循环：当 (1) 为真时迭代
+    [minIndx, dst]=VQIndex(X,CB);  % 详解: 执行语句
 
-    ClusterD=zeros(1,LC);
-    Population=zeros(1,LC);
-    LowPop=[];
-    % Find the Centroids (Mean of each Cluster)
-    for i=1:LC
-        Ind=find(minIndx==i);
-        if length(Ind)<MinPop*N/LC % if a cluster has very low population just remember it
-            LowPop=[LowPop i];
-        else
-            CB(:,i)=mean(X(:,Ind),2);
-            Population(i)=length(Ind);
-            ClusterD(i)=sum(dst(Ind));
-        end        
-    end
-    if ~isempty(LowPop)
-        [temp MaxInd]=maxn(Population,length(LowPop));
-        CB(:,LowPop)=CB(:,MaxInd)*(1+e); % Replace low-population codewords with splits of high population codewords
-        CB(:,MaxInd)=CB(:,MaxInd)*(1-e);
+    ClusterD=zeros(1,LC);  % 详解: 赋值：将 zeros(...) 的结果保存到 ClusterD
+    Population=zeros(1,LC);  % 详解: 赋值：将 zeros(...) 的结果保存到 Population
+    LowPop=[];  % 详解: 赋值：计算表达式并保存到 LowPop
+    for i=1:LC  % 详解: for 循环：迭代变量 i 遍历 1:LC
+        Ind=find(minIndx==i);  % 详解: 赋值：将 find(...) 的结果保存到 Ind
+        if length(Ind)<MinPop*N/LC  % 详解: 条件判断：if (length(Ind)<MinPop*N/LC)
+            LowPop=[LowPop i];  % 详解: 赋值：计算表达式并保存到 LowPop
+        else  % 详解: 条件判断：else 分支
+            CB(:,i)=mean(X(:,Ind),2);  % 详解: 调用函数：CB(:,i)=mean(X(:,Ind),2)
+            Population(i)=length(Ind);  % 详解: 调用函数：Population(i)=length(Ind)
+            ClusterD(i)=sum(dst(Ind));  % 详解: 调用函数：ClusterD(i)=sum(dst(Ind))
+        end  % 详解: 执行语句
+    end  % 详解: 执行语句
+    if ~isempty(LowPop)  % 详解: 条件判断：if (~isempty(LowPop))
+        [temp MaxInd]=maxn(Population,length(LowPop));  % 详解: 获取向量/矩阵尺寸
+        CB(:,LowPop)=CB(:,MaxInd)*(1+e);  % 详解: 调用函数：CB(:,LowPop)=CB(:,MaxInd)*(1+e)
+        CB(:,MaxInd)=CB(:,MaxInd)*(1-e);  % 详解: 调用函数：CB(:,MaxInd)=CB(:,MaxInd)*(1-e)
         
-        %re-train
-        [minIndx, dst]=VQIndex(X,CB);
+        [minIndx, dst]=VQIndex(X,CB);  % 详解: 执行语句
 
-        ClusterD=zeros(1,LC);
-        Population=zeros(1,LC);
+        ClusterD=zeros(1,LC);  % 详解: 赋值：将 zeros(...) 的结果保存到 ClusterD
+        Population=zeros(1,LC);  % 详解: 赋值：将 zeros(...) 的结果保存到 Population
         
-        for i=1:LC
-            Ind=find(minIndx==i);
-            if ~isempty(Ind)
-                CB(:,i)=mean(X(:,Ind),2);
-                Population(i)=length(Ind);
-                ClusterD(i)=sum(dst(Ind));
-            else %if no vector is close enough to this codeword, replace it with a random vector
-                CB(:,i)=X(:,fix(rand*N)+1);
-                disp('A random vector was assigned as a codeword.')
-                isFirstRound=1;% At least another iteration is required
-            end                
-        end
-    end
-    Iter=Iter+1;
-    if isFirstRound % First itteration after a split (dont exit)
-        TotalDist=sum(ClusterD(~isnan(ClusterD)));
-        DistHist(Iter)=TotalDist;
-        PrevTotalDist=TotalDist;        
-        isFirstRound=0;
-    else
-        TotalDist=sum(ClusterD(~isnan(ClusterD)));  
-        DistHist(Iter)=TotalDist;
-        PercentageImprovement=((PrevTotalDist-TotalDist)/PrevTotalDist);
-        if PercentageImprovement>=DT %Improvement substantial
-            PrevTotalDist=TotalDist; %Save Distortion of this iteration and continue training
-            isFirstRound=0;
-        else%Improvement NOT substantial (Saturation)
-            EachSizeIterCounter=0;
-            if LC>=L %Enough Codewords?
-                if L==LC %Exact number of codewords
-                    disp(TotalDist)
-                    break
-                else % Kill one codeword at a time
-                    [temp, Ind]=min(Population); % Eliminate low population codewords
-                    NCB=zeros(d,LC-1);
-                    NCB=CB(:,setxor(1:LC,Ind(1)));
-                    CB=NCB;
-                    LC=LC-1;
-                    isFirstRound=1;
-                end
-            else %If not enough codewords yet, then Split more
-                CB=[CB*(1+e) CB*(1-e)];
-                e=eRed*e; %Split size reduction
-                DT=DT*DTRed; %Improvement Threshold Reduction
-                LC=size(CB,2);
-                isFirstRound=1;
-                Split=Split+1;
-                IsThereABestCB=0; % As we just split this codebook, there is no best codebook at this size yet
-                disp(LC)
-            end
-        end
-    end    
-    if ~IsThereABestCB
-        BestCB=CB;
-        BestD=TotalDist;
-        IsThereABestCB=1;
-    else % If there is a best CB, check to see if the current one is better than that
-        if TotalDist<BestD
-            BestCB=CB;
-            BestD=TotalDist;
-        end
-    end
-    EachSizeIterCounter=EachSizeIterCounter+1;
-    if EachSizeIterCounter>maxIterInEachSize % If too many itterations in this size, stop training this size
-        EachSizeIterCounter=0;
-        CB=BestCB; % choose the best codebook so far
-        IsThereABestCB=0;
-        if LC>=L %Enough Codewords?
-            if L==LC %Exact number of codewords
-                disp(TotalDist)
-                break
-            else % Kill one codeword at a time
-                [temp, Ind]=min(Population);
-                NCB=zeros(d,LC-1);
-                NCB=CB(:,setxor(1:LC,Ind(1)));
-                CB=NCB;
-                LC=LC-1;
-                isFirstRound=1;
-            end
-        else %Split
-            CB=[CB*(1+e) CB*(1-e)];
-            e=eRed*e; %Split size reduction
-            DT=DT*DTRed; %Improvement Threshold Reduction
-            LC=size(CB,2);
-            isFirstRound=1;
-            Split=Split+1;
-            IsThereABestCB=0;
-            disp(LC)
-        end
-    end        
-    disp(TotalDist)
-    p=Population/N;
-    save CBTemp CB p DistHist
-end
-m=CB;
+        for i=1:LC  % 详解: for 循环：迭代变量 i 遍历 1:LC
+            Ind=find(minIndx==i);  % 详解: 赋值：将 find(...) 的结果保存到 Ind
+            if ~isempty(Ind)  % 详解: 条件判断：if (~isempty(Ind))
+                CB(:,i)=mean(X(:,Ind),2);  % 详解: 调用函数：CB(:,i)=mean(X(:,Ind),2)
+                Population(i)=length(Ind);  % 详解: 调用函数：Population(i)=length(Ind)
+                ClusterD(i)=sum(dst(Ind));  % 详解: 调用函数：ClusterD(i)=sum(dst(Ind))
+            else  % 详解: 条件判断：else 分支
+                CB(:,i)=X(:,fix(rand*N)+1);  % 详解: 调用函数：CB(:,i)=X(:,fix(rand*N)+1)
+                disp('A random vector was assigned as a codeword.')  % 详解: 调用函数：disp('A random vector was assigned as a codeword.')
+                isFirstRound=1;  % 详解: 赋值：计算表达式并保存到 isFirstRound
+            end  % 详解: 执行语句
+        end  % 详解: 执行语句
+    end  % 详解: 执行语句
+    Iter=Iter+1;  % 详解: 赋值：计算表达式并保存到 Iter
+    if isFirstRound  % 详解: 条件判断：if (isFirstRound)
+        TotalDist=sum(ClusterD(~isnan(ClusterD)));  % 详解: 赋值：将 sum(...) 的结果保存到 TotalDist
+        DistHist(Iter)=TotalDist;  % 详解: 执行语句
+        PrevTotalDist=TotalDist;  % 详解: 赋值：计算表达式并保存到 PrevTotalDist
+        isFirstRound=0;  % 详解: 赋值：计算表达式并保存到 isFirstRound
+    else  % 详解: 条件判断：else 分支
+        TotalDist=sum(ClusterD(~isnan(ClusterD)));  % 详解: 赋值：将 sum(...) 的结果保存到 TotalDist
+        DistHist(Iter)=TotalDist;  % 详解: 执行语句
+        PercentageImprovement=((PrevTotalDist-TotalDist)/PrevTotalDist);  % 详解: 赋值：计算表达式并保存到 PercentageImprovement
+        if PercentageImprovement>=DT  % 详解: 条件判断：if (PercentageImprovement>=DT)
+            PrevTotalDist=TotalDist;  % 详解: 赋值：计算表达式并保存到 PrevTotalDist
+            isFirstRound=0;  % 详解: 赋值：计算表达式并保存到 isFirstRound
+        else  % 详解: 条件判断：else 分支
+            EachSizeIterCounter=0;  % 详解: 赋值：计算表达式并保存到 EachSizeIterCounter
+            if LC>=L  % 详解: 条件判断：if (LC>=L)
+                if L==LC  % 详解: 条件判断：if (L==LC)
+                    disp(TotalDist)  % 详解: 调用函数：disp(TotalDist)
+                    break  % 详解: 跳出循环：break
+                else  % 详解: 条件判断：else 分支
+                    [temp, Ind]=min(Population);  % 详解: 统计：最大/最小值
+                    NCB=zeros(d,LC-1);  % 详解: 赋值：将 zeros(...) 的结果保存到 NCB
+                    NCB=CB(:,setxor(1:LC,Ind(1)));  % 详解: 赋值：将 CB(...) 的结果保存到 NCB
+                    CB=NCB;  % 详解: 赋值：计算表达式并保存到 CB
+                    LC=LC-1;  % 详解: 赋值：计算表达式并保存到 LC
+                    isFirstRound=1;  % 详解: 赋值：计算表达式并保存到 isFirstRound
+                end  % 详解: 执行语句
+            else  % 详解: 条件判断：else 分支
+                CB=[CB*(1+e) CB*(1-e)];  % 详解: 赋值：计算表达式并保存到 CB
+                e=eRed*e;  % 详解: 赋值：计算表达式并保存到 e
+                DT=DT*DTRed;  % 详解: 赋值：计算表达式并保存到 DT
+                LC=size(CB,2);  % 详解: 赋值：将 size(...) 的结果保存到 LC
+                isFirstRound=1;  % 详解: 赋值：计算表达式并保存到 isFirstRound
+                Split=Split+1;  % 详解: 赋值：计算表达式并保存到 Split
+                IsThereABestCB=0;  % 详解: 赋值：计算表达式并保存到 IsThereABestCB
+                disp(LC)  % 详解: 调用函数：disp(LC)
+            end  % 详解: 执行语句
+        end  % 详解: 执行语句
+    end  % 详解: 执行语句
+    if ~IsThereABestCB  % 详解: 条件判断：if (~IsThereABestCB)
+        BestCB=CB;  % 详解: 赋值：计算表达式并保存到 BestCB
+        BestD=TotalDist;  % 详解: 赋值：计算表达式并保存到 BestD
+        IsThereABestCB=1;  % 详解: 赋值：计算表达式并保存到 IsThereABestCB
+    else  % 详解: 条件判断：else 分支
+        if TotalDist<BestD  % 详解: 条件判断：if (TotalDist<BestD)
+            BestCB=CB;  % 详解: 赋值：计算表达式并保存到 BestCB
+            BestD=TotalDist;  % 详解: 赋值：计算表达式并保存到 BestD
+        end  % 详解: 执行语句
+    end  % 详解: 执行语句
+    EachSizeIterCounter=EachSizeIterCounter+1;  % 详解: 赋值：计算表达式并保存到 EachSizeIterCounter
+    if EachSizeIterCounter>maxIterInEachSize  % 详解: 条件判断：if (EachSizeIterCounter>maxIterInEachSize)
+        EachSizeIterCounter=0;  % 详解: 赋值：计算表达式并保存到 EachSizeIterCounter
+        CB=BestCB;  % 详解: 赋值：计算表达式并保存到 CB
+        IsThereABestCB=0;  % 详解: 赋值：计算表达式并保存到 IsThereABestCB
+        if LC>=L  % 详解: 条件判断：if (LC>=L)
+            if L==LC  % 详解: 条件判断：if (L==LC)
+                disp(TotalDist)  % 详解: 调用函数：disp(TotalDist)
+                break  % 详解: 跳出循环：break
+            else  % 详解: 条件判断：else 分支
+                [temp, Ind]=min(Population);  % 详解: 统计：最大/最小值
+                NCB=zeros(d,LC-1);  % 详解: 赋值：将 zeros(...) 的结果保存到 NCB
+                NCB=CB(:,setxor(1:LC,Ind(1)));  % 详解: 赋值：将 CB(...) 的结果保存到 NCB
+                CB=NCB;  % 详解: 赋值：计算表达式并保存到 CB
+                LC=LC-1;  % 详解: 赋值：计算表达式并保存到 LC
+                isFirstRound=1;  % 详解: 赋值：计算表达式并保存到 isFirstRound
+            end  % 详解: 执行语句
+        else  % 详解: 条件判断：else 分支
+            CB=[CB*(1+e) CB*(1-e)];  % 详解: 赋值：计算表达式并保存到 CB
+            e=eRed*e;  % 详解: 赋值：计算表达式并保存到 e
+            DT=DT*DTRed;  % 详解: 赋值：计算表达式并保存到 DT
+            LC=size(CB,2);  % 详解: 赋值：将 size(...) 的结果保存到 LC
+            isFirstRound=1;  % 详解: 赋值：计算表达式并保存到 isFirstRound
+            Split=Split+1;  % 详解: 赋值：计算表达式并保存到 Split
+            IsThereABestCB=0;  % 详解: 赋值：计算表达式并保存到 IsThereABestCB
+            disp(LC)  % 详解: 调用函数：disp(LC)
+        end  % 详解: 执行语句
+    end  % 详解: 执行语句
+    disp(TotalDist)  % 详解: 调用函数：disp(TotalDist)
+    p=Population/N;  % 详解: 赋值：计算表达式并保存到 p
+    save CBTemp CB p DistHist  % 详解: 执行语句
+end  % 详解: 执行语句
+m=CB;  % 详解: 赋值：计算表达式并保存到 m
 
-p=Population/N;
+p=Population/N;  % 详解: 赋值：计算表达式并保存到 p
 
-disp(['Iterations = ' num2str(Iter)]);
-disp(['Split = ' num2str(Split)]);
+disp(['Iterations = ' num2str(Iter)]);  % 详解: 调用函数：disp(['Iterations = ' num2str(Iter)])
+disp(['Split = ' num2str(Split)]);  % 详解: 调用函数：disp(['Split = ' num2str(Split)])
 
-function [v, i]=maxn(x,n)
-% [V, I]=MAXN(X,N)
-% APPLY TO VECTORS ONLY!
-% This function returns the N maximum values of vector X with their indices.
-% V is a vector which has the maximum values, and I is the index matrix,
-% i.e. the indices corresponding to the N maximum values in the vector X
+function [v, i]=maxn(x,n)  % 详解: 函数定义：maxn(x,n), 返回：v, i
 
-if nargin<2
-    [v, i]=max(x); %Only the first maximum (default n=1)
-else
-    n=min(length(x),n);
-    [v, i]=sort(x);
-    v=v(end:-1:end-n+1);
-    i=i(end:-1:end-n+1);    
-end
+if nargin<2  % 详解: 条件判断：if (nargin<2)
+    [v, i]=max(x);  % 详解: 统计：最大/最小值
+else  % 详解: 条件判断：else 分支
+    n=min(length(x),n);  % 详解: 赋值：将 min(...) 的结果保存到 n
+    [v, i]=sort(x);  % 详解: 执行语句
+    v=v(end:-1:end-n+1);  % 详解: 赋值：将 v(...) 的结果保存到 v
+    i=i(end:-1:end-n+1);  % 详解: 赋值：将 i(...) 的结果保存到 i
+end  % 详解: 执行语句
         
-function [I, dst]=VQIndex(X,CB) 
-% Distance function
-% Returns the closest index of vectors in X to codewords in CB
-% In other words:
-% I is a vector. The length of I is equal to the number of columns in X.
-% Each element of I is the index of closest codeword (column) of CB to
-% coresponding column of X
+function [I, dst]=VQIndex(X,CB)  % 详解: 函数定义：VQIndex(X,CB), 返回：I, dst
 
-L=size(CB,2);
-N=size(X,2);
-LNThreshold=64*10000;
+L=size(CB,2);  % 详解: 赋值：将 size(...) 的结果保存到 L
+N=size(X,2);  % 详解: 赋值：将 size(...) 的结果保存到 N
+LNThreshold=64*10000;  % 详解: 赋值：计算表达式并保存到 LNThreshold
 
-if L*N<LNThreshold
-    D=zeros(L,N);
-    for i=1:L
-        D(i,:)=sum((repmat(CB(:,i),1,N)-X).^2,1);
-    end
-    [dst I]=min(D);
-else
-    I=zeros(1,N);
-    dst=I;
-    for i=1:N
-        D=sum((repmat(X(:,i),1,L)-CB).^2,1);
-        [dst(i) I(i)]=min(D);
-    end
-end
+if L*N<LNThreshold  % 详解: 条件判断：if (L*N<LNThreshold)
+    D=zeros(L,N);  % 详解: 赋值：将 zeros(...) 的结果保存到 D
+    for i=1:L  % 详解: for 循环：迭代变量 i 遍历 1:L
+        D(i,:)=sum((repmat(CB(:,i),1,N)-X).^2,1);  % 详解: 调用函数：D(i,:)=sum((repmat(CB(:,i),1,N)-X).^2,1)
+    end  % 详解: 执行语句
+    [dst I]=min(D);  % 详解: 统计：最大/最小值
+else  % 详解: 条件判断：else 分支
+    I=zeros(1,N);  % 详解: 赋值：将 zeros(...) 的结果保存到 I
+    dst=I;  % 详解: 赋值：计算表达式并保存到 dst
+    for i=1:N  % 详解: for 循环：迭代变量 i 遍历 1:N
+        D=sum((repmat(X(:,i),1,L)-CB).^2,1);  % 详解: 赋值：将 sum(...) 的结果保存到 D
+        [dst(i) I(i)]=min(D);  % 详解: 统计：最大/最小值
+    end  % 详解: 执行语句
+end  % 详解: 执行语句
     
-function [I, dist]=VQLSFSpectralIndex(X,CB,W)
-% If your codewords are LSF coefficients, You can use this function instead of VQINDEX
-% This is for speech coding
-% I=VQLSFSPECTRALINDEX(X,CB,W)
-% Calculates the nearest set of LSF coefficients in the codebook CB to each
-% column of X by calculating their LP spectral distances.
-% I is the index of the closest codeword, X is the set of LSF coefficients
-% (each column is a set of coefficients) CB is the codebook, W is the
-% weighting vector, if not provided it is assumed to be equal to ones(256,1)
-% Esfandiar Zavarehei
-% 9-Oct-05
+function [I, dist]=VQLSFSpectralIndex(X,CB,W)  % 详解: 函数定义：VQLSFSpectralIndex(X,CB,W), 返回：I, dist
 
-if nargin<3
-    L=256;
-    W=ones(L,1);
-else
-    if isscalar(W)
-        L=W;
-        W=ones(L,1);
-    elseif isvector(W)
-        W=W(:);
-        L=length(W);
-    else
-        error('Invalid input argument. W should be either a vector or a scaler!')
-    end
-end
+if nargin<3  % 详解: 条件判断：if (nargin<3)
+    L=256;  % 详解: 赋值：计算表达式并保存到 L
+    W=ones(L,1);  % 详解: 赋值：将 ones(...) 的结果保存到 W
+else  % 详解: 条件判断：else 分支
+    if isscalar(W)  % 详解: 条件判断：if (isscalar(W))
+        L=W;  % 详解: 赋值：计算表达式并保存到 L
+        W=ones(L,1);  % 详解: 赋值：将 ones(...) 的结果保存到 W
+    elseif isvector(W)  % 详解: 条件判断：elseif (isvector(W))
+        W=W(:);  % 详解: 赋值：将 W(...) 的结果保存到 W
+        L=length(W);  % 详解: 赋值：将 length(...) 的结果保存到 L
+    else  % 详解: 条件判断：else 分支
+        error('Invalid input argument. W should be either a vector or a scaler!')  % 详解: 调用函数：error('Invalid input argument. W should be either a vector or a scaler!')
+    end  % 详解: 执行语句
+end  % 详解: 执行语句
 
-NX=size(X,2);
-NCB=size(CB,2);
+NX=size(X,2);  % 详解: 赋值：将 size(...) 的结果保存到 NX
+NCB=size(CB,2);  % 详解: 赋值：将 size(...) 的结果保存到 NCB
 
-AX=lsf2lpc(X);
-ACB=lsf2lpc(CB);
+AX=lsf2lpc(X);  % 详解: 赋值：将 lsf2lpc(...) 的结果保存到 AX
+ACB=lsf2lpc(CB);  % 详解: 赋值：将 lsf2lpc(...) 的结果保存到 ACB
 
 
-D=zeros(NCB,1);
+D=zeros(NCB,1);  % 详解: 赋值：将 zeros(...) 的结果保存到 D
 
-w=linspace(0,pi,L+1);
-w=w(1:end-1);
-N=size(AX,2)-1;
-WFZ=zeros(N+1,L);
-IMAGUNIT=sqrt(-1);
-for k=0:N
-    WFZ(k+1,:)=exp(IMAGUNIT*k*w);
-end
+w=linspace(0,pi,L+1);  % 详解: 赋值：将 linspace(...) 的结果保存到 w
+w=w(1:end-1);  % 详解: 赋值：将 w(...) 的结果保存到 w
+N=size(AX,2)-1;  % 详解: 赋值：将 size(...) 的结果保存到 N
+WFZ=zeros(N+1,L);  % 详解: 赋值：将 zeros(...) 的结果保存到 WFZ
+IMAGUNIT=sqrt(-1);  % 详解: 赋值：将 sqrt(...) 的结果保存到 IMAGUNIT
+for k=0:N  % 详解: for 循环：迭代变量 k 遍历 0:N
+    WFZ(k+1,:)=exp(IMAGUNIT*k*w);  % 详解: 调用函数：WFZ(k+1,:)=exp(IMAGUNIT*k*w)
+end  % 详解: 执行语句
 
-SCB=zeros(L,NCB);
-for i=1:NCB
-    SCB(:,i)=(1./abs(ACB(i,:)*WFZ));
-end
+SCB=zeros(L,NCB);  % 详解: 赋值：将 zeros(...) 的结果保存到 SCB
+for i=1:NCB  % 详解: for 循环：迭代变量 i 遍历 1:NCB
+    SCB(:,i)=(1./abs(ACB(i,:)*WFZ));  % 详解: 调用函数：SCB(:,i)=(1./abs(ACB(i,:)*WFZ))
+end  % 详解: 执行语句
 
-I=zeros(1,NX);
-dist=zeros(1,NX);
-for j=1:NX
-    SX=(1./abs(AX(j,:)*WFZ))';    
-    for i=1:NCB
-        D(i)=sqrt(sum(((SX-SCB(:,i)).^2).*W));
-    end
-    [dist(j), I(j)]=min(D);
-end
+I=zeros(1,NX);  % 详解: 赋值：将 zeros(...) 的结果保存到 I
+dist=zeros(1,NX);  % 详解: 赋值：将 zeros(...) 的结果保存到 dist
+for j=1:NX  % 详解: for 循环：迭代变量 j 遍历 1:NX
+    SX=(1./abs(AX(j,:)*WFZ))';      % 赋值：设置变量 SX  % 详解: 赋值：计算表达式并保存到 SX  % 详解: 赋值：计算表达式并保存到 SX
+    for i=1:NCB  % 详解: for 循环：迭代变量 i 遍历 1:NCB
+        D(i)=sqrt(sum(((SX-SCB(:,i)).^2).*W));  % 详解: 调用函数：D(i)=sqrt(sum(((SX-SCB(:,i)).^2).*W))
+    end  % 详解: 执行语句
+    [dist(j), I(j)]=min(D);  % 详解: 统计：最大/最小值
+end  % 详解: 执行语句
+
+
+

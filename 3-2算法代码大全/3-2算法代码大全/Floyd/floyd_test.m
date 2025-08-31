@@ -1,8 +1,15 @@
-clear;
-w=[0 9 inf 3 inf;
-   9 0 2 inf 7;
-   inf 2 0 2 4;
-   3 inf 2 0 inf;
-   inf 7 4 inf 0];%��ʼ��Ȩֵ����
-%����floyd����
-[kk,DD,rr,mc,mk]=floyd(w);
+﻿% 文件: floyd_test.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
+
+clear;  % 详解: 执行语句
+w=[0 9 inf 3 inf;  % 详解: 赋值：计算表达式并保存到 w
+   9 0 2 inf 7;  % 详解: 执行语句
+   inf 2 0 2 4;  % 详解: 执行语句
+   3 inf 2 0 inf;  % 详解: 执行语句
+   inf 7 4 inf 0];  % 详解: 执行语句
+[kk,DD,rr,mc,mk]=floyd(w);  % 详解: 执行语句
+
+
+

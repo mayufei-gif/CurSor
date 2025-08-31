@@ -1,36 +1,29 @@
-function x = chi2inv(p,v);
-%CHI2INV Inverse of the chi-square cumulative distribution function (cdf).
-%   X = CHI2INV(P,V)  returns the inverse of the chi-square cdf with V  
-%   degrees of freedom at the values in P. The chi-square cdf with V 
-%   degrees of freedom, is the gamma cdf with parameters V/2 and 2.   
-%
-%   The size of X is the common size of P and V. A scalar input
-%   functions as a constant matrix of the same size as the other input.   
+﻿% 文件: chi2inv.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-%   References:
-%      [1]  M. Abramowitz and I. A. Stegun, "Handbook of Mathematical
-%      Functions", Government Printing Office, 1964, 26.4.
-%      [2] E. Kreyszig, "Introductory Mathematical Statistics",
-%      John Wiley, 1970, section 10.2 (page 144)
+function x = chi2inv(p,v);  % 详解: 执行语句
 
-%   Copyright 1993-2002 The MathWorks, Inc. 
-%   $Revision: 1.1 $  $Date: 2005/04/26 02:30:30 $
 
-if nargin < 2, 
-    error('Requires two input arguments.');
-end
 
-[errorcode p v] = distchck(2,p,v);
+if nargin < 2,  % 详解: 条件判断：if (nargin < 2,)
+    error('Requires two input arguments.');  % 详解: 调用函数：error('Requires two input arguments.')
+end  % 详解: 执行语句
 
-if errorcode > 0
-    error('Requires non-scalar arguments to match in size.');
-end
+[errorcode p v] = distchck(2,p,v);  % 详解: 执行语句
 
-% Call the gamma inverse function. 
-x = gaminv(p,v/2,2);
+if errorcode > 0  % 详解: 条件判断：if (errorcode > 0)
+    error('Requires non-scalar arguments to match in size.');  % 详解: 调用函数：error('Requires non-scalar arguments to match in size.')
+end  % 详解: 执行语句
 
-% Return NaN if the degrees of freedom is not positive.
-k = (v <= 0);
-if any(k(:))
-    x(k) = NaN;
-end
+x = gaminv(p,v/2,2);  % 详解: 赋值：将 gaminv(...) 的结果保存到 x
+
+k = (v <= 0);  % 详解: 赋值：计算表达式并保存到 k
+if any(k(:))  % 详解: 条件判断：if (any(k(:)))
+    x(k) = NaN;  % 详解: 执行语句
+end  % 详解: 执行语句
+
+
+
+

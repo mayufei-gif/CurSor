@@ -1,37 +1,25 @@
-function [initState, transmat, mu, Nproto, pick] = mhmmParzen_train_observed(obsData, hiddenData, ...
-						  nstates, maxNproto, varargin)
-% mhmmParzentrain_observed  with mixture of Gaussian outputs from fully observed sequences
-% function [initState, transmat, mu, Nproto] = mhmm_train_observed_parzen(obsData, hiddenData, ...
-%						  nstates, maxNproto)
-%
-%
-% INPUT
-% If all sequences have the same length
-% obsData(:,t,ex) 
-% hiddenData(ex,t)  - must be ROW vector if only one sequence
-% If sequences have different lengths, we use cell arrays
-% obsData{ex}(:,t) 
-% hiddenData{ex}(t)
-%
-% Optional argumnets
-% dirichletPriorWeight - for smoothing transition matrix counts
-% mkSymmetric
-%
-% Output
-% mu(:,q)
-% Nproto(q) is the number of prototypes (mixture components) chosen for state q
+﻿% 文件: mhmmParzen_train_observed.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-[transmat, initState] = transmat_train_observed(...
-    hiddenData, nstates, varargin{:});
+function [initState, transmat, mu, Nproto, pick] = mhmmParzen_train_observed(obsData, hiddenData, ...  % 详解: 执行语句
+						  nstates, maxNproto, varargin)  % 详解: 执行语句
 
-% convert to obsData(:,t*nex)
-if ~iscell(obsData)
-  [D T Nex] = size(obsData);
-  obsData = reshape(obsData, D, T*Nex);
-else
-  obsData = cat(2, obsData{:});
-  hiddenData = cat(2, hiddenData{:});
-end
-[mu, Nproto, pick] = parzen_fit_select_unif(obsData, hiddenData(:), maxNproto);
+[transmat, initState] = transmat_train_observed(...  % 详解: 执行语句
+    hiddenData, nstates, varargin{:});  % 详解: 执行语句
+
+if ~iscell(obsData)  % 详解: 条件判断：if (~iscell(obsData))
+  [D T Nex] = size(obsData);  % 详解: 获取向量/矩阵尺寸
+  obsData = reshape(obsData, D, T*Nex);  % 详解: 赋值：将 reshape(...) 的结果保存到 obsData
+else  % 详解: 条件判断：else 分支
+  obsData = cat(2, obsData{:});  % 详解: 赋值：将 cat(...) 的结果保存到 obsData
+  hiddenData = cat(2, hiddenData{:});  % 详解: 赋值：将 cat(...) 的结果保存到 hiddenData
+end  % 详解: 执行语句
+[mu, Nproto, pick] = parzen_fit_select_unif(obsData, hiddenData(:), maxNproto);  % 详解: 执行语句
 
  
+
+
+
+

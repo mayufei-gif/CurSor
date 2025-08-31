@@ -1,84 +1,40 @@
-function [T c]=Primf(a)
-% ����С��������Prim�㷨
-% function [T c]=Primf(a)
-%  a����Ȩ����
-%  c:�������ķ���;
-%  T:�������ı߼���;
+﻿% 文件: Primf.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-l=length(a);
-a(a==0)=inf;
-k=1:l;
-listV(k)=0;
-listV(1)=1;
-e=1;
-while (e<l)
-    min=inf;
-    for i=1:l
-        if listV(i)==1
-            for j=1:l
-                if listV(j)==0 & min>a(i,j)
-                        min=a(i,j);b=a(i,j);
-                        s=i;d=j;
-                end
-            end
-        end
-    end
-    listV(d)=1;
-    distance(e)=b;
-    source(e)=s;
-    destination(e)=d;
-    e=e+1;
-end
+function [T c]=Primf(a)  % 详解: 函数定义：Primf(a), 返回：T c
 
-T=[source;destination];
-for g=1:e-1
-    c(g)=a(T(1,g),T(2,g));
-end
-c;
-%=====================otherway
-%D=[inf 7 8 2 inf inf 3 inf;
-%    7 inf 1 inf 2 inf inf 3;
-%    8 1 inf 4 2 7 inf inf;
-%    2 inf 4 inf inf 4 6 inf;
-%    inf 2 2 inf inf 5 inf 1;
-%    inf inf 7 4 5 inf 4 3;
-%    3 inf inf 6 inf 4 inf 6;
-%    inf 3 inf inf 1 3 6 inf];
-%n=8;
-%  function [T c]=Primf1(D)
-% n=length(D);
-% T=[];l=0;%l��¼T������
-% q(1)=-1;
-%for i=2:n
-%    p(i)=1;q(i)=D(i,1);
-%end
-%k=1;
-%while 1
-%    if k>=n
-%       % disp(T);
-%        break;
-%    else
-%        min=inf;
-%        for i=2:n
-%            if q(i)>0&q(i)<min
-%                min=q(i);
-%                h=i;
-%            end
-%        end
-%    end
-%    l=l+1;
-%    T(1,l)=h;T(2,l)=p(h);
-%    q(h)=-1;
-%    for j=2:n
-%        if D(h,j)<q(j)
-%            q(j)=D(h,j);
-%            p(j)=h;
-%        end
-%    end
-%    k=k+1;
-%end
-%T;
-%for g=1:n-1
-%    c(g)=a(T(1,g),T(2,g));
-%end
-%c;
+l=length(a);  % 详解: 赋值：将 length(...) 的结果保存到 l
+a(a==0)=inf;  % 详解: 执行语句
+k=1:l;  % 详解: 赋值：计算表达式并保存到 k
+listV(k)=0;  % 详解: 执行语句
+listV(1)=1;  % 详解: 执行语句
+e=1;  % 详解: 赋值：计算表达式并保存到 e
+while (e<l)  % 详解: while 循环：当 ((e<l)) 为真时迭代
+    min=inf;  % 详解: 赋值：计算表达式并保存到 min
+    for i=1:l  % 详解: for 循环：迭代变量 i 遍历 1:l
+        if listV(i)==1  % 详解: 条件判断：if (listV(i)==1)
+            for j=1:l  % 详解: for 循环：迭代变量 j 遍历 1:l
+                if listV(j)==0 & min>a(i,j)  % 详解: 条件判断：if (listV(j)==0 & min>a(i,j))
+                        min=a(i,j);b=a(i,j);  % 详解: 赋值：将 a(...) 的结果保存到 min
+                        s=i;d=j;  % 详解: 赋值：计算表达式并保存到 s
+                end  % 详解: 执行语句
+            end  % 详解: 执行语句
+        end  % 详解: 执行语句
+    end  % 详解: 执行语句
+    listV(d)=1;  % 详解: 执行语句
+    distance(e)=b;  % 详解: 执行语句
+    source(e)=s;  % 详解: 执行语句
+    destination(e)=d;  % 详解: 执行语句
+    e=e+1;  % 详解: 赋值：计算表达式并保存到 e
+end  % 详解: 执行语句
+
+T=[source;destination];  % 详解: 赋值：计算表达式并保存到 T
+for g=1:e-1  % 详解: for 循环：迭代变量 g 遍历 1:e-1
+    c(g)=a(T(1,g),T(2,g));  % 详解: 调用函数：c(g)=a(T(1,g),T(2,g))
+end  % 详解: 执行语句
+c;  % 详解: 执行语句
+
+
+

@@ -1,71 +1,40 @@
-function z = trapz(x,y,dim)
-%���λ��ַ�.��������ֵ�����͹⻬�Բ��õĺ���.
-%  z=trapz(x,y),x�Ǳ�ʾ�����������ɢ������;
-%               y����xͬά��������,��ʾ��������;
-%               z���ػ��ֵĽ���ֵ.
-%��     ����exp(-x^2)��[-1 1]�ϵĶ�����  
-%     clear;
-%     x=-1:0.1:1;
-%     y=exp(-x.^2);
-%     trapz(x,y)
-%
-%TRAPZ  Trapezoidal numerical integration.
-%   Z = TRAPZ(Y) computes an approximation of the integral of Y via
-%   the trapazoidal method (with unit spacing).  To compute the integral
-%   for spacing different from one, multiply Z by the spacing increment.
-%
-%   For vectors, TRAPZ(Y) is the integral of Y. For matrices, TRAPZ(Y)
-%   is a row vector with the integral over each column. For N-D
-%   arrays, TRAPZ(Y) works across the first non-singleton dimension.
-%
-%   Z = TRAPZ(X,Y) computes the integral of Y with respect to X using
-%   the trapezoidal method.  X and Y must be vectors of the same
-%   length, or X must be a column vector and Y an array whose first
-%   non-singleton dimension is length(X).  TRAPZ operates along this
-%   dimension.
-%
-%   Z = TRAPZ(X,Y,DIM) or TRAPZ(Y,DIM) integrates across dimension DIM
-%   of Y. The length of X must be the same as size(Y,DIM)).
-%
-%   Example: If Y = [0 1 2
-%                    3 4 5]
-%
-%   then trapz(Y,1) is [1.5 2.5 3.5] and trapz(Y,2) is [2
-%                                                       8];
-%
-%   See also SUM, CUMSUM, CUMTRAPZ.
+﻿% 文件: TRAPZ.M
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-%   Clay M. Thompson, 10/16/90; Cleve Moler, 1/19/92.
-%   Copyright (c) 1984-98 by The MathWorks, Inc.
-%   $Revision: 5.10 $  $Date: 1997/11/21 23:24:10 $
+function z = trapz(x,y,dim)  % 详解: 执行语句
 
-%   Make sure x and y are column vectors, or y is a matrix.
 
-perm = []; nshifts = 0;
-if nargin == 3, % trapz(x,y,dim)
-  perm = [dim:max(ndims(y),dim) 1:dim-1];
-  y = permute(y,perm);
-  m = size(y,1);
-elseif nargin==2 & length(y)==1 % trapz(y,dim)
-  dim = y; y = x;
-  perm = [dim:max(ndims(y),dim) 1:dim-1];
-  y = permute(y,perm);
-  m = size(y,1);
-  x = 1:m;
-else
-  if nargin < 2, y = x; end
-  [y,nshifts] = shiftdim(y);
-  m = size(y,1);
-  if nargin < 2, x = 1:m; end
-end
-x = x(:);
-if length(x) ~= m
-    error('length(x) must equal length of first non-singleton dim of y.');
-end
 
-%   Trapezoid sum computed with vector-matrix multiply.
-z = diff(x,1,1)' * (y(1:m-1,:) + y(2:m,:))/2;
+perm = []; nshifts = 0;  % 详解: 赋值：计算表达式并保存到 perm
+if nargin == 3,  % 详解: 条件判断：if (nargin == 3,)
+  perm = [dim:max(ndims(y),dim) 1:dim-1];  % 详解: 赋值：计算表达式并保存到 perm
+  y = permute(y,perm);  % 详解: 赋值：将 permute(...) 的结果保存到 y
+  m = size(y,1);  % 详解: 赋值：将 size(...) 的结果保存到 m
+elseif nargin==2 & length(y)==1  % 详解: 条件判断：elseif (nargin==2 & length(y)==1)
+  dim = y; y = x;  % 详解: 赋值：计算表达式并保存到 dim
+  perm = [dim:max(ndims(y),dim) 1:dim-1];  % 详解: 赋值：计算表达式并保存到 perm
+  y = permute(y,perm);  % 详解: 赋值：将 permute(...) 的结果保存到 y
+  m = size(y,1);  % 详解: 赋值：将 size(...) 的结果保存到 m
+  x = 1:m;  % 详解: 赋值：计算表达式并保存到 x
+else  % 详解: 条件判断：else 分支
+  if nargin < 2, y = x; end  % 详解: 条件判断：if (nargin < 2, y = x; end)
+  [y,nshifts] = shiftdim(y);  % 详解: 执行语句
+  m = size(y,1);  % 详解: 赋值：将 size(...) 的结果保存到 m
+  if nargin < 2, x = 1:m; end  % 详解: 条件判断：if (nargin < 2, x = 1:m; end)
+end  % 详解: 执行语句
+x = x(:);  % 详解: 赋值：将 x(...) 的结果保存到 x
+if length(x) ~= m  % 详解: 条件判断：if (length(x) ~= m)
+    error('length(x) must equal length of first non-singleton dim of y.');  % 详解: 调用函数：error('length(x) must equal length of first non-singleton dim of y.')
+end  % 详解: 执行语句
 
-siz = size(y); siz(1) = 1;
-z = reshape(z,[ones(1,nshifts),siz]);
-if ~isempty(perm), z = ipermute(z,perm); end
+z = diff(x,1,1)' * (y(1:m-1,:) + y(2:m,:))/2;  % 赋值：设置变量 z  % 详解: 赋值：将 diff(...) 的结果保存到 z  % 详解: 赋值：将 diff(...) 的结果保存到 z
+
+siz = size(y); siz(1) = 1;  % 详解: 赋值：将 size(...) 的结果保存到 siz
+z = reshape(z,[ones(1,nshifts),siz]);  % 详解: 赋值：将 reshape(...) 的结果保存到 z
+if ~isempty(perm), z = ipermute(z,perm); end  % 详解: 条件判断：if (~isempty(perm), z = ipermute(z,perm); end)
+
+
+
+

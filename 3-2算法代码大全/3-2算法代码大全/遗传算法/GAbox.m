@@ -1,41 +1,45 @@
-%Çó½ây=variable .* sin(10 * pi * variable) + 2.0µÄ×î´óÖµ
-figure(1);
-fplot('variable .* sin(10 * pi * variable) + 2.0',[-1, 2]);%»­³öÄ¿±êº¯ÊıÍ¼
-%¶¨ÒåÒÅ´«Ëã·¨²ÎÊı
-NIND = 40;%¸öÌåÊıÄ¿
-MAXGEN = 25;%×î´óÒÅ´«´úÊı
-PRECI = 20;%±äÁ¿µÄ¶ş½øÖÆÎ»Êı£¨×¢£ºÒ²¾ÍÊÇ¾«¶È£©
-GGAP = 0.9;%´ú¹µ
-trace = zeros(2, MAXGEN);%Ñ°ÓÅ½á¹û£¬³õÊ¼Öµ
-FieldD = [20; -1;2;1;0;1;1];%ÇøÓòÃèÊöÆ÷
-Chrom = crtbp(NIND,PRECI);%³õÊ¼ÖÖÈº
-gen = 0;%´ú¼ÆÊıÆ÷
-variable = bs2rv(Chrom,FieldD);%³õÊ¼ÖÖÈº×ª³ÉÊ®½øÖÆÊı
-ObjV = variable .* sin(10 * pi * variable) + 2.0;%Ä¿±êº¯ÊıÖµ
-while gen <= MAXGEN,
+ï»¿% æ–‡ä»¶: GAbox.m
+% è¯´æ˜: è‡ªåŠ¨æ·»åŠ çš„æ³¨é‡Šå ä½ï¼Œè¯·æ ¹æ®éœ€è¦è¡¥å……ã€‚
+% ç”Ÿæˆ: 2025-08-31 23:06
+% æ³¨é‡Š: æœ¬æ–‡ä»¶å¤´ç”±è„šæœ¬è‡ªåŠ¨æ·»åŠ 
 
-    FitnV = ranking(-ObjV);%·ÖÅäÊÊÓ¦¶ÈÖµ
-%£¨×¢£ºº¯ÊırankingµÄ¹¦ÄÜÊÇ£º»ùÓÚÅÅĞòµÄÊÊÓ¦¶ÈÖµ·ÖÅä£¬¸ù¾İ¸öÌåµÄÄ¿±êÖµÓÉĞ¡µ½´óµÄË³Ğò¶ÔËüÃÇ½øĞĞÅÅĞò£¬
-%²¢·µ»ØÒ»°üº¬¶ÔÓ¦¸öÌåÊÊÓ¦¶ÈÖµFitnVµÄÁĞÏòÁ¿¡£
-%Ñ¹²îÊÇÖ¸£º·ÖÅäµÄ¸öÌåÊÊÓ¦¶ÈÖµµÄ²î¾à£¬×îºÃµÄºÍ×î»µµÄ£¬Ëû¶ÔÔ­À´µÄº¯ÊıÖµÃ»ÓĞÓ°Ïì£¬Ö»ÊÇ¸ù¾İÔ­À´µÄº¯ÊıÖµÀ´·ÖÅäÒ»¸öÌåÏÖ¸öÌåÓÅÁÓµÄÒ»¸öÖµ¡££©
-SelCh = select('sus',Chrom,FitnV,GGAP);%Ñ¡Ôñ
-SelCh = recombin('xovsp',SelCh,0.7);%ÖØ×é£¬¼´½»²æ
-SelCh = mut(SelCh); %±äÒì
-variable = bs2rv(SelCh,FieldD);%×Ó´úÊ®½øÖÆ×ª»»
-ObjVSel = variable .* sin(10 * pi * variable) + 2.0;%×Ó´úÄ¿±êº¯ÊıÖµ
-[Chrom ObjV] = reins(Chrom, SelCh, 1, 1, ObjV, ObjVSel);%ÖØ²åÈë×Ó´úĞÂÖÖÈº
-gen = gen + 1; %(×¢£ºmatlab²»Ö§³Ögen += 1£©
-[Y,I] = max(ObjV),hold on;
-plot(variable, Y, 'bo');
-trace(1, gen) = max(ObjV); %ÒÅ´«Ëã·¨ĞÔÄÜ¸ú×Ù
-trace(2, gen) = sum(ObjV) / length(ObjV);
-end
-variable = bs2rv(Chrom, FieldD);%×îÓÅ¸öÌåµÄÊ®½øÖÆ×ª»»
-hold on,
-grid;
-plot(variable, ObjV, 'b*');
-figure(2);
-plot(trace(1, :));
-hold on
-plot(trace(2, :),'-.'); grid;
-legend('½âµÄ±ä»¯', 'ÖÖÈº¾ùÖµµÄ±ä»¯');
+%æ±‚è§£y=variable .* sin(10 * pi * variable) + 2.0çš„æœ€å¤§å€¼
+figure(1);  % è¯¦è§£: è°ƒç”¨å‡½æ•°ï¼šfigure(1)
+fplot('variable .* sin(10 * pi * variable) + 2.0',[-1, 2]);  % è¯¦è§£: è°ƒç”¨å‡½æ•°ï¼šfplot('variable .* sin(10 * pi * variable) + 2.0',[-1, 2])
+NIND = 40;  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° NIND
+MAXGEN = 25;  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° MAXGEN
+PRECI = 20;  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° PRECI
+GGAP = 0.9;  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° GGAP
+trace = zeros(2, MAXGEN);  % è¯¦è§£: èµ‹å€¼ï¼šå°† zeros(...) çš„ç»“æœä¿å­˜åˆ° trace
+FieldD = [20; -1;2;1;0;1;1];  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° FieldD
+Chrom = crtbp(NIND,PRECI);  % è¯¦è§£: èµ‹å€¼ï¼šå°† crtbp(...) çš„ç»“æœä¿å­˜åˆ° Chrom
+gen = 0;  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° gen
+variable = bs2rv(Chrom,FieldD);  % è¯¦è§£: èµ‹å€¼ï¼šå°† bs2rv(...) çš„ç»“æœä¿å­˜åˆ° variable
+ObjV = variable .* sin(10 * pi * variable) + 2.0;  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° ObjV
+while gen <= MAXGEN,  % è¯¦è§£: while å¾ªç¯ï¼šå½“ (gen <= MAXGEN,) ä¸ºçœŸæ—¶è¿­ä»£
+
+    FitnV = ranking(-ObjV);  % è¯¦è§£: èµ‹å€¼ï¼šå°† ranking(...) çš„ç»“æœä¿å­˜åˆ° FitnV
+SelCh = select('sus',Chrom,FitnV,GGAP);  % è¯¦è§£: èµ‹å€¼ï¼šå°† select(...) çš„ç»“æœä¿å­˜åˆ° SelCh
+SelCh = recombin('xovsp',SelCh,0.7);  % è¯¦è§£: èµ‹å€¼ï¼šå°† recombin(...) çš„ç»“æœä¿å­˜åˆ° SelCh
+SelCh = mut(SelCh);  % è¯¦è§£: èµ‹å€¼ï¼šå°† mut(...) çš„ç»“æœä¿å­˜åˆ° SelCh
+variable = bs2rv(SelCh,FieldD);  % è¯¦è§£: èµ‹å€¼ï¼šå°† bs2rv(...) çš„ç»“æœä¿å­˜åˆ° variable
+ObjVSel = variable .* sin(10 * pi * variable) + 2.0;  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° ObjVSel
+[Chrom ObjV] = reins(Chrom, SelCh, 1, 1, ObjV, ObjVSel);  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+gen = gen + 1;  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° gen
+[Y,I] = max(ObjV),hold on;  % è¯¦è§£: ç»Ÿè®¡ï¼šæœ€å¤§/æœ€å°å€¼
+plot(variable, Y, 'bo');  % è¯¦è§£: è°ƒç”¨å‡½æ•°ï¼šplot(variable, Y, 'bo')
+trace(1, gen) = max(ObjV);  % è¯¦è§£: è°ƒç”¨å‡½æ•°ï¼štrace(1, gen) = max(ObjV)
+trace(2, gen) = sum(ObjV) / length(ObjV);  % è¯¦è§£: è°ƒç”¨å‡½æ•°ï¼štrace(2, gen) = sum(ObjV) / length(ObjV)
+end  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+variable = bs2rv(Chrom, FieldD);  % è¯¦è§£: èµ‹å€¼ï¼šå°† bs2rv(...) çš„ç»“æœä¿å­˜åˆ° variable
+hold on,  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+grid;  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+plot(variable, ObjV, 'b*');  % è¯¦è§£: è°ƒç”¨å‡½æ•°ï¼šplot(variable, ObjV, 'b*')
+figure(2);  % è¯¦è§£: è°ƒç”¨å‡½æ•°ï¼šfigure(2)
+plot(trace(1, :));  % è¯¦è§£: è°ƒç”¨å‡½æ•°ï¼šplot(trace(1, :))
+hold on  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+plot(trace(2, :),'-.'); grid;  % è¯¦è§£: ç»˜å›¾ï¼šäºŒç»´æ›²çº¿
+legend('è§£çš„å˜åŒ–', 'ç§ç¾¤å‡å€¼çš„å˜åŒ–');  % è¯¦è§£: è°ƒç”¨å‡½æ•°ï¼šlegend('è§£çš„å˜åŒ–', 'ç§ç¾¤å‡å€¼çš„å˜åŒ–')
+
+
+

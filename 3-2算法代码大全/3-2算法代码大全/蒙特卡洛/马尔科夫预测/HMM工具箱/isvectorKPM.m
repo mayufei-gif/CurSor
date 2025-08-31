@@ -1,9 +1,13 @@
-function p = isvector(v)
-% ISVECTOR Returns 1 if all but one dimension have size 1.
-% p = isvector(v)
-%
-% Example: isvector(rand(1,2,1)) = 1, isvector(rand(2,2)) = 0.
+﻿% 文件: isvectorKPM.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-s=size(v);
-p = (ndims(v)<=2) & (s(1) == 1 | s(2) == 1);
-%p = sum( size(v) > 1) <= 1; % Peter Acklam's solution
+function p = isvector(v)  % 详解: 执行语句
+
+s=size(v);  % 详解: 赋值：将 size(...) 的结果保存到 s
+p = (ndims(v)<=2) & (s(1) == 1 | s(2) == 1);  % 详解: 赋值：计算表达式并保存到 p
+
+
+
+

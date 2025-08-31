@@ -1,12 +1,13 @@
-function indices = argmin(v)
-% ARGMIN Return as a subscript vector the location of the smallest element of a multidimensional array v.
-% indices = argmin(v)
-%
-% Returns the first minimum in the case of ties.
-% Example:
-% X = [2 8 4; 7 3 9];
-% argmin(X) = [1 1], i.e., row 1 column 1
+﻿% 文件: argmin.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-[m i] = min(v(:));
-indices = ind2subv(mysize(v), i);
-%indices = ind2subv(size(v), i);
+function indices = argmin(v)  % 详解: 执行语句
+
+[m i] = min(v(:));  % 详解: 统计：最大/最小值
+indices = ind2subv(mysize(v), i);  % 详解: 赋值：将 ind2subv(...) 的结果保存到 indices
+
+
+
+

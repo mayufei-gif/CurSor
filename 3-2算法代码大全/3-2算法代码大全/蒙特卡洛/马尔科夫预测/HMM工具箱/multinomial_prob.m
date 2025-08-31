@@ -1,20 +1,18 @@
-function B = eval_pdf_cond_multinomial(data, obsmat)
-% EVAL_PDF_COND_MULTINOMIAL Evaluate pdf of conditional multinomial 
-% function B = eval_pdf_cond_multinomial(data, obsmat)
-%
-% Notation: Y = observation (O values), Q = conditioning variable (K values)
-%
-% Inputs:
-% data(t) = t'th observation - must be an integer in {1,2,...,K}: cannot be 0!
-% obsmat(i,o) = Pr(Y(t)=o | Q(t)=i)
-%
-% Output:
-% B(i,t) = Pr(y(t) | Q(t)=i)
+﻿% 文件: multinomial_prob.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-[Q O] = size(obsmat);
-T = prod(size(data)); % length(data);
-B = zeros(Q,T);
+function B = eval_pdf_cond_multinomial(data, obsmat)  % 详解: 执行语句
 
-for t=1:T
-  B(:,t) = obsmat(:, data(t));
-end
+[Q O] = size(obsmat);  % 详解: 获取向量/矩阵尺寸
+T = prod(size(data));  % 详解: 赋值：将 prod(...) 的结果保存到 T
+B = zeros(Q,T);  % 详解: 赋值：将 zeros(...) 的结果保存到 B
+
+for t=1:T  % 详解: for 循环：迭代变量 t 遍历 1:T
+  B(:,t) = obsmat(:, data(t));  % 详解: 调用函数：B(:,t) = obsmat(:, data(t))
+end  % 详解: 执行语句
+
+
+
+

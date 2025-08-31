@@ -1,10 +1,15 @@
+﻿% 文件: f11.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
+
 % function fval = f11(x)
 % 
 % Bound = [-65.536 65.536];
 % 
 % if nargin==0
 %     fval = Bound;
-% else
+% else  % 中文: p（j）= h;
 %     data = [-32 -16   0  16  32 ...
 %             -32 -16   0  16  32 ...
 %             -32 -16   0  16  32 ...
@@ -16,15 +21,18 @@
 %              16  16  16  16  16 ...
 %              32  32  32  32  32];
 %     fval = 1/(1/500+sum(1./((x(1)-data(1,:)).^6+(x(2)-data(2,:)).^6+(1:25)))); 
-% end
-function fval =f11(x)
+% end  % 中文: min = q（i）;
+function fval =f11(x)  % 详解: 执行语句
 
-Bound=[-600 600];
+Bound=[-600 600];  % 详解: 赋值：计算表达式并保存到 Bound
 
-if nargin==0
-   fval = Bound;
-else
-    [Dim, PopSize] = size(x);
-    indices = repmat(1:Dim, PopSize, 1);
-    fval  = .00025*sum((x-100).^2) - prod( cos((x-100)./sqrt(indices')) ) +1;
-end
+if nargin==0  % 详解: 条件判断：if (nargin==0)
+   fval = Bound;  % 详解: 赋值：计算表达式并保存到 fval
+else  % 详解: 条件判断：else 分支
+    [Dim, PopSize] = size(x);  % 详解: 获取向量/矩阵尺寸
+    indices = repmat(1:Dim, PopSize, 1);  % 详解: 赋值：将 repmat(...) 的结果保存到 indices
+    fval  = .00025*sum((x-100).^2) - prod( cos((x-100)./sqrt(indices')) ) +1;  % 统计：求和/均值/中位数  % 详解: 赋值：计算表达式并保存到 fval  % 详解: 赋值：计算表达式并保存到 fval
+end  % 详解: 执行语句
+
+
+

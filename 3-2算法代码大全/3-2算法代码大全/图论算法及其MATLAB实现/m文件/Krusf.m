@@ -1,52 +1,52 @@
-function [T c]=Krusf(d,flag)
-% function [T c]=Krusf(d,flag)
-% ����С��������Kruskal�㷨
-%  ��Ȩ����Ĳ���������
-%  1)һ��ı�Ȩ����Ϊnxnά�����÷�ʽ[T c]=Krusf(d)
-%  2����Ȩ�����ǰ���зֱ��¼ͼ�����бߵ���ʼ�������ֹ���㣬
-%     ����߲��ظ���¼�������м�¼��Ӧ�ߵ�Ȩֵ�����÷�ʽΪ[T c]=Krusf(d,1)
-%  c:�������ķ���;
-%  T:�������ı߼���;
+﻿% 文件: Krusf.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-if nargin==1
-n=size(d,2);
-m=sum(sum(d~=0))/2;
-b=zeros(3,m);
-k=1;
-for i=1:n
-    for j=(i+1):n
-        if d(i,j)~=0
-            b(1,k)=i;b(2,k)=j;
-            b(3,k)=d(i,j);k=k+1;
-        end
-    end
-end
-else
-    b=d;
-end
+function [T c]=Krusf(d,flag)  % 详解: 函数定义：Krusf(d,flag), 返回：T c
 
-n=max(max(b(1:2,:)));
-m=size(b,2);
-[B,i]=sortrows(b',3);
-B=B';
-c=0;T=[];
-k=1;t=1:n;
-for i=1:m
-    if t(B(1,i))~=t(B(2,i))
-         T(1:2,k)=B(1:2,i);
-         c=c+B(3,i);
-         k=k+1;
-         tmin=min(t(B(1,i)),t(B(2,i)));
-         tmax=max(t(B(1,i)),t(B(2,i)));
-         for j=1:n
-             if t(j)==tmax
-                 t(j)=tmin;
-             end
-         end
-    end
-    if k==n
-        break;
-    end
-end
-T;
-c;
+if nargin==1  % 详解: 条件判断：if (nargin==1)
+n=size(d,2);  % 详解: 赋值：将 size(...) 的结果保存到 n
+m=sum(sum(d~=0))/2;  % 详解: 赋值：将 sum(...) 的结果保存到 m
+b=zeros(3,m);  % 详解: 赋值：将 zeros(...) 的结果保存到 b
+k=1;  % 详解: 赋值：计算表达式并保存到 k
+for i=1:n  % 详解: for 循环：迭代变量 i 遍历 1:n
+    for j=(i+1):n  % 详解: for 循环：迭代变量 j 遍历 (i+1):n
+        if d(i,j)~=0  % 详解: 条件判断：if (d(i,j)~=0)
+            b(1,k)=i;b(2,k)=j;  % 详解: 执行语句
+            b(3,k)=d(i,j);k=k+1;  % 详解: 执行语句
+        end  % 详解: 执行语句
+    end  % 详解: 执行语句
+end  % 详解: 执行语句
+else  % 详解: 条件判断：else 分支
+    b=d;  % 详解: 赋值：计算表达式并保存到 b
+end  % 详解: 执行语句
+
+n=max(max(b(1:2,:)));  % 详解: 赋值：将 max(...) 的结果保存到 n
+m=size(b,2);  % 详解: 赋值：将 size(...) 的结果保存到 m
+[B,i]=sortrows(b',3);  % 执行语句  % 详解: 执行语句  % 详解: 执行语句
+B=B';  % 赋值：设置变量 B  % 详解: 赋值：计算表达式并保存到 B  % 详解: 赋值：计算表达式并保存到 B
+c=0;T=[];  % 详解: 赋值：计算表达式并保存到 c
+k=1;t=1:n;  % 详解: 赋值：计算表达式并保存到 k
+for i=1:m  % 详解: for 循环：迭代变量 i 遍历 1:m
+    if t(B(1,i))~=t(B(2,i))  % 详解: 条件判断：if (t(B(1,i))~=t(B(2,i)))
+         T(1:2,k)=B(1:2,i);  % 详解: 调用函数：T(1:2,k)=B(1:2,i)
+         c=c+B(3,i);  % 详解: 赋值：计算表达式并保存到 c
+         k=k+1;  % 详解: 赋值：计算表达式并保存到 k
+         tmin=min(t(B(1,i)),t(B(2,i)));  % 详解: 赋值：将 min(...) 的结果保存到 tmin
+         tmax=max(t(B(1,i)),t(B(2,i)));  % 详解: 赋值：将 max(...) 的结果保存到 tmax
+         for j=1:n  % 详解: for 循环：迭代变量 j 遍历 1:n
+             if t(j)==tmax  % 详解: 条件判断：if (t(j)==tmax)
+                 t(j)=tmin;  % 详解: 执行语句
+             end  % 详解: 执行语句
+         end  % 详解: 执行语句
+    end  % 详解: 执行语句
+    if k==n  % 详解: 条件判断：if (k==n)
+        break;  % 详解: 跳出循环：break
+    end  % 详解: 执行语句
+end  % 详解: 执行语句
+T;  % 详解: 执行语句
+c;  % 详解: 执行语句
+
+
+

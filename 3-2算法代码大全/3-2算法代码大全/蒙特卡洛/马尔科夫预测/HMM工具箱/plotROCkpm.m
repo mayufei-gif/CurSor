@@ -1,69 +1,55 @@
-function [falseAlarmRate, detectionRate, area, th] = plotROC(confidence, testClass, col, varargin)
-% You pass the scores and the classes, and the function returns the false
-% alarm rate and the detection rate for different points across the ROC.
-%
-% [faR, dR] = plotROC(score, class)
-%
-%  faR (false alarm rate) is uniformly sampled from 0 to 1
-%  dR (detection rate) is computed using the scores.
-%
-% class = 0 => target absent
-% class = 1 => target present
-%
-% score is the output of the detector, or any other measure of detection.
-% There is no plot unless you add a third parameter that is the color of
-% the graph. For instance:
-% [faR, dR] = plotROC(score, class, 'r')
-%
-% faR, dR are size 1x1250
+﻿% 文件: plotROCkpm.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-if nargin < 3, col = []; end
-[scale01] = process_options(varargin, 'scale01', 1);
+function [falseAlarmRate, detectionRate, area, th] = plotROC(confidence, testClass, col, varargin)  % 详解: 函数定义：plotROC(confidence, testClass, col, varargin), 返回：falseAlarmRate, detectionRate, area, th
 
-S = rand('state');
-rand('state',0);
-confidence = confidence + rand(size(confidence))*10^(-10);
-rand('state',S)
+if nargin < 3, col = []; end  % 详解: 条件判断：if (nargin < 3, col = []; end)
+[scale01] = process_options(varargin, 'scale01', 1);  % 详解: 执行语句
 
-ndxAbs = find(testClass==0); % absent
-ndxPres = find(testClass==1); % present
+S = rand('state');  % 详解: 赋值：将 rand(...) 的结果保存到 S
+rand('state',0);  % 详解: 调用函数：rand('state',0)
+confidence = confidence + rand(size(confidence))*10^(-10);  % 详解: 赋值：计算表达式并保存到 confidence
+rand('state',S)  % 详解: 调用函数：rand('state',S)
 
-[th, j] = sort(confidence(ndxAbs));
-th = th(fix(linspace(1, length(th), 1250))); 
+ndxAbs = find(testClass==0);  % 详解: 赋值：将 find(...) 的结果保存到 ndxAbs
+ndxPres = find(testClass==1);  % 详解: 赋值：将 find(...) 的结果保存到 ndxPres
 
-cAbs = confidence(ndxAbs);
-cPres = confidence(ndxPres);
-for t=1:length(th)
-  if length(ndxPres) == 0
-    detectionRate(t) = 0;
-  else
-    detectionRate(t)  = sum(cPres>=th(t)) / length(ndxPres);
-  end
-  if length(ndxAbs) == 0
-    falseAlarmRate(t) = 0;
-  else
-    falseAlarmRate(t) = sum(cAbs>=th(t)) / length(ndxAbs);
-  end
+[th, j] = sort(confidence(ndxAbs));  % 详解: 执行语句
+th = th(fix(linspace(1, length(th), 1250)));  % 详解: 赋值：将 th(...) 的结果保存到 th
+
+cAbs = confidence(ndxAbs);  % 详解: 赋值：将 confidence(...) 的结果保存到 cAbs
+cPres = confidence(ndxPres);  % 详解: 赋值：将 confidence(...) 的结果保存到 cPres
+for t=1:length(th)  % 详解: for 循环：迭代变量 t 遍历 1:length(th)
+  if length(ndxPres) == 0  % 详解: 条件判断：if (length(ndxPres) == 0)
+    detectionRate(t) = 0;  % 详解: 执行语句
+  else  % 详解: 条件判断：else 分支
+    detectionRate(t)  = sum(cPres>=th(t)) / length(ndxPres);  % 详解: 调用函数：detectionRate(t) = sum(cPres>=th(t)) / length(ndxPres)
+  end  % 详解: 执行语句
+  if length(ndxAbs) == 0  % 详解: 条件判断：if (length(ndxAbs) == 0)
+    falseAlarmRate(t) = 0;  % 详解: 执行语句
+  else  % 详解: 条件判断：else 分支
+    falseAlarmRate(t) = sum(cAbs>=th(t)) / length(ndxAbs);  % 详解: 调用函数：falseAlarmRate(t) = sum(cAbs>=th(t)) / length(ndxAbs)
+  end  % 详解: 执行语句
   
-  %detectionRate(t)  = sum(confidence(ndxPres)>=th(t)) / length(ndxPres);
-  %falseAlarmRate(t) = sum(confidence(ndxAbs)>=th(t)) / length(ndxAbs);
-  %detections(t)     = sum(confidence(ndxPres)>=th(t));
-  %falseAlarms(t)    = sum(confidence(ndxAbs)>=th(t));
-end
+end  % 详解: 执行语句
 
-area = sum(abs(falseAlarmRate(2:end) - falseAlarmRate(1:end-1)) .* detectionRate(2:end));
+area = sum(abs(falseAlarmRate(2:end) - falseAlarmRate(1:end-1)) .* detectionRate(2:end));  % 详解: 赋值：将 sum(...) 的结果保存到 area
 
-if ~isempty(col)
-    h=plot(falseAlarmRate, detectionRate, [col '-']);
-    %set(h, 'linewidth', 2);
-    e = 0.05;
-    if scale01
-      axis([0-e 1+e 0-e 1+e])
-    else
-      % zoom in on the top left corner
-      axis([0-e 0.5+e 0.5-e 1+e])
-    end
-    grid on
-    ylabel('detection rate')
-    xlabel('false alarm rate')
-end
+if ~isempty(col)  % 详解: 条件判断：if (~isempty(col))
+    h=plot(falseAlarmRate, detectionRate, [col '-']);  % 详解: 赋值：将 plot(...) 的结果保存到 h
+    e = 0.05;  % 详解: 赋值：计算表达式并保存到 e
+    if scale01  % 详解: 条件判断：if (scale01)
+      axis([0-e 1+e 0-e 1+e])  % 详解: 调用函数：axis([0-e 1+e 0-e 1+e])
+    else  % 详解: 条件判断：else 分支
+      axis([0-e 0.5+e 0.5-e 1+e])  % 详解: 调用函数：axis([0-e 0.5+e 0.5-e 1+e])
+    end  % 详解: 执行语句
+    grid on  % 详解: 执行语句
+    ylabel('detection rate')  % 详解: 调用函数：ylabel('detection rate')
+    xlabel('false alarm rate')  % 详解: 调用函数：xlabel('false alarm rate')
+end  % 详解: 执行语句
+
+
+
+

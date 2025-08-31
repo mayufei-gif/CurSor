@@ -1,40 +1,42 @@
-function [S,Q]=concom(G)
-% ͼ����ͨ�Լ���
-% function [S,Q]=concom(G)
-% G ͼ���ڽӾ���
-% S ͼ����ͨ���� Q ͼ�Ķ������ڵĿ��
+﻿% 文件: concom.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-n=size(G,1);
-m=sum(sum(G))/2;
-S=0;j=1;C=1;
-Q=zeros(n,1);
-for i=1:n
-    for j=(i+1):n
-        if G(i,j)==1  % ����֮���б�
-        if Q(i)==Q(j) % ����֮���б�������ͬһ��
-            if Q(i)==0
-                Q(i)=C;Q(j)=C; 
-                C=C+1;
-                S=S+1;
-            end
-        else
-            if Q(i)==0 % ��Ϊ���i����j��ͬһ��
-                Q(i)=Q(j);
-            elseif Q(j)==0 % ��Ϊ���j����i��ͬһ��
-                Q(j)=Q(i);
-            else   % �����������������Ϊ��ͬ�Ŀ飬����п�ϲ�
-                for k=1:n
-                    if Q(k)==Q(i)
-                        Q(k)=Q(j); % ������ϲ�
-                    end
-                end
-                S=S-1;
-            end
-        end
-        end
-    end
-end
-S;
-Q;
-% G=[1 0 1 1;1 1 0 1;1 1 1 1;1 0 1 1]   
-% G=[0 1 0 0;1 0 0 0;0 0 0 1;0 0 1 0] 
+function [S,Q]=concom(G)  % 详解: 函数定义：concom(G), 返回：S,Q
+
+n=size(G,1);  % 详解: 赋值：将 size(...) 的结果保存到 n
+m=sum(sum(G))/2;  % 详解: 赋值：将 sum(...) 的结果保存到 m
+S=0;j=1;C=1;  % 详解: 赋值：计算表达式并保存到 S
+Q=zeros(n,1);  % 详解: 赋值：将 zeros(...) 的结果保存到 Q
+for i=1:n  % 详解: for 循环：迭代变量 i 遍历 1:n
+    for j=(i+1):n  % 详解: for 循环：迭代变量 j 遍历 (i+1):n
+        if G(i,j)==1  % 详解: 条件判断：if (G(i,j)==1)
+        if Q(i)==Q(j)  % 详解: 条件判断：if (Q(i)==Q(j))
+            if Q(i)==0  % 详解: 条件判断：if (Q(i)==0)
+                Q(i)=C;Q(j)=C;  % 详解: 执行语句
+                C=C+1;  % 详解: 赋值：计算表达式并保存到 C
+                S=S+1;  % 详解: 赋值：计算表达式并保存到 S
+            end  % 详解: 执行语句
+        else  % 详解: 条件判断：else 分支
+            if Q(i)==0  % 详解: 条件判断：if (Q(i)==0)
+                Q(i)=Q(j);  % 详解: 调用函数：Q(i)=Q(j)
+            elseif Q(j)==0  % 详解: 条件判断：elseif (Q(j)==0)
+                Q(j)=Q(i);  % 详解: 调用函数：Q(j)=Q(i)
+            else  % 详解: 条件判断：else 分支
+                for k=1:n  % 详解: for 循环：迭代变量 k 遍历 1:n
+                    if Q(k)==Q(i)  % 详解: 条件判断：if (Q(k)==Q(i))
+                        Q(k)=Q(j);  % 详解: 调用函数：Q(k)=Q(j)
+                    end  % 详解: 执行语句
+                end  % 详解: 执行语句
+                S=S-1;  % 详解: 赋值：计算表达式并保存到 S
+            end  % 详解: 执行语句
+        end  % 详解: 执行语句
+        end  % 详解: 执行语句
+    end  % 详解: 执行语句
+end  % 详解: 执行语句
+S;  % 详解: 执行语句
+Q;  % 详解: 执行语句
+
+
+

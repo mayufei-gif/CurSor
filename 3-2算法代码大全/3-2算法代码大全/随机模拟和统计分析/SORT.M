@@ -1,5 +1,10 @@
-%��״������������
-%����
+﻿% 文件: SORT.M
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
+
+%列状数据升序排列
+%例如
 %    A=[11 4 0.2;22 3 0.5;0 3 0.4];
 %    sort(A)
 %
@@ -27,8 +32,10 @@
 %
 %   See also SORTROWS, MIN, MAX, MEAN, MEDIAN.
 
-%   Copyright (c) 1984-98 by The MathWorks, Inc.
-%   $Revision: 5.11 $  $Date: 1997/11/21 23:24:04 $
+%   Copyright (c) 1984-98 by The MathWorks, Inc.  % 中文: Mathworks，Inc。版权（C）1984-98
+%   $Revision: 5.11 $  $Date: 1997/11/21 23:24:04 $  % 中文: $修订：5.11 $ $日期：1997/11/21 23:24:04 $
 %   Built-in function.
 
-%   Cell array implementation in @cell/sort.m
+%   Cell array implementation in @cell/sort.m  % 中文: @cell/sort.m |||的单元格数组实现sortrows（a，3）||| Sortrows按顺序排序行。
+
+

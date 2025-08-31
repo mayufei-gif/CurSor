@@ -1,148 +1,98 @@
-function [Q,cnt] = quad8(funfcn,a,b,tol,trace,varargin)
-%��ֵ����
-%z=quad8('Fun',A,B,Tol,trace,p1,p2,L)
-%   ����:"Fun"-��ʾ����������M������.
-%        A,B-�ϩp����.
-%        Tol-����,ȱʡֵΪ1e-3.
-%        trace-����ʱ��ʾ�������,ȱʡֵΪ0.
-%        p1,p2,L-�α���,һ��ȱʡ.
-%������ exp(-x^2)��[-1��1]����
-%   ��дM����quadeg3fun.m
-%                   function  y=quadeg3fun(x)
-%                   y=exp(-x.^2);
-%   ��
-%   z=quad8('quadeg3fun',-1,1)    
-%
-%QUAD8  Numerically evaluate integral, higher order method.
-%   Q = QUAD8('F',A,B) approximates the integral of F(X) from A to B to
-%   within a relative error of 1e-3 using an adaptive recursive Newton
-%   Cotes 8 panel rule.  'F' is a string containing the name of the
-%   function.  The function must return a vector of output values if
-%   given a vector of input values.  Q = Inf is returned if an excessive
-%   recursion level is reached, indicating a possibly singular integral.
-%
-%   Q = QUAD8('F',A,B,TOL) integrates to a relative error of TOL.  Use
-%   a two element tolerance, TOL = [rel_tol abs_tol], to specify a
-%   combination of relative and absolute error.
-%
-%   Q = QUAD8('F',A,B,TOL,TRACE) integrates to a relative error of TOL and
-%   for non-zero TRACE traces the function evaluations with a point plot
-%   of the integrand.
-%
-%   Q = QUAD8('F',A,B,TOL,TRACE,P1,P2,...) allows coefficients P1, P2, ...
-%   to be passed directly to function F:   G = F(X,P1,P2,...).
-%   To use default values for TOL or TRACE, you may pass in the empty
-%   matrix ([]).
-%
-%   See also QUAD, DBLQUAD.
+﻿% 文件: QUAD8.M
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-%   Cleve Moler, 5-08-88.
-%   Copyright (c) 1984-98 by The MathWorks, Inc.
-%   $Revision: 5.16 $  $Date: 1997/11/21 23:31:14 $
+function [Q,cnt] = quad8(funfcn,a,b,tol,trace,varargin)  % 详解: 函数定义：quad8(funfcn,a,b,tol,trace,varargin), 返回：Q,cnt
 
-% [Q,cnt] = quad8(F,a,b,tol) also returns a function evaluation count.
 
-if nargin < 4, tol = [1.e-3 0]; trace = 0; end
-if nargin < 5, trace = 0; end
-if isempty(tol), tol = [1.e-3 0]; end
-if length(tol)==1, tol = [tol 0]; end
-if isempty(trace), trace = 0; end
-% QUAD8 usually does better than the default 1e-3.
-h = b - a;
 
-% Top level initialization, Newton-Cotes weights
-w = [3956 23552 -3712 41984 -18160 41984 -3712 23552 3956]/14175;
-x = a + (0:8)*(b-a)/8;
-y = feval(funfcn,x,varargin{:});
+if nargin < 4, tol = [1.e-3 0]; trace = 0; end  % 详解: 条件判断：if (nargin < 4, tol = [1.e-3 0]; trace = 0; end)
+if nargin < 5, trace = 0; end  % 详解: 条件判断：if (nargin < 5, trace = 0; end)
+if isempty(tol), tol = [1.e-3 0]; end  % 详解: 条件判断：if (isempty(tol), tol = [1.e-3 0]; end)
+if length(tol)==1, tol = [tol 0]; end  % 详解: 条件判断：if (length(tol)==1, tol = [tol 0]; end)
+if isempty(trace), trace = 0; end  % 详解: 条件判断：if (isempty(trace), trace = 0; end)
+h = b - a;  % 详解: 赋值：计算表达式并保存到 h
 
-yllow = min([min(real(y)) min(imag(y))]);
-ylhi = max([max(real(y)) max(imag(y))]);
-lims = [min(x) max(x) yllow ylhi];
-ind = find(~isfinite(lims));
-if ~isempty(ind)
-    [mind,nind] = size(ind);
-    lims(ind) = 1.e30*(-ones(mind,nind) .^ rem(ind,2));
-end
-if trace
-    axis(lims);
-% doesn't take care of complex case
-    plot([a b],[real(y(1)) real(y(9))],'.'), hold on
-    if ~isreal(y)
-        plot([a b],[imag(y(1)) imag(y(9))],'+')
-    end
-    drawnow
-end
-lev = 1;
+w = [3956 23552 -3712 41984 -18160 41984 -3712 23552 3956]/14175;  % 详解: 赋值：计算表达式并保存到 w
+x = a + (0:8)*(b-a)/8;  % 详解: 赋值：计算表达式并保存到 x
+y = feval(funfcn,x,varargin{:});  % 详解: 赋值：将 feval(...) 的结果保存到 y
 
-% Adaptive, recursive Newton-Cotes 8 panel quadrature
-if ~isreal(y)
-    Q0 = 1e30;
-else
-    Q0 = inf;
-end
-recur_lev_excess = 0;
-[Q,cnt,recur_lev_excess] = quad8stp(funfcn,a,b,tol,lev,w,x,y,Q0,trace,recur_lev_excess,varargin{:});
-cnt = cnt + 9;
-if trace
-    hold off
-    axis('auto');
-end
-if (recur_lev_excess > 1)
-    warning(sprintf('Recursion level limit reached %d times.', ...
-         recur_lev_excess ))
-end
+yllow = min([min(real(y)) min(imag(y))]);  % 详解: 赋值：将 min(...) 的结果保存到 yllow
+ylhi = max([max(real(y)) max(imag(y))]);  % 详解: 赋值：将 max(...) 的结果保存到 ylhi
+lims = [min(x) max(x) yllow ylhi];  % 详解: 赋值：计算表达式并保存到 lims
+ind = find(~isfinite(lims));  % 详解: 赋值：将 find(...) 的结果保存到 ind
+if ~isempty(ind)  % 详解: 条件判断：if (~isempty(ind))
+    [mind,nind] = size(ind);  % 详解: 获取向量/矩阵尺寸
+    lims(ind) = 1.e30*(-ones(mind,nind) .^ rem(ind,2));  % 详解: 调用函数：lims(ind) = 1.e30*(-ones(mind,nind) .^ rem(ind,2))
+end  % 详解: 执行语句
+if trace  % 详解: 条件判断：if (trace)
+    axis(lims);  % 详解: 调用函数：axis(lims)
+    plot([a b],[real(y(1)) real(y(9))],'.'), hold on  % 详解: 绘图：二维曲线
+    if ~isreal(y)  % 详解: 条件判断：if (~isreal(y))
+        plot([a b],[imag(y(1)) imag(y(9))],'+')  % 详解: 调用函数：plot([a b],[imag(y(1)) imag(y(9))],'+')
+    end  % 详解: 执行语句
+    drawnow  % 详解: 执行语句
+end  % 详解: 执行语句
+lev = 1;  % 详解: 赋值：计算表达式并保存到 lev
 
-%------------------------------------------------------------------
-function [Q,cnt,recur_lev_excess] = quad8stp(FunFcn,a,b,tol,lev,w,x0,f0,Q0,trace,recur_lev_excess,varargin)
-%QUAD8STP Recursive function used by QUAD8.
-%   [Q,cnt] = quad8stp(F,a,b,tol,lev,w,f,Q0) tries to approximate
-%   the integral of f(x) from a to b to within a relative error of tol.  
-%   F is a string containing the name of f.  The remaining arguments are 
-%   generated by quad8 or by the recursion.  lev is the recursion level.
-%   w is the weights in the 8 panel Newton Cotes formula.
-%   x0 is a vector of 9 equally spaced abscissa is the interval.
-%   f0 is a vector of the 9 function values at x.
-%   Q0 is an approximate value of the integral.
-%   See also QUAD8 and QUAD.
+if ~isreal(y)  % 详解: 条件判断：if (~isreal(y))
+    Q0 = 1e30;  % 详解: 赋值：计算表达式并保存到 Q0
+else  % 详解: 条件判断：else 分支
+    Q0 = inf;  % 详解: 赋值：计算表达式并保存到 Q0
+end  % 详解: 执行语句
+recur_lev_excess = 0;  % 详解: 赋值：计算表达式并保存到 recur_lev_excess
+[Q,cnt,recur_lev_excess] = quad8stp(funfcn,a,b,tol,lev,w,x,y,Q0,trace,recur_lev_excess,varargin{:});  % 详解: 执行语句
+cnt = cnt + 9;  % 详解: 赋值：计算表达式并保存到 cnt
+if trace  % 详解: 条件判断：if (trace)
+    hold off  % 详解: 执行语句
+    axis('auto');  % 详解: 调用函数：axis('auto')
+end  % 详解: 执行语句
+if (recur_lev_excess > 1)  % 详解: 条件判断：if ((recur_lev_excess > 1))
+    warning(sprintf('Recursion level limit reached %d times.', ...  % 详解: 执行语句
+         recur_lev_excess ))  % 详解: 执行语句
+end  % 详解: 执行语句
 
-%   Cleve Moler, 5-08-88.
+function [Q,cnt,recur_lev_excess] = quad8stp(FunFcn,a,b,tol,lev,w,x0,f0,Q0,trace,recur_lev_excess,varargin)  % 详解: 函数定义：quad8stp(FunFcn,a,b,tol,lev,w,x0,f0,Q0,trace,recur_lev_excess,varargin), 返回：Q,cnt,recur_lev_excess
 
-LEVMAX = 10;
 
-% Evaluate function at midpoints of left and right half intervals.
-x = zeros(1,17);
-f = zeros(1,17);
-x(1:2:17) = x0;
-f(1:2:17) = f0;
-x(2:2:16) = (x0(1:8) + x0(2:9))/2;
-f(2:2:16) = feval(FunFcn,x(2:2:16),varargin{:});
-if trace
-    plot(x(2:2:16),f(2:2:16),'.');
-    if ~isreal(f)
-        plot(x(2:2:16),imag(f(2:2:16)),'+');
-    end
-    drawnow
-end
-cnt = 8;
+LEVMAX = 10;  % 详解: 赋值：计算表达式并保存到 LEVMAX
 
-% Integrate over half intervals.
-h = (b-a)/16;
-Q1 = h*w*f(1:9).';
-Q2 = h*w*f(9:17).';
-Q = Q1 + Q2;
+x = zeros(1,17);  % 详解: 赋值：将 zeros(...) 的结果保存到 x
+f = zeros(1,17);  % 详解: 赋值：将 zeros(...) 的结果保存到 f
+x(1:2:17) = x0;  % 详解: 执行语句
+f(1:2:17) = f0;  % 详解: 执行语句
+x(2:2:16) = (x0(1:8) + x0(2:9))/2;  % 详解: 执行语句
+f(2:2:16) = feval(FunFcn,x(2:2:16),varargin{:});  % 详解: 调用函数：f(2:2:16) = feval(FunFcn,x(2:2:16),varargin{:})
+if trace  % 详解: 条件判断：if (trace)
+    plot(x(2:2:16),f(2:2:16),'.');  % 详解: 调用函数：plot(x(2:2:16),f(2:2:16),'.')
+    if ~isreal(f)  % 详解: 条件判断：if (~isreal(f))
+        plot(x(2:2:16),imag(f(2:2:16)),'+');  % 详解: 调用函数：plot(x(2:2:16),imag(f(2:2:16)),'+')
+    end  % 详解: 执行语句
+    drawnow  % 详解: 执行语句
+end  % 详解: 执行语句
+cnt = 8;  % 详解: 赋值：计算表达式并保存到 cnt
 
-% Recursively refine approximations.
-if (abs(Q - Q0) > tol(1)*abs(Q)+tol(2)) & (lev <= LEVMAX)
-   c = (a+b)/2;
-   [Q1,cnt1,recur_lev_excess] = quad8stp(FunFcn,a,c,tol/2,lev+1,w,x(1:9),f(1:9),Q1,trace,recur_lev_excess,varargin{:});
-   [Q2,cnt2,recur_lev_excess] = quad8stp(FunFcn,c,b,tol/2,lev+1,w,x(9:17),f(9:17),Q2,trace,recur_lev_excess,varargin{:});
-   Q = Q1 + Q2;
-   cnt = cnt + cnt1 + cnt2;
-elseif (lev > LEVMAX)
-   if ~recur_lev_excess
-      warning('Recursion level limit reached in quad8. Singularity likely.')
-      recur_lev_excess = 1;
-   else
-      recur_lev_excess = recur_lev_excess + 1;
-   end
-end
+h = (b-a)/16;  % 详解: 赋值：计算表达式并保存到 h
+Q1 = h*w*f(1:9).';  % 赋值：设置变量 Q1  % 详解: 赋值：计算表达式并保存到 Q1  % 详解: 赋值：计算表达式并保存到 Q1
+Q2 = h*w*f(9:17).';  % 赋值：设置变量 Q2  % 详解: 赋值：计算表达式并保存到 Q2  % 详解: 赋值：计算表达式并保存到 Q2
+Q = Q1 + Q2;  % 详解: 赋值：计算表达式并保存到 Q
+
+if (abs(Q - Q0) > tol(1)*abs(Q)+tol(2)) & (lev <= LEVMAX)  % 详解: 条件判断：if ((abs(Q - Q0) > tol(1)*abs(Q)+tol(2)) & (lev <= LEVMAX))
+   c = (a+b)/2;  % 详解: 赋值：计算表达式并保存到 c
+   [Q1,cnt1,recur_lev_excess] = quad8stp(FunFcn,a,c,tol/2,lev+1,w,x(1:9),f(1:9),Q1,trace,recur_lev_excess,varargin{:});  % 详解: 执行语句
+   [Q2,cnt2,recur_lev_excess] = quad8stp(FunFcn,c,b,tol/2,lev+1,w,x(9:17),f(9:17),Q2,trace,recur_lev_excess,varargin{:});  % 详解: 执行语句
+   Q = Q1 + Q2;  % 详解: 赋值：计算表达式并保存到 Q
+   cnt = cnt + cnt1 + cnt2;  % 详解: 赋值：计算表达式并保存到 cnt
+elseif (lev > LEVMAX)  % 详解: 条件判断：elseif ((lev > LEVMAX))
+   if ~recur_lev_excess  % 详解: 条件判断：if (~recur_lev_excess)
+      warning('Recursion level limit reached in quad8. Singularity likely.')  % 详解: 调用函数：warning('Recursion level limit reached in quad8. Singularity likely.')
+      recur_lev_excess = 1;  % 详解: 赋值：计算表达式并保存到 recur_lev_excess
+   else  % 详解: 条件判断：else 分支
+      recur_lev_excess = recur_lev_excess + 1;  % 详解: 赋值：计算表达式并保存到 recur_lev_excess
+   end  % 详解: 执行语句
+end  % 详解: 执行语句
+
+
+
+

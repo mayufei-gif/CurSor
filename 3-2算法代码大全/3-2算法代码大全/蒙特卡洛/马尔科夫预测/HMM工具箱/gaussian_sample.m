@@ -1,25 +1,21 @@
-function x = gsamp(mu, covar, nsamp)
-%GSAMP	Sample from a Gaussian distribution.
-%
-%	Description
-%
-%	X = GSAMP(MU, COVAR, NSAMP) generates a sample of size NSAMP from a
-%	D-dimensional Gaussian distribution. The Gaussian density has mean
-%	vector MU and covariance matrix COVAR, and the matrix X has NSAMP
-%	rows in which each row represents a D-dimensional sample vector.
-%
-%	See also
-%	GAUSS, DEMGAUSS
-%
+﻿% 文件: gaussian_sample.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-%	Copyright (c) Ian T Nabney (1996-2001)
+function x = gsamp(mu, covar, nsamp)  % 详解: 执行语句
 
-d = size(covar, 1);
 
-mu = reshape(mu, 1, d);   % Ensure that mu is a row vector
+d = size(covar, 1);  % 详解: 赋值：将 size(...) 的结果保存到 d
 
-[evec, eval] = eig(covar);
+mu = reshape(mu, 1, d);  % 详解: 赋值：将 reshape(...) 的结果保存到 mu
 
-coeffs = randn(nsamp, d)*sqrt(eval);
+[evec, eval] = eig(covar);  % 详解: 执行语句
 
-x = ones(nsamp, 1)*mu + coeffs*evec';
+coeffs = randn(nsamp, d)*sqrt(eval);  % 详解: 赋值：将 randn(...) 的结果保存到 coeffs
+
+x = ones(nsamp, 1)*mu + coeffs*evec';  % 创建全 1 矩阵/数组  % 详解: 赋值：将 ones(...) 的结果保存到 x  % 详解: 赋值：将 ones(...) 的结果保存到 x
+
+
+
+

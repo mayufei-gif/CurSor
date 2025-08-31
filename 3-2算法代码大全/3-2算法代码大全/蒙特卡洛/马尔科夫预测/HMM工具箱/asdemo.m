@@ -1,70 +1,59 @@
-% ASORT
+﻿% 文件: asdemo.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
+
+% ASORT  % 中文: - 显示结果||| - 使用无空间/模板选项运行
 % a pedestrian NUMERICAL SORTER of ALPHANUMERIC data
 
 % - create some data
-		d = {
-%		strings with one valid alphanumeric number
-%		sorted numerically
-			'-inf'
-			'x-3.2e4y'
-			'f-1.4'
-			'-.1'
-			'+ .1d-2'
-			'.1'
-			'f.1'
-			'f -+1.4'
-			'f.2'
-			'f.3'
-			'f.10'
-			'f.11'
-			'+inf'
-			' -nan'
-			'+ nan'
-			'nan'
-%		strings with many numbers or invalid/ambiguous numbers
-%		sorted in ascii dictionary order
-			' nan nan'
-			'+ .1e-.2'
-			'-1 2'
-			'Z12e12ez'
-			'inf -inf'
-			's.3TT.4'
-			'z12e12ez'
-%		strings without numbers
-%		sorted in ascii dictionary order
-			' . .. '
-			'.'
-			'...'
-			'.b a.'
-			'a string'
-			'a. .b'
-		};
-%   ... and scramble it...
-		rand('seed',10);
-		d=d(randperm(numel(d)));
+		d = {  % 详解: 赋值：计算表达式并保存到 d
+			'-inf'  % 详解: 执行语句
+			'x-3.2e4y'  % 详解: 执行语句
+			'f-1.4'  % 详解: 执行语句
+			'-.1'  % 详解: 执行语句
+			'+ .1d-2'  % 详解: 执行语句
+			'.1'  % 详解: 执行语句
+			'f.1'  % 详解: 执行语句
+			'f -+1.4'  % 详解: 执行语句
+			'f.2'  % 详解: 执行语句
+			'f.3'  % 详解: 执行语句
+			'f.10'  % 详解: 执行语句
+			'f.11'  % 详解: 执行语句
+			'+inf'  % 详解: 执行语句
+			' -nan'  % 详解: 执行语句
+			'+ nan'  % 详解: 执行语句
+			'nan'  % 详解: 执行语句
+			' nan nan'  % 详解: 执行语句
+			'+ .1e-.2'  % 详解: 执行语句
+			'-1 2'  % 详解: 执行语句
+			'Z12e12ez'  % 详解: 执行语句
+			'inf -inf'  % 详解: 执行语句
+			's.3TT.4'  % 详解: 执行语句
+			'z12e12ez'  % 详解: 执行语句
+			' . .. '  % 详解: 执行语句
+			'.'  % 详解: 执行语句
+			'...'  % 详解: 执行语句
+			'.b a.'  % 详解: 执行语句
+			'a string'  % 详解: 执行语句
+			'a. .b'  % 详解: 执行语句
+		};  % 详解: 执行语句
+		rand('seed',10);  % 详解: 调用函数：rand('seed',10)
+		d=d(randperm(numel(d)));  % 详解: 赋值：将 d(...) 的结果保存到 d
 
-% - run ASORT with
-%   verbose output:		<-v>
-%   keep additional results:	<-d>
-		o=asort(d,'-v','-d');
-% - or
-%		p=asort(char(d),'-v','-d');
+		o=asort(d,'-v','-d');  % 详解: 赋值：将 asort(...) 的结果保存到 o
 
-% - show results
-		o
-		o.anr
+		o  % 详解: 执行语句
+		o.anr  % 详解: 执行语句
 
-% - run ASORT with no-space/template options
-%   NOTE the impact of -w/-t order!
-		s={'ff - 1','ff + 1','- 12'};
-%   RAW
-		o=asort(s,'-v');
-%   remove SPACEs
-		o=asort(s,'-v','-w');
-%   remove TEMPLATE(s)
-		o=asort(s,'-v','-t',{'ff','1'});
-%   remove TEMPLATE(s) than SPACEs
-		o=asort(s,'-v','-t','1','-w');
-%   remove SPACEs than TEMPLATE(s)
-		o=asort(s,'-v','-w','-t','1');
+		s={'ff - 1','ff + 1','- 12'};  % 详解: 赋值：计算表达式并保存到 s
+		o=asort(s,'-v');  % 详解: 赋值：将 asort(...) 的结果保存到 o
+		o=asort(s,'-v','-w');  % 详解: 赋值：将 asort(...) 的结果保存到 o
+		o=asort(s,'-v','-t',{'ff','1'});  % 详解: 赋值：将 asort(...) 的结果保存到 o
+		o=asort(s,'-v','-t','1','-w');  % 详解: 赋值：将 asort(...) 的结果保存到 o
+		o=asort(s,'-v','-w','-t','1');  % 详解: 赋值：将 asort(...) 的结果保存到 o
+
+
+
+
 

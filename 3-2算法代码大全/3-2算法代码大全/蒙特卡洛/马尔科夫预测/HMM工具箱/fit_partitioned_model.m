@@ -1,59 +1,32 @@
-function [model, partition_size] = fit_partitioned_model(...
-    inputs, outputs, selectors, sel_sizes, min_size, partition_names, fn_name, varargin)
-%function [models, partition_sizes] = fit_partitioned_model(...
-%    inputs, outputs, selectors, sel_sizes, min_size, partition_names, fn_name, varargin)
-%
-% Fit models to different subsets (columns)  of the input/output data, 
-% as chosen by the selectors matrix. If there is only output data, set input=[].
-% If there is less than min_size data in partition i, 
-% we set model{i} = []
-%
-% Example:
-% selectors = [1 2 1 1 1
-%              1 2 2 1 2]
-% sel_sizes = [2 2] so there are 4 models: (1,1), (2,1), (1,2), (2,2)
-% We fit model{1} to data from columns 1,4
-% We fit model{2} to no data
-% We fit model{3} to data from column 3,5
-% We fit model{4} to data from column 2 (assuming min_size <= 1)
-%
-% For each partition, we call the specified function with the specified arguments
-% as follows:
-%  model{i}  = fn(input(:,cols{i}), output(:,cols{i}), args)
-% (We omit input if [])
-% partition_size(i) is the amount of data in the i'th partition.
-%
-% Example use: row 1 of selectors is whether an object is present/absent
-% and row 2 is the location.
-%
-% Demo:
-% inputs = 1:5; outputs = 6:10; selectors = as above
-% fn = 'fit_partitioned_model_testfn';
-% [model, partition_size] = fit_partitioned_model(inputs, outputs, selectors, [2 2], fn)
-% should produce
-% model{1}.input = [1 4], model{1}.output = [6 9]
-% model{2} = []
-% model{3}.input = [3 5], model{3}.output = [8 10], 
-% model{4}.input = [2], model{3}.output = [7], 
-% partition_size = [2 0 2 1]
+﻿% 文件: fit_partitioned_model.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
+
+function [model, partition_size] = fit_partitioned_model(...  % 详解: 执行语句
+    inputs, outputs, selectors, sel_sizes, min_size, partition_names, fn_name, varargin)  % 详解: 执行语句
 
 
-sel_ndx = subv2ind(sel_sizes, selectors');
-Nmodels = prod(sel_sizes);
-model = cell(1, Nmodels);
-partition_size = zeros(1, Nmodels);
-for m=1:Nmodels
-  ndx = find(sel_ndx==m);
-  partition_size(m) = length(ndx);
-  if ~isempty(partition_names) % & (partition_size(m) < min_size)
-    fprintf('partition %s has size %d, min size = %d\n', ...
-	    partition_names{m}, partition_size(m), min_size);
-  end
-  if partition_size(m) >= min_size
-    if isempty(inputs)
-      model{m} = feval(fn_name, outputs(:, ndx), varargin{:});
-    else
-      model{m} = feval(fn_name, inputs(:,ndx), outputs(:, ndx), varargin{:});
-    end
-  end
-end
+sel_ndx = subv2ind(sel_sizes, selectors');  % 赋值：设置变量 sel_ndx  % 详解: 赋值：将 subv2ind(...) 的结果保存到 sel_ndx  % 详解: 赋值：将 subv2ind(...) 的结果保存到 sel_ndx
+Nmodels = prod(sel_sizes);  % 详解: 赋值：将 prod(...) 的结果保存到 Nmodels
+model = cell(1, Nmodels);  % 详解: 赋值：将 cell(...) 的结果保存到 model
+partition_size = zeros(1, Nmodels);  % 详解: 赋值：将 zeros(...) 的结果保存到 partition_size
+for m=1:Nmodels  % 详解: for 循环：迭代变量 m 遍历 1:Nmodels
+  ndx = find(sel_ndx==m);  % 详解: 赋值：将 find(...) 的结果保存到 ndx
+  partition_size(m) = length(ndx);  % 详解: 调用函数：partition_size(m) = length(ndx)
+  if ~isempty(partition_names)  % 详解: 条件判断：if (~isempty(partition_names))
+    fprintf('partition %s has size %d, min size = %d\n', ...  % 详解: 打印/显示输出
+	    partition_names{m}, partition_size(m), min_size);  % 详解: 执行语句
+  end  % 详解: 执行语句
+  if partition_size(m) >= min_size  % 详解: 条件判断：if (partition_size(m) >= min_size)
+    if isempty(inputs)  % 详解: 条件判断：if (isempty(inputs))
+      model{m} = feval(fn_name, outputs(:, ndx), varargin{:});  % 详解: 执行语句
+    else  % 详解: 条件判断：else 分支
+      model{m} = feval(fn_name, inputs(:,ndx), outputs(:, ndx), varargin{:});  % 详解: 执行语句
+    end  % 详解: 执行语句
+  end  % 详解: 执行语句
+end  % 详解: 执行语句
+
+
+
+

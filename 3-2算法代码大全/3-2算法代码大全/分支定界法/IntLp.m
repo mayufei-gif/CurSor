@@ -1,67 +1,52 @@
-function [x,y]=IntLp(f,G,h,Geq,heq,lb,ub,x,id,options)
-%ÕûÊıÏßĞÔ¹æ»®·ÖÖ¦¶¨½ç·¨£¬¿ÉÇó½âÈ«ÕûÊıÏßĞÔ»ò»ìºÏÕûÊıÏßĞÔ¹æ»®¡£
-% y = min f'*x subject to: G*x <= h Geq*x=heq xÎªÈ«ÕûÊı»ò»ìºÏÕû% ÊıÁĞÏòÁ¿
-%ÓÃ·¨
-% [x,y]=IntLp(f,G,h)
-% [x,y]=IntLp(f,G,h,Geq,heq)
-% [x,y]=IntLp(f,G,h,Geq,heq,lb,ub)
-% [x,y]=IntLp(f,G,h,Geq,heq,lb,ub,x)
-% [x,y]=IntLp(f,G,h,Geq,heq,lb,ub,x,id)
-% [x,y]=IntLp(f,G,h,Geq,heq,lb,ub,x,id,options)
-%²ÎÊıËµÃ÷
-% x£º×îÓÅ½âÁĞÏòÁ¿£» y£ºÄ¿±êº¯Êı×îĞ¡Öµ£»f£ºÄ¿±êº¯ÊıÏµÊıÁĞÏòÁ¿ 
-% G£ºÔ¼Êø²»µÈÊ½Ìõ¼şÏµÊı¾ØÕó£»h£ºÔ¼Êø²»µÈÊ½Ìõ¼şÓÒ¶ËÁĞÏòÁ¿
-% Geq£ºÔ¼ÊøµÈÊ½Ìõ¼şÏµÊı¾ØÕó£»heq£ºÔ¼ÊøµÈÊ½Ìõ¼şÓÒ¶ËÁĞÏòÁ¿
-% lb£º½âµÄÏÂ½çÁĞÏòÁ¿(Default: -inf)£»ub£º½âµÄÉÏ½çÁĞÏòÁ¿(Default: inf)
-% x£ºµü´ú³õÖµÁĞÏòÁ¿£»
-% id£ºÕûÊı±äÁ¿Ö¸±êÁĞÏòÁ¿,1-ÕûÊı£¬0-ÊµÊı(Default: 1)
-% optionsµÄÉèÖÃÇë²Î¼ûoptimset»òlingprog
-%Àı min Z=x1+4x2
-% s.t. 2x1+x2<=8
-% x1+2x2>=6
-% x1, x2>=0ÇÒÎªÕûÊı
-%ÏÈ½«x1+2x2>=6»¯Îª - x1 - 2x2<= -6
-%[x,y]=IntLp([1;4],[2 1;-1 -2],[8;-6],[],[],[0;0])
+ï»¿% æ–‡ä»¶: IntLp.m
+% è¯´æ˜: è‡ªåŠ¨æ·»åŠ çš„æ³¨é‡Šå ä½ï¼Œè¯·æ ¹æ®éœ€è¦è¡¥å……ã€‚
+% ç”Ÿæˆ: 2025-08-31 23:06
+% æ³¨é‡Š: æœ¬æ–‡ä»¶å¤´ç”±è„šæœ¬è‡ªåŠ¨æ·»åŠ 
+
+function [x,y]=IntLp(f,G,h,Geq,heq,lb,ub,x,id,options)  % è¯¦è§£: å‡½æ•°å®šä¹‰ï¼šIntLp(f,G,h,Geq,heq,lb,ub,x,id,options), è¿”å›ï¼šx,y
 
 
 
-global upper opt c x0 A b Aeq beq ID options;
-if nargin<10, options=optimset({});options.Display='off';
-options.LargeScale='off';end
-if nargin<9, id=ones(size(f));end
-if nargin<8, x=[];end
-if nargin<7|isempty(ub), ub=inf*ones(size(f));end
-if nargin<6|isempty(lb), lb=zeros(size(f));end
-if nargin<5, heq=[];end
-if nargin<4, Geq=[];end
-upper=inf;c=f;x0=x;A=G;b=h;Aeq=Geq;beq=heq;ID=id;
-ftemp=ILP(lb(:),ub(:));
-x=opt;y=upper;
-%ÒÔÏÂ×Óº¯Êı
-function ftemp=ILP(vlb,vub)
-global upper opt c x0 A b Aeq beq ID options;
-[x,ftemp,how]=linprog(c,A,b,Aeq,beq,vlb,vub,x0,options);
-if how<=0
-return;
-end;
-if ftemp-upper>0.00005 %in order to avoid error
-return;
-end;
-if max(abs(x.*ID-round(x.*ID)))<0.00005
-if upper-ftemp>0.00005 %in order to avoid error
-opt=x';upper=ftemp;
-return;
-else 
-opt=[opt;x'];
-return;
-end;end;
-notintx=find(abs(x-round(x))>=0.00005); %in order to avoid error
-intx=fix(x);tempvlb=vlb;tempvub=vub;
-if vub(notintx(1,1),1)>=intx(notintx(1,1),1)+1
-tempvlb(notintx(1,1),1)=intx(notintx(1,1),1)+1;
-ftemp=ILP(tempvlb,vub);
-end;
-if vlb(notintx(1,1),1)<=intx(notintx(1,1),1)
-tempvub(notintx(1,1),1)=intx(notintx(1,1),1);
-ftemp=ILP(vlb,tempvub);
-end;
+global upper opt c x0 A b Aeq beq ID options;  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+if nargin<10, options=optimset({});options.Display='off';  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šif (nargin<10, options=optimset({});options.Display='off';)
+options.LargeScale='off';end  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° options.LargeScale
+if nargin<9, id=ones(size(f));end  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šif (nargin<9, id=ones(size(f));end)
+if nargin<8, x=[];end  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šif (nargin<8, x=[];end)
+if nargin<7|isempty(ub), ub=inf*ones(size(f));end  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šif (nargin<7|isempty(ub), ub=inf*ones(size(f));end)
+if nargin<6|isempty(lb), lb=zeros(size(f));end  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šif (nargin<6|isempty(lb), lb=zeros(size(f));end)
+if nargin<5, heq=[];end  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šif (nargin<5, heq=[];end)
+if nargin<4, Geq=[];end  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šif (nargin<4, Geq=[];end)
+upper=inf;c=f;x0=x;A=G;b=h;Aeq=Geq;beq=heq;ID=id;  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° upper
+ftemp=ILP(lb(:),ub(:));  % è¯¦è§£: èµ‹å€¼ï¼šå°† ILP(...) çš„ç»“æœä¿å­˜åˆ° ftemp
+x=opt;y=upper;  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° x
+function ftemp=ILP(vlb,vub)  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+global upper opt c x0 A b Aeq beq ID options;  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+[x,ftemp,how]=linprog(c,A,b,Aeq,beq,vlb,vub,x0,options);  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+if how<=0  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šif (how<=0)
+return;  % è¯¦è§£: è¿”å›ï¼šä»å½“å‰å‡½æ•°è¿”å›
+end;  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+if ftemp-upper>0.00005  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šif (ftemp-upper>0.00005)
+return;  % è¯¦è§£: è¿”å›ï¼šä»å½“å‰å‡½æ•°è¿”å›
+end;  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+if max(abs(x.*ID-round(x.*ID)))<0.00005  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šif (max(abs(x.*ID-round(x.*ID)))<0.00005)
+if upper-ftemp>0.00005  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šif (upper-ftemp>0.00005)
+opt=x';upper=ftemp;  % èµ‹å€¼ï¼šè®¾ç½®å˜é‡ opt  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° opt  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° opt
+return;  % è¯¦è§£: è¿”å›ï¼šä»å½“å‰å‡½æ•°è¿”å›
+else  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šelse åˆ†æ”¯
+opt=[opt;x'];  % èµ‹å€¼ï¼šè®¾ç½®å˜é‡ opt  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° opt  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° opt
+return;  % è¯¦è§£: è¿”å›ï¼šä»å½“å‰å‡½æ•°è¿”å›
+end;end;  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+notintx=find(abs(x-round(x))>=0.00005);  % è¯¦è§£: èµ‹å€¼ï¼šå°† find(...) çš„ç»“æœä¿å­˜åˆ° notintx
+intx=fix(x);tempvlb=vlb;tempvub=vub;  % è¯¦è§£: èµ‹å€¼ï¼šå°† fix(...) çš„ç»“æœä¿å­˜åˆ° intx
+if vub(notintx(1,1),1)>=intx(notintx(1,1),1)+1  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šif (vub(notintx(1,1),1)>=intx(notintx(1,1),1)+1)
+tempvlb(notintx(1,1),1)=intx(notintx(1,1),1)+1;  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+ftemp=ILP(tempvlb,vub);  % è¯¦è§£: èµ‹å€¼ï¼šå°† ILP(...) çš„ç»“æœä¿å­˜åˆ° ftemp
+end;  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+if vlb(notintx(1,1),1)<=intx(notintx(1,1),1)  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šif (vlb(notintx(1,1),1)<=intx(notintx(1,1),1))
+tempvub(notintx(1,1),1)=intx(notintx(1,1),1);  % è¯¦è§£: è°ƒç”¨å‡½æ•°ï¼štempvub(notintx(1,1),1)=intx(notintx(1,1),1)
+ftemp=ILP(vlb,tempvub);  % è¯¦è§£: èµ‹å€¼ï¼šå°† ILP(...) çš„ç»“æœä¿å­˜åˆ° ftemp
+end;  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+
+
+
+

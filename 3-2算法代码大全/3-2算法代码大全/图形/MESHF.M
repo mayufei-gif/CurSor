@@ -1,47 +1,26 @@
-function [x,y,z]=meshf(f_name,xa,xb,y_lower,y_upper,m,n)
-%¶şÔªº¯Êız=f(x,y)·Ç¾ØĞÎÍø¸ñÍ¼
-%ÓÃ·¨£º[x,y,z]=meshf('f_name',xa,xb,'y_lower','y_upper',m,n)
-%     f_name: ±íÊ¾¶şÔªº¯Êız=f(x,y)µÄMº¯ÊıÃû
-%     xa,xb: xÏÂ¶ËÓëÉÏ¶Ë
-%     y_lower,y_upper:  yÓÃx±íÊ¾µÄÉÏ¶Ëº¯ÊıÓëÏÂ¶Ëº¯Êı
-%     m,n: Íø¸ñÊı£¨Ä¬ÈÏm=n=20£©
-%     [x,y,z]: ·µ»ØÍø¸ñÊı¾İ£¬¿ÉÓÃmesh(x,y,z)×÷Í¼£¬ÈôÎŞÊä³ö±äÁ¿Ôò×Ô¶¯×÷Í¼
-%ÀıÌâ »­z=exp(-x^2/2-y^2/2)/2/piÔÚx^2+y^2<=9ÄÚµÄÍ¼¡£
-%ÏÈĞ´Èı¸öMº¯Êıtop_f.m, low_f.m, upp_f.m
-%                    Mº¯Êıtop_f.m
-%                 function z=f(x,y)
-%                 z=exp(-x.^2/2-y.^2/2)/2/pi; 
-%                    Mº¯Êılow_f.m
-%                 function y=f(x)
-%                 y=-sqrt(9-x.^2);
-%                    Mº¯Êıupp_f.m
-%                 function y=f(x)
-%                 y=sqrt(9-x.^2);
-%ÏÖÔÚÓÃÃüÁî
-%     meshf('top_f',-3,3,'low_f','upp_f')
-%
-% Purpose: Generate mesh of z=f(x,y)
-% Synopsis: [x,y,z]=meshf('f_name',xa,xb,'y_lower','y_upper',m,n)
-%		f_name: file name of 2-D function f(x,y)
-%		xa,xb: lower and upper limit of x
-%		y_lower,y_upper: file names of lower and upper 
-%                                limit of y (1-D function of x)
-%		m,n: number of meshgrid (Default: m=n=20)
-%		[x,y,z]: return mesh data used by MESH of SURF
+ï»¿% æ–‡ä»¶: MESHF.M
+% è¯´æ˜: è‡ªåŠ¨æ·»åŠ çš„æ³¨é‡Šå ä½ï¼Œè¯·æ ¹æ®éœ€è¦è¡¥å……ã€‚
+% ç”Ÿæˆ: 2025-08-31 23:06
+% æ³¨é‡Š: æœ¬æ–‡ä»¶å¤´ç”±è„šæœ¬è‡ªåŠ¨æ·»åŠ 
 
-% L.J.Hu 8-8-1998
+function [x,y,z]=meshf(f_name,xa,xb,y_lower,y_upper,m,n)  % è¯¦è§£: å‡½æ•°å®šä¹‰ï¼šmeshf(f_name,xa,xb,y_lower,y_upper,m,n), è¿”å›ï¼šx,y,z
 
-if nargin<7,n=20;end
-if nargin<6,m=20;end
 
-x=linspace(xa,xb,m);
-yc=feval(y_lower,x);yd=feval(y_upper,x);
+if nargin<7,n=20;end  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šif (nargin<7,n=20;end)
+if nargin<6,m=20;end  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šif (nargin<6,m=20;end)
 
-x=ones(n,1)*x;
-y=zeros(n,m);
-for i=1:m
-  y(:,i)=linspace(yc(i),yd(i),n)';
-end
-z=feval(f_name,x,y);
+x=linspace(xa,xb,m);  % è¯¦è§£: èµ‹å€¼ï¼šå°† linspace(...) çš„ç»“æœä¿å­˜åˆ° x
+yc=feval(y_lower,x);yd=feval(y_upper,x);  % è¯¦è§£: èµ‹å€¼ï¼šå°† feval(...) çš„ç»“æœä¿å­˜åˆ° yc
 
-if nargout==0,mesh(x,y,z);xlabel('X');ylabel('Y');end
+x=ones(n,1)*x;  % è¯¦è§£: èµ‹å€¼ï¼šå°† ones(...) çš„ç»“æœä¿å­˜åˆ° x
+y=zeros(n,m);  % è¯¦è§£: èµ‹å€¼ï¼šå°† zeros(...) çš„ç»“æœä¿å­˜åˆ° y
+for i=1:m  % è¯¦è§£: for å¾ªç¯ï¼šè¿­ä»£å˜é‡ i éå† 1:m
+  y(:,i)=linspace(yc(i),yd(i),n)';  % ç”Ÿæˆç­‰/å¯¹æ•°é—´éš”åºåˆ—  % è¯¦è§£: æ‰§è¡Œè¯­å¥  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+end  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+z=feval(f_name,x,y);  % è¯¦è§£: èµ‹å€¼ï¼šå°† feval(...) çš„ç»“æœä¿å­˜åˆ° z
+
+if nargout==0,mesh(x,y,z);xlabel('X');ylabel('Y');end  % è¯¦è§£: æ¡ä»¶åˆ¤æ–­ï¼šif (nargout==0,mesh(x,y,z);xlabel('X');ylabel('Y');end)
+
+
+
+

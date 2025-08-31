@@ -1,79 +1,54 @@
-function [x0,y0] = centroid(x,y)
-% CENTROID Center of mass of a polygon.
-%	[X0,Y0] = CENTROID(X,Y) Calculates centroid 
-%	(center of mass) of planar polygon with vertices 
-%	coordinates X, Y.
-%	Z0 = CENTROID(X+i*Y) returns Z0=X0+i*Y0 the same
-%	as CENTROID(X,Y).
+﻿% 文件: polygon_centroid.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-%  Copyright (c) 1995 by Kirill K. Pankratov,
-%       kirill@plume.mit.edu.
-%       06/01/95, 06/07/95
+function [x0,y0] = centroid(x,y)  % 详解: 函数定义：centroid(x,y), 返回：x0,y0
 
-% Algorithm:
-%  X0 = Int{x*ds}/Int{ds}, where ds - area element
-%  so that Int{ds} is total area of a polygon.
-%    Using Green's theorem the area integral can be 
-%  reduced to a contour integral:
-%  Int{x*ds} = -Int{x^2*dy}, Int{ds} = Int{x*dy} along
-%  the perimeter of a polygon.
-%    For a polygon as a sequence of line segments
-%  this can be reduced exactly to a sum:
-%  Int{x^2*dy} = Sum{ (x_{i}^2+x_{i+1}^2+x_{i}*x_{i+1})*
-%  (y_{i+1}-y_{i})}/3;
-%  Int{x*dy} = Sum{(x_{i}+x_{i+1})(y_{i+1}-y_{i})}/2.
-%    Similarly
-%  Y0 = Int{y*ds}/Int{ds}, where
-%  Int{y*ds} = Int{y^2*dx} = 
-%  = Sum{ (y_{i}^2+y_{i+1}^2+y_{i}*y_{i+1})*
-%  (x_{i+1}-x_{i})}/3.
 
- % Handle input ......................
-if nargin==0, help centroid, return, end
-if nargin==1
-  sz = size(x);
-  if sz(1)==2      % Matrix 2 by n
-    y = x(2,:); x = x(1,:);
-  elseif sz(2)==2  % Matrix n by 2
-    y = x(:,2); x = x(:,1);
-  else
-    y = imag(x);
-    x = real(x);
-  end
-end 
 
- % Make a polygon closed ..............
-x = [x(:); x(1)];
-y = [y(:); y(1)];
+if nargin==0, help centroid, return, end  % 详解: 条件判断：if (nargin==0, help centroid, return, end)
+if nargin==1  % 详解: 条件判断：if (nargin==1)
+  sz = size(x);  % 详解: 赋值：将 size(...) 的结果保存到 sz
+  if sz(1)==2  % 详解: 条件判断：if (sz(1)==2)
+    y = x(2,:); x = x(1,:);  % 详解: 赋值：将 x(...) 的结果保存到 y
+  elseif sz(2)==2  % 详解: 条件判断：elseif (sz(2)==2)
+    y = x(:,2); x = x(:,1);  % 详解: 赋值：将 x(...) 的结果保存到 y
+  else  % 详解: 条件判断：else 分支
+    y = imag(x);  % 详解: 赋值：将 imag(...) 的结果保存到 y
+    x = real(x);  % 详解: 赋值：将 real(...) 的结果保存到 x
+  end  % 详解: 执行语句
+end  % 详解: 执行语句
 
- % Check length .......................
-l = length(x);
-if length(y)~=l
-  error(' Vectors x and y must have the same length')
-end
+x = [x(:); x(1)];  % 详解: 赋值：计算表达式并保存到 x
+y = [y(:); y(1)];  % 详解: 赋值：计算表达式并保存到 y
 
- % X-mean: Int{x^2*dy} ................
-del = y(2:l)-y(1:l-1);
-v = x(1:l-1).^2+x(2:l).^2+x(1:l-1).*x(2:l);
-x0 = v'*del;
+l = length(x);  % 详解: 赋值：将 length(...) 的结果保存到 l
+if length(y)~=l  % 详解: 条件判断：if (length(y)~=l)
+  error(' Vectors x and y must have the same length')  % 详解: 调用函数：error(' Vectors x and y must have the same length')
+end  % 详解: 执行语句
 
- % Y-mean: Int{y^2*dx} ................
-del = x(2:l)-x(1:l-1);
-v = y(1:l-1).^2+y(2:l).^2+y(1:l-1).*y(2:l);
-y0 = v'*del;
+del = y(2:l)-y(1:l-1);  % 详解: 赋值：将 y(...) 的结果保存到 del
+v = x(1:l-1).^2+x(2:l).^2+x(1:l-1).*x(2:l);  % 详解: 赋值：将 x(...) 的结果保存到 v
+x0 = v'*del;  % 赋值：设置变量 x0  % 详解: 赋值：计算表达式并保存到 x0  % 详解: 赋值：计算表达式并保存到 x0
 
- % Calculate area: Int{y*dx} ..........
-a = (y(1:l-1)+y(2:l))'*del;
-tol= 2*eps;
-if abs(a)<tol
-  disp(' Warning: area of polygon is close to 0')
-  a = a+sign(a)*tol+(~a)*tol;
-end
- % Multiplier
-a = 1/3/a;
+del = x(2:l)-x(1:l-1);  % 详解: 赋值：将 x(...) 的结果保存到 del
+v = y(1:l-1).^2+y(2:l).^2+y(1:l-1).*y(2:l);  % 详解: 赋值：将 y(...) 的结果保存到 v
+y0 = v'*del;  % 赋值：设置变量 y0  % 详解: 赋值：计算表达式并保存到 y0  % 详解: 赋值：计算表达式并保存到 y0
 
- % Divide by area .....................
-x0 = -x0*a;
-y0 =  y0*a;
+a = (y(1:l-1)+y(2:l))'*del;  % 赋值：设置变量 a  % 详解: 赋值：计算表达式并保存到 a  % 详解: 赋值：计算表达式并保存到 a
+tol= 2*eps;  % 详解: 赋值：计算表达式并保存到 tol
+if abs(a)<tol  % 详解: 条件判断：if (abs(a)<tol)
+  disp(' Warning: area of polygon is close to 0')  % 详解: 调用函数：disp(' Warning: area of polygon is close to 0')
+  a = a+sign(a)*tol+(~a)*tol;  % 详解: 赋值：计算表达式并保存到 a
+end  % 详解: 执行语句
+a = 1/3/a;  % 详解: 赋值：计算表达式并保存到 a
 
-if nargout < 2, x0 = x0+i*y0; end
+x0 = -x0*a;  % 详解: 赋值：计算表达式并保存到 x0
+y0 =  y0*a;  % 详解: 赋值：计算表达式并保存到 y0
+
+if nargout < 2, x0 = x0+i*y0; end  % 详解: 条件判断：if (nargout < 2, x0 = x0+i*y0; end)
+
+
+
+

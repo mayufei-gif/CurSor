@@ -1,23 +1,23 @@
-function f=boundnetf(G1,G2)
-% function f=boundnetf(G1,G2)
-% ���������½�Ŀ�����
-% G1 ���������½���� G2���������Ͻ����
-% ����2F�󸽼�����������,����fofuf.m
-n=size(G2,1);
-G=G2-G1;
-%G(G~=0)=1;
-x=zeros(1,n);
-W=[0 x 0;
-    x' G x';
-    0 x 0]; % �����µĶ���
-% �����µı�
-for i=1:n
-    W(i+1,n+2)=sum(G2(:,i))-sum(G1(:,i));
-    W(1,i+1)=sum(G2(i,:))-sum(G1(i,:));
-end
-W(1,n+2)=inf;
-W(n+2,1)=inf;
-% ����2F�㷨�󸽼�����������
-% [f1 wf]=Dinif2(W);
-[f1 wf]=fofuf(W);
-f=f1(2:(n+1),2:(n+1))+G1;
+﻿% 文件: boundnetf.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
+
+function f=boundnetf(G1,G2)  % 详解: 执行语句
+n=size(G2,1);  % 详解: 赋值：将 size(...) 的结果保存到 n
+G=G2-G1;  % 详解: 赋值：计算表达式并保存到 G
+x=zeros(1,n);  % 详解: 赋值：将 zeros(...) 的结果保存到 x
+W=[0 x 0;  % 详解: 赋值：计算表达式并保存到 W
+    x' G x';  % 详解: 执行语句
+    0 x 0];  % 详解: 执行语句
+for i=1:n  % 详解: for 循环：迭代变量 i 遍历 1:n
+    W(i+1,n+2)=sum(G2(:,i))-sum(G1(:,i));  % 详解: 调用函数：W(i+1,n+2)=sum(G2(:,i))-sum(G1(:,i))
+    W(1,i+1)=sum(G2(i,:))-sum(G1(i,:));  % 详解: 调用函数：W(1,i+1)=sum(G2(i,:))-sum(G1(i,:))
+end  % 详解: 执行语句
+W(1,n+2)=inf;  % 详解: 执行语句
+W(n+2,1)=inf;  % 详解: 执行语句
+[f1 wf]=fofuf(W);  % 详解: 执行语句
+f=f1(2:(n+1),2:(n+1))+G1;  % 详解: 赋值：将 f1(...) 的结果保存到 f
+
+
+

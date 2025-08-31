@@ -1,30 +1,16 @@
-function BNBGUI(file)
-%�����������滮ͼ�ι���
-% BNGUI Runs a GUI for BNB18 
-% Usage: BNBGUI
-% or     BNBGUI(file)
-%
-% file is a MAT-file saved by BNBGUI. 
-%
-% The GUI has (some) online help.
-%
-% E.C. Kuipers
-% e-mail E.C.Kuipers@cpedu.rug.nl 
-% FI-Lab
-% Applied Physics
-% Rijksuniversiteit Groningen
-%
-% BNBGUI uses:
-% bnbgui.m bnbguicb.m guierr.m guierr.mat guifun.m guifun.mat
-% guimain.m guimain.mat guiset.m guiset.mat bnb18.m
-% 
-% BNB18 uses:
-% Optimization Toolbox Version 2.0 (R11) 09-Oct-1998
-% From this toolbox fmincon.m is called.
-%
-if nargin==0
-   bnbguicb('init');
-   bnbguicb('main');
-elseif nargin==1
-   bnbguicb('load',file);
-end;
+﻿% 文件: BNBGUI.M
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
+
+function BNBGUI(file)  % 详解: 函数定义：BNBGUI(file)
+if nargin==0  % 详解: 条件判断：if (nargin==0)
+   bnbguicb('init');  % 详解: 调用函数：bnbguicb('init')
+   bnbguicb('main');  % 详解: 调用函数：bnbguicb('main')
+elseif nargin==1  % 详解: 条件判断：elseif (nargin==1)
+   bnbguicb('load',file);  % 详解: 调用函数：bnbguicb('load',file)
+end;  % 详解: 执行语句
+
+
+
+

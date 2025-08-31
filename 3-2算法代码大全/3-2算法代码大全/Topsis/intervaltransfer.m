@@ -1,6 +1,14 @@
-function x2 =intervaltransfer(qujian,lb,ub,x)
-%TOPSIS·¨£¬¶ÔÇø¼äÐÍ±äÁ¿µÄ¹æ·¶»¯´¦Àí£¬qijian±íÊ¾×îÓÅÊôÐÔÇø¼ä£¬lb±íÊ¾ÏÂ½ç£¬ub±íÊ¾ÉÏ½ç
-x2=(1-(qujian(1)-x)./(qujian(1)-lb)).*(x>=lb&x<qujian(1))+(x>=qujian(1)&x<=qujian(2))+(1-(x-qujian(2))./(ub-qujian(2))).*(x>qujian(2)&x<=ub);
+ï»¿% æ–‡ä»¶: intervaltransfer.m
+% è¯´æ˜Ž: è‡ªåŠ¨æ·»åŠ çš„æ³¨é‡Šå ä½ï¼Œè¯·æ ¹æ®éœ€è¦è¡¥å……ã€‚
+% ç”Ÿæˆ: 2025-08-31 23:06
+% æ³¨é‡Š: æœ¬æ–‡ä»¶å¤´ç”±è„šæœ¬è‡ªåŠ¨æ·»åŠ 
 
-end
+function x2 =intervaltransfer(qujian,lb,ub,x)  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+x2=(1-(qujian(1)-x)./(qujian(1)-lb)).*(x>=lb&x<qujian(1))+(x>=qujian(1)&x<=qujian(2))+(1-(x-qujian(2))./(ub-qujian(2))).*(x>qujian(2)&x<=ub);  % è¯¦è§£: èµ‹å€¼ï¼šè®¡ç®—è¡¨è¾¾å¼å¹¶ä¿å­˜åˆ° x2
+
+end  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+
+
+
+
 

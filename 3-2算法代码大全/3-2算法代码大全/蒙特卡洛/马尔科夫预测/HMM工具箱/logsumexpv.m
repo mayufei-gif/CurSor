@@ -1,15 +1,17 @@
-function s = logsumexpv(a)
-% Returns log(sum(exp(a)))  while avoiding numerical underflow.
-%
-% e.g., log(e^a1 + e^a2) = a1 + log(1 + e^(a2-a1)) if a1>a2
-% If a1 ~ a2, and a1>a2, then e^(a2-a1) is exp(small negative number),
-% which can be computed without underflow.
+﻿% 文件: logsumexpv.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-% Same as logsumexp, except we assume a is a vector.
-% This avoids a call to repmat, which takes 50% of the time!
+function s = logsumexpv(a)  % 详解: 执行语句
 
-a = a(:)'; % make row vector
-m = max(a);
-b = a - m*ones(1,length(a));
-s = m + log(sum(exp(b)));
+
+a = a(:)'; % make row vector  % 详解: 赋值：将 a(...) 的结果保存到 a  % 详解: 赋值：将 a(...) 的结果保存到 a
+m = max(a);  % 详解: 赋值：将 max(...) 的结果保存到 m
+b = a - m*ones(1,length(a));  % 详解: 赋值：计算表达式并保存到 b
+s = m + log(sum(exp(b)));  % 详解: 赋值：计算表达式并保存到 s
+
+
+
+
 

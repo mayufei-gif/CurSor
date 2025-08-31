@@ -1,66 +1,40 @@
-function ndx = subv2ind(siz, subv)
-% SUBV2IND Like the built-in sub2ind, but the subscripts are given as row vectors.
-% ind = subv2ind(siz,subv)
-%
-% siz can be a row or column vector of size d.
-% subv should be a collection of N row vectors of size d.
-% ind will be of size N * 1.
-%
-% Example:
-% subv = [1 1 1;
-%         2 1 1;
-%         ...
-%         2 2 2];
-% subv2ind([2 2 2], subv) returns [1 2 ... 8]'
-% i.e., the leftmost digit toggles fastest.
-%
-% See also IND2SUBV.
+﻿% 文件: subv2ind.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
+
+function ndx = subv2ind(siz, subv)  % 详解: 执行语句
 
 
-if isempty(subv)
-  ndx = [];
-  return;
-end
+if isempty(subv)  % 详解: 条件判断：if (isempty(subv))
+  ndx = [];  % 详解: 赋值：计算表达式并保存到 ndx
+  return;  % 详解: 返回：从当前函数返回
+end  % 详解: 执行语句
 
-if isempty(siz)
-  ndx = 1;
-  return;
-end
+if isempty(siz)  % 详解: 条件判断：if (isempty(siz))
+  ndx = 1;  % 详解: 赋值：计算表达式并保存到 ndx
+  return;  % 详解: 返回：从当前函数返回
+end  % 详解: 执行语句
 
-[ncases ndims] = size(subv);
+[ncases ndims] = size(subv);  % 详解: 获取向量/矩阵尺寸
 
-%if length(siz) ~= ndims
-%  error('length of subscript vector and sizes must be equal');
-%end
 
-if all(siz==2)
-  %rbits = subv(:,end:-1:1)-1; % read from right to left, convert to 0s/1s
-  %ndx = bitv2dec(rbits)+1; 
-  twos = pow2(0:ndims-1);
-  ndx = ((subv-1) * twos(:)) + 1;
-  %ndx = sum((subv-1) .* twos(ones(ncases,1), :), 2) + 1; % equivalent to matrix * vector
-  %ndx = sum((subv-1) .* repmat(twos, ncases, 1), 2) + 1; % much slower than ones
-  %ndx = ndx(:)';
-else
-  %siz = siz(:)';
-  cp = [1 cumprod(siz(1:end-1))]';
-  %ndx = ones(ncases, 1);
-  %for i = 1:ndims
-  %  ndx = ndx + (subv(:,i)-1)*cp(i);
-  %end
-  ndx = (subv-1)*cp + 1;
-end
+if all(siz==2)  % 详解: 条件判断：if (all(siz==2))
+  twos = pow2(0:ndims-1);  % 详解: 赋值：将 pow2(...) 的结果保存到 twos
+  ndx = ((subv-1) * twos(:)) + 1;  % 详解: 赋值：计算表达式并保存到 ndx
+else  % 详解: 条件判断：else 分支
+  cp = [1 cumprod(siz(1:end-1))]';  % 赋值：设置变量 cp  % 详解: 赋值：计算表达式并保存到 cp  % 详解: 赋值：计算表达式并保存到 cp
+  ndx = (subv-1)*cp + 1;  % 详解: 赋值：计算表达式并保存到 ndx
+end  % 详解: 执行语句
 
-%%%%%%%%%%%
 
-function d = bitv2dec(bits)
-% BITV2DEC Convert a bit vector to a decimal integer
-% d = butv2dec(bits)
-%
-% This is just like the built-in bin2dec, except the argument is a vector, not a string.
-% If bits is an array, each row will be converted.
+function d = bitv2dec(bits)  % 详解: 执行语句
 
-[m n] = size(bits);
-twos = pow2(n-1:-1:0);
-d = sum(bits .* twos(ones(m,1),:),2);
+[m n] = size(bits);  % 详解: 获取向量/矩阵尺寸
+twos = pow2(n-1:-1:0);  % 详解: 赋值：将 pow2(...) 的结果保存到 twos
+d = sum(bits .* twos(ones(m,1),:),2);  % 详解: 赋值：将 sum(...) 的结果保存到 d
+
+
+
+
 

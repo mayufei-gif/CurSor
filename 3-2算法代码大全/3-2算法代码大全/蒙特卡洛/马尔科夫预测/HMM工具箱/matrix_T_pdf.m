@@ -1,12 +1,18 @@
-function p = matrix_T_pdf(A, M, V, K, n)
-% MATRIX_T_PDF Evaluate the density of a matrix under a Matrix-T distribution
-% p = matrix_T_pdf(A, M, V, K, n)
+﻿% 文件: matrix_T_pdf.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-% See "Bayesian Linear Regression", T. Minka, MIT Tech Report, 2001
+function p = matrix_T_pdf(A, M, V, K, n)  % 详解: 执行语句
 
-[d m] = size(K);
-is = 1:d;
-c1 = prod(gamma((n+1-is)/2)) / prod(gamma((n-m+1-is)/2));
-c2 = det(K)^(d/2) / det(pi*V)^(m/2); %% pi or 2pi?
-p = c1 * c2 * det((A-M)'*inv(V)*(A-M)*K + eye(m))^(-n/2);
+
+[d m] = size(K);  % 详解: 获取向量/矩阵尺寸
+is = 1:d;  % 详解: 赋值：计算表达式并保存到 is
+c1 = prod(gamma((n+1-is)/2)) / prod(gamma((n-m+1-is)/2));  % 详解: 赋值：将 prod(...) 的结果保存到 c1
+c2 = det(K)^(d/2) / det(pi*V)^(m/2);  % 详解: 赋值：将 det(...) 的结果保存到 c2
+p = c1 * c2 * det((A-M)'*inv(V)*(A-M)*K + eye(m))^(-n/2);  % 创建单位矩阵  % 详解: 赋值：计算表达式并保存到 p  % 详解: 赋值：计算表达式并保存到 p
+
+
+
+
 

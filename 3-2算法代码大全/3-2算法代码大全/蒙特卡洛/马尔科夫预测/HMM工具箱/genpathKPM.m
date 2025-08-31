@@ -1,45 +1,43 @@
-function p = genpathKPM(d)
-% genpathKPM Like built-in genpath, but omits directories whose name is 'Old', 'old' or 'CVS'
-% function p = genpathKPM(d)
+﻿% 文件: genpathKPM.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-if nargin==0,
-  p = genpath(fullfile(matlabroot,'toolbox'));
-  if length(p) > 1, p(end) = []; end % Remove trailing pathsep
-  return
-end
+function p = genpathKPM(d)  % 详解: 执行语句
 
-% initialise variables
-methodsep = '@';  % qualifier for overloaded method directories
-p = '';           % path to be returned
+if nargin==0,  % 详解: 条件判断：if (nargin==0,)
+  p = genpath(fullfile(matlabroot,'toolbox'));  % 详解: 赋值：将 genpath(...) 的结果保存到 p
+  if length(p) > 1, p(end) = []; end  % 详解: 条件判断：if (length(p) > 1, p(end) = []; end)
+  return  % 详解: 返回：从当前函数返回
+end  % 详解: 执行语句
 
-% Generate path based on given root directory
-files = dir(d);
-if isempty(files)
-  return
-end
+methodsep = '@';  % 详解: 赋值：计算表达式并保存到 methodsep
+p = '';  % 详解: 赋值：计算表达式并保存到 p
 
-% Add d to the path even if it is empty.
-p = [p d pathsep];
+files = dir(d);  % 详解: 赋值：将 dir(...) 的结果保存到 files
+if isempty(files)  % 详解: 条件判断：if (isempty(files))
+  return  % 详解: 返回：从当前函数返回
+end  % 详解: 执行语句
 
-% set logical vector for subdirectory entries in d
-isdir = logical(cat(1,files.isdir));
-%
-% Recursively descend through directories which are neither
-% private nor "class" directories.
-%
-dirs = files(isdir); % select only directory entries from the current listing
+p = [p d pathsep];  % 详解: 赋值：计算表达式并保存到 p
 
-for i=1:length(dirs)
-   dirname = dirs(i).name;
-   if    ~strcmp( dirname,'.')         & ...
-         ~strcmp( dirname,'..')        & ...
-         ~strncmp( dirname,methodsep,1)& ...
-         ~strcmp( dirname,'private') & ...
-	 ~strcmp( dirname, 'old') & ...      % KPM
-	 ~strcmp( dirname, 'Old') & ... % KPM
-     	 ~strcmp( dirname, 'CVS')            % KPM
-      p = [p genpathKPM(fullfile(d,dirname))]; % recursive calling of this function.
-   end
-end
+isdir = logical(cat(1,files.isdir));  % 详解: 赋值：将 logical(...) 的结果保存到 isdir
+dirs = files(isdir);  % 详解: 赋值：将 files(...) 的结果保存到 dirs
 
-%------------------------------------------------------------------------------
+for i=1:length(dirs)  % 详解: for 循环：迭代变量 i 遍历 1:length(dirs)
+   dirname = dirs(i).name;  % 详解: 赋值：将 dirs(...) 的结果保存到 dirname
+   if    ~strcmp( dirname,'.')         & ...  % 详解: 条件判断：if (~strcmp( dirname,'.')         & ...)
+         ~strcmp( dirname,'..')        & ...  % 详解: 执行语句
+         ~strncmp( dirname,methodsep,1)& ...  % 详解: 执行语句
+         ~strcmp( dirname,'private') & ...  % 详解: 执行语句
+	 ~strcmp( dirname, 'old') & ...  % 详解: 执行语句
+	 ~strcmp( dirname, 'Old') & ...  % 详解: 执行语句
+     	 ~strcmp( dirname, 'CVS')  % 详解: 执行语句
+      p = [p genpathKPM(fullfile(d,dirname))];  % 详解: 赋值：计算表达式并保存到 p
+   end  % 详解: 执行语句
+end  % 详解: 执行语句
+
+
+
+
+

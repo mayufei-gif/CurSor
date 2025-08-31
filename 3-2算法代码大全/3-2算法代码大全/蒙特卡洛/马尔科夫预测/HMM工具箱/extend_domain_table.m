@@ -1,24 +1,24 @@
-function B = extend_domain_table(A, smalldom, smallsz, bigdom, bigsz)
-% EXTEND_DOMAIN_TABLE Expand an array so it has the desired size.
-% B = extend_domain_table(A, smalldom, smallsz, bigdom, bigsz)
-%
-% A is the array with domain smalldom and sizes smallsz.
-% bigdom is the desired domain, with sizes bigsz.
-%
-% Example:
-% smalldom = [1 3], smallsz = [2 4], bigdom = [1 2 3 4], bigsz = [2 1 4 5],
-% so B(i,j,k,l) = A(i,k) for i in 1:2, j in 1:1, k in 1:4, l in 1:5
+﻿% 文件: extend_domain_table.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-if isequal(size(A), [1 1]) % a scalar
-  B = A; % * myones(bigsz);
-  return;
-end
+function B = extend_domain_table(A, smalldom, smallsz, bigdom, bigsz)  % 详解: 执行语句
 
-map = find_equiv_posns(smalldom, bigdom);
-sz = ones(1, length(bigdom));
-sz(map) = smallsz;
-B = myreshape(A, sz); % add dimensions for the stuff not in A
-sz = bigsz;
-sz(map) = 1; % don't replicate along A's dimensions
-B = myrepmat(B, sz(:)');
+if isequal(size(A), [1 1])  % 详解: 条件判断：if (isequal(size(A), [1 1]))
+  B = A;  % 详解: 赋值：计算表达式并保存到 B
+  return;  % 详解: 返回：从当前函数返回
+end  % 详解: 执行语句
+
+map = find_equiv_posns(smalldom, bigdom);  % 详解: 赋值：将 find_equiv_posns(...) 的结果保存到 map
+sz = ones(1, length(bigdom));  % 详解: 赋值：将 ones(...) 的结果保存到 sz
+sz(map) = smallsz;  % 详解: 执行语句
+B = myreshape(A, sz);  % 详解: 赋值：将 myreshape(...) 的结果保存到 B
+sz = bigsz;  % 详解: 赋值：计算表达式并保存到 sz
+sz(map) = 1;  % 详解: 执行语句
+B = myrepmat(B, sz(:)');  % 赋值：设置变量 B  % 详解: 赋值：将 myrepmat(...) 的结果保存到 B  % 详解: 赋值：将 myrepmat(...) 的结果保存到 B
                            
+
+
+
+

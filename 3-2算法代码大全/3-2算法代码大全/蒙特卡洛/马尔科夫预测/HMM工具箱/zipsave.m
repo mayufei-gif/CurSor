@@ -1,3 +1,8 @@
+﻿% 文件: zipsave.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
+
 %ZIPSAVE   Save data in compressed format
 %
 %	zipsave( filename, data )
@@ -19,24 +24,20 @@
 % Modified by Kevin Murphy, 26 Feb 2004, to use winzip
 %------------------------------------------------------------------------
 
-function zipsave( filename, data )
-
-%--- Save data in a temporary file in matlab format (.mat)---
-
-eval( ['save ''', filename, ''' data'] )
+function zipsave( filename, data )  % 详解: 函数定义：zipsave(filename, data)
 
 
-%--- Compress data by calling pkzip (comand line command) ---
-% 	Options used: 
-%	'add' = add compressed files to the resulting zip file
-%	'silent' = no console output 
-%	'over=all' = overwrite files
+eval( ['save ''', filename, ''' data'] )  % 详解: 调用函数：eval(['save ''', filename, ''' data'])
 
-%eval( ['!pkzip25 -silent -add -over=all ', filename, '.zip ', filename,'.mat'] )
-eval( ['!zip ', filename, '.zip ', filename,'.mat'] )
 
-%--- Delete temporary matlab format file ---
 
-delete( [filename,'.mat'] )
+eval( ['!zip ', filename, '.zip ', filename,'.mat'] )  % 详解: 调用函数：eval(['!zip ', filename, '.zip ', filename,'.mat'])
+
+
+delete( [filename,'.mat'] )  % 详解: 调用函数：delete([filename,'.mat'])
+
+
+
+
 
 

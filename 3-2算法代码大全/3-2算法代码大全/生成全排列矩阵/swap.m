@@ -1,3 +1,12 @@
-%��дswap����
-function  [a,b]=swap(a,b)
-a=a+b;b=a-b;a=a-b;
+﻿% 文件: swap.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
+
+%编写swap函数
+function  [a,b]=swap(a,b)  % 详解: 函数定义：swap(a,b), 返回：a,b
+a=a+b;b=a-b;a=a-b;  % 详解: 赋值：计算表达式并保存到 a
+
+
+
+

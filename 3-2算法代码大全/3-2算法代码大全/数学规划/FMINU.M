@@ -1,300 +1,236 @@
-function [x,OPTIONS] = fminu(FUN,x,OPTIONS,GRADFUN,varargin)
-%��Ԫ������ֵ��ţ�ٷ��������ڹ⻬�����Ż�?
-%x=fminu('fun',x0)ţ�ٷ����Ԫ����y=f(x)��x0�����ľֲ���Сֵ��?
-%   ���� x,x0��Ϊ������ 
-%x=fminu('fun',x0,options)����options���Ż����㷨������������,
-%          ��help foptions�ɿ����������ĺ��塣
-%x=fminu('fun',x0,options,'grad') grad����f(x)���ݶȺ�������ʽ��ɼӿ�����ٶȡ?
-%x=fminu('fun',x0,options,'grad',p1,p2��)p1,p2,..�Ǳ�ʾfun��M�����еĲ�����
-%����  ��f(x)=100(x2-x1^2)^2+(1-x1)^2��[-1.2,1]�����ļ�Сֵ��
-% ��дM����optfun1.m  
-%         function  f=optfun1(x)
-%         f=100*(x(2)-x(1).^2).^2+(1-x(1)).^2;
-% ���
-%  clear;
-%  x=[-1.2,1];
-%  [x,options]=fminu('optfun1',x,options);
-%  x,options(8)
-%
-%FMINU  Finds the minimum of a function of several variables.
-%   X=FMINU('FUN',X0) starts at the matrix X0 and finds a minimum to the
-%   function which is described in FUN (usually an M-file: FUN.M).
-%   The function 'FUN' should return a scalar function value: F=FUN(X).
-%
-%   X=FMINU('FUN',X0,OPTIONS) allows a vector of optional parameters to
-%   be defined. OPTIONS(1) controls how much display output is given; set 
-%   to 1 for a tabular display of results, (default is no display: 0). 
-%   OPTIONS(2) is a measure of the precision required for the values of 
-%   X at the solution. OPTIONS(3) is a measure of the precision
-%   required of the objective function at the solution.
-%   For more information type HELP FOPTIONS. 
-%
-%   X=FMINU('FUN',X0,OPTIONS,'GRADFUN') enables a function'GRADFUN'
-%   to be entered which returns the partial derivatives of the function,
-%   df/dX, at the point X: gf = GRADFUN(X).
-%
-%   X=FMINU('FUN',X0,OPTIONS,'GRADFUN',P1,P2,...) passes the problem-
-%   dependent parameters P1,P2,... directly to the functions FUN 
-%   and GRADFUN: FUN(X,P1,P2,...) and GRADFUN(X,P1,P2,...).  Pass
-%   empty matrices for OPTIONS, and 'GRADFUN' to use the default 
-%   values.
-%
-%   [X,OPTIONS]=FMINU('FUN',X0,...) returns the parameters used in the 
-%   optimization method.  For example, options(10) contains the number 
-%   of function evaluations used.
-%
-%   The default algorithm is the BFGS Quasi-Newton method with a 
-%   mixed quadratic and cubic line search procedure. 
+﻿% 文件: FMINU.M
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-%   Copyright (c) 1990-98 by The MathWorks, Inc.
-%   $Revision: 1.27 $  $Date: 1997/11/29 01:23:11 $
-%   Andy Grace 7-9-90.
+function [x,OPTIONS] = fminu(FUN,x,OPTIONS,GRADFUN,varargin)  % 详解: 函数定义：fminu(FUN,x,OPTIONS,GRADFUN,varargin), 返回：x,OPTIONS
 
 
-% ------------Initialization----------------
-XOUT=x(:);
-nvars=length(XOUT);
 
-if nargin < 2, error('fminu requires two input arguments');end
-if nargin < 3, OPTIONS=[]; end
-if nargin < 4, GRADFUN=[]; end
+XOUT=x(:);  % 详解: 赋值：将 x(...) 的结果保存到 XOUT
+nvars=length(XOUT);  % 详解: 赋值：将 length(...) 的结果保存到 nvars
 
-% Convert to inline function as needed.
-if ~isempty(FUN)
-  [funfcn, msg] = fcnchk(FUN,length(varargin));
-  if ~isempty(msg)
-    error(msg);
-  end
-else
-  error('FUN must be a function name or valid expression.')
-end
+if nargin < 2, error('fminu requires two input arguments');end  % 详解: 条件判断：if (nargin < 2, error('fminu requires two input arguments');end)
+if nargin < 3, OPTIONS=[]; end  % 详解: 条件判断：if (nargin < 3, OPTIONS=[]; end)
+if nargin < 4, GRADFUN=[]; end  % 详解: 条件判断：if (nargin < 4, GRADFUN=[]; end)
 
-if ~isempty(GRADFUN)
-  [gradfcn, msg] = fcnchk(GRADFUN,length(varargin));
-  if ~isempty(msg)
-    error(msg);
-  end
-else
-  gradfcn = [];
-end
+if ~isempty(FUN)  % 详解: 条件判断：if (~isempty(FUN))
+  [funfcn, msg] = fcnchk(FUN,length(varargin));  % 详解: 获取向量/矩阵尺寸
+  if ~isempty(msg)  % 详解: 条件判断：if (~isempty(msg))
+    error(msg);  % 详解: 调用函数：error(msg)
+  end  % 详解: 执行语句
+else  % 详解: 条件判断：else 分支
+  error('FUN must be a function name or valid expression.')  % 详解: 调用函数：error('FUN must be a function name or valid expression.')
+end  % 详解: 执行语句
 
-f = feval(funfcn,x,varargin{:}); 
-n = length(XOUT);
-GRAD=zeros(nvars,1);
-OLDX=XOUT;
-MATX=zeros(3,1);
-MATL=[f;0;0];
-OLDF=f;
-FIRSTF=f;
-[OLDX,OLDF,HESS,OPTIONS]=optint(XOUT,f,OPTIONS);
-CHG = 1e-7*abs(XOUT)+1e-7*ones(nvars,1);
-SD = zeros(nvars,1);
-diff = zeros(nvars,1);
-PCNT = 0;
-how = '';
+if ~isempty(GRADFUN)  % 详解: 条件判断：if (~isempty(GRADFUN))
+  [gradfcn, msg] = fcnchk(GRADFUN,length(varargin));  % 详解: 获取向量/矩阵尺寸
+  if ~isempty(msg)  % 详解: 条件判断：if (~isempty(msg))
+    error(msg);  % 详解: 调用函数：error(msg)
+  end  % 详解: 执行语句
+else  % 详解: 条件判断：else 分支
+  gradfcn = [];  % 详解: 赋值：计算表达式并保存到 gradfcn
+end  % 详解: 执行语句
+
+f = feval(funfcn,x,varargin{:});  % 详解: 赋值：将 feval(...) 的结果保存到 f
+n = length(XOUT);  % 详解: 赋值：将 length(...) 的结果保存到 n
+GRAD=zeros(nvars,1);  % 详解: 赋值：将 zeros(...) 的结果保存到 GRAD
+OLDX=XOUT;  % 详解: 赋值：计算表达式并保存到 OLDX
+MATX=zeros(3,1);  % 详解: 赋值：将 zeros(...) 的结果保存到 MATX
+MATL=[f;0;0];  % 详解: 赋值：计算表达式并保存到 MATL
+OLDF=f;  % 详解: 赋值：计算表达式并保存到 OLDF
+FIRSTF=f;  % 详解: 赋值：计算表达式并保存到 FIRSTF
+[OLDX,OLDF,HESS,OPTIONS]=optint(XOUT,f,OPTIONS);  % 详解: 执行语句
+CHG = 1e-7*abs(XOUT)+1e-7*ones(nvars,1);  % 详解: 赋值：计算表达式并保存到 CHG
+SD = zeros(nvars,1);  % 详解: 赋值：将 zeros(...) 的结果保存到 SD
+diff = zeros(nvars,1);  % 详解: 赋值：将 zeros(...) 的结果保存到 diff
+PCNT = 0;  % 详解: 赋值：计算表达式并保存到 PCNT
+how = '';  % 详解: 赋值：计算表达式并保存到 how
 
 
-OPTIONS(10)=2; % Function evaluation count (add 1 for last evaluation)
-status =-1;
+OPTIONS(10)=2;  % 详解: 执行语句
+status =-1;  % 详解: 赋值：计算表达式并保存到 status
 
-while status ~= 1
-% Work Out Gradients
-    if isempty(gradfcn) | OPTIONS(9) 
-        OLDF=f;
-% Finite difference perturbation levels
-% First check perturbation level is not less than search direction.
-        f = find(10*abs(CHG)>abs(SD)); 
-        CHG(f) = -0.1*SD(f);
-% Ensure within user-defined limits
-        CHG = sign(CHG+eps).*min(max(abs(CHG),OPTIONS(16)),OPTIONS(17));
-        for gcnt=1:nvars
-            XOUT(gcnt,1)=XOUT(gcnt)+CHG(gcnt);
-            x(:) = XOUT; 
-            f = feval(funfcn,x,varargin{:});
-            GRAD(gcnt)=(f-OLDF)/(CHG(gcnt));
-            if f < OLDF
-                OLDF=f;
-            else
-                XOUT(gcnt)=XOUT(gcnt)-CHG(gcnt);
-            end
-        end
-% Try to set difference to 1e-8 for next iteration
-% Add eps for machines that can't handle divide by zero.
-        CHG = 1e-8./(GRAD + eps); 
-        f = OLDF;
-        OPTIONS(10)=OPTIONS(10)+nvars;
-% Gradient check 
-        if OPTIONS(9) == 1 
-            GRADFD = GRAD; 
-            x(:)=XOUT;  
-            GRAD(:) = feval(gradfcn,x,varargin{:});
-            if isa(gradfcn,'inline')
-              graderr(GRADFD, GRAD, formula(gradfcn));
-            else
-              graderr(GRADFD, GRAD,  gradfcn);
-            end
-             OPTIONS(9) = 0; 
-        end
+while status ~= 1  % 详解: while 循环：当 (status ~= 1) 为真时迭代
+    if isempty(gradfcn) | OPTIONS(9)  % 详解: 条件判断：if (isempty(gradfcn) | OPTIONS(9))
+        OLDF=f;  % 详解: 赋值：计算表达式并保存到 OLDF
+        f = find(10*abs(CHG)>abs(SD));  % 详解: 赋值：将 find(...) 的结果保存到 f
+        CHG(f) = -0.1*SD(f);  % 详解: 调用函数：CHG(f) = -0.1*SD(f)
+        CHG = sign(CHG+eps).*min(max(abs(CHG),OPTIONS(16)),OPTIONS(17));  % 详解: 赋值：将 sign(...) 的结果保存到 CHG
+        for gcnt=1:nvars  % 详解: for 循环：迭代变量 gcnt 遍历 1:nvars
+            XOUT(gcnt,1)=XOUT(gcnt)+CHG(gcnt);  % 详解: 调用函数：XOUT(gcnt,1)=XOUT(gcnt)+CHG(gcnt)
+            x(:) = XOUT;  % 详解: 执行语句
+            f = feval(funfcn,x,varargin{:});  % 详解: 赋值：将 feval(...) 的结果保存到 f
+            GRAD(gcnt)=(f-OLDF)/(CHG(gcnt));  % 详解: 调用函数：GRAD(gcnt)=(f-OLDF)/(CHG(gcnt))
+            if f < OLDF  % 详解: 条件判断：if (f < OLDF)
+                OLDF=f;  % 详解: 赋值：计算表达式并保存到 OLDF
+            else  % 详解: 条件判断：else 分支
+                XOUT(gcnt)=XOUT(gcnt)-CHG(gcnt);  % 详解: 调用函数：XOUT(gcnt)=XOUT(gcnt)-CHG(gcnt)
+            end  % 详解: 执行语句
+        end  % 详解: 执行语句
+        CHG = 1e-8./(GRAD + eps);  % 详解: 赋值：计算表达式并保存到 CHG
+        f = OLDF;  % 详解: 赋值：计算表达式并保存到 f
+        OPTIONS(10)=OPTIONS(10)+nvars;  % 详解: 执行语句
+        if OPTIONS(9) == 1  % 详解: 条件判断：if (OPTIONS(9) == 1)
+            GRADFD = GRAD;  % 详解: 赋值：计算表达式并保存到 GRADFD
+            x(:)=XOUT;  % 详解: 执行语句
+            GRAD(:) = feval(gradfcn,x,varargin{:});  % 详解: 调用函数：GRAD(:) = feval(gradfcn,x,varargin{:})
+            if isa(gradfcn,'inline')  % 详解: 条件判断：if (isa(gradfcn,'inline'))
+              graderr(GRADFD, GRAD, formula(gradfcn));  % 详解: 调用函数：graderr(GRADFD, GRAD, formula(gradfcn))
+            else  % 详解: 条件判断：else 分支
+              graderr(GRADFD, GRAD,  gradfcn);  % 详解: 调用函数：graderr(GRADFD, GRAD, gradfcn)
+            end  % 详解: 执行语句
+             OPTIONS(9) = 0;  % 详解: 执行语句
+        end  % 详解: 执行语句
                 
-    else
-        OPTIONS(11)=OPTIONS(11)+1;
-        x(:)=XOUT; 
-        GRAD(:) = feval(gradfcn,x,varargin{:});
-    end
-%---------------Initialization of Search Direction------------------
-if status == -1
-    SD=-GRAD;
-    FIRSTF=f;
-    OLDG=GRAD;
-    GDOLD=GRAD'*SD;
-% For initial step-size guess assume the minimum is at zero. 
-    OPTIONS(18) = max(0.001, min([1,2*abs(f/GDOLD)]));
-    if OPTIONS(1)>0
-        disp([sprintf('%5.0f %12.6g %12.6g ',OPTIONS(10),f,OPTIONS(18)),sprintf('%12.3g  ',GDOLD)]);
-    end
-    XOUT=XOUT+OPTIONS(18)*SD;
-    status=4; 
-    if OPTIONS(7)==0; PCNT=1; end
+    else  % 详解: 条件判断：else 分支
+        OPTIONS(11)=OPTIONS(11)+1;  % 详解: 执行语句
+        x(:)=XOUT;  % 详解: 执行语句
+        GRAD(:) = feval(gradfcn,x,varargin{:});  % 详解: 调用函数：GRAD(:) = feval(gradfcn,x,varargin{:})
+    end  % 详解: 执行语句
+if status == -1  % 详解: 条件判断：if (status == -1)
+    SD=-GRAD;  % 详解: 赋值：计算表达式并保存到 SD
+    FIRSTF=f;  % 详解: 赋值：计算表达式并保存到 FIRSTF
+    OLDG=GRAD;  % 详解: 赋值：计算表达式并保存到 OLDG
+    GDOLD=GRAD'*SD;  % 赋值：设置变量 GDOLD  % 详解: 赋值：计算表达式并保存到 GDOLD  % 详解: 赋值：计算表达式并保存到 GDOLD
+    OPTIONS(18) = max(0.001, min([1,2*abs(f/GDOLD)]));  % 详解: 调用函数：OPTIONS(18) = max(0.001, min([1,2*abs(f/GDOLD)]))
+    if OPTIONS(1)>0  % 详解: 条件判断：if (OPTIONS(1)>0)
+        disp([sprintf('%5.0f %12.6g %12.6g ',OPTIONS(10),f,OPTIONS(18)),sprintf('%12.3g  ',GDOLD)]);  % 详解: 调用函数：disp([sprintf('%5.0f %12.6g %12.6g ',OPTIONS(10),f,OPTIONS(18)),sprintf('%12.3g ',GDOLD)])
+    end  % 详解: 执行语句
+    XOUT=XOUT+OPTIONS(18)*SD;  % 详解: 赋值：计算表达式并保存到 XOUT
+    status=4;  % 详解: 赋值：计算表达式并保存到 status
+    if OPTIONS(7)==0; PCNT=1; end  % 详解: 条件判断：if (OPTIONS(7)==0; PCNT=1; end)
          
-else
-%-------------Direction Update------------------
-    gdnew=GRAD'*SD;
-    if OPTIONS(1)>0, 
-        num=[sprintf('%5.0f %12.6g %12.6g ',OPTIONS(10),f,OPTIONS(18)),sprintf('%12.3g  ',gdnew)];
-    end
-    if (gdnew>0 & f>FIRSTF)|~finite(f)
-% Case 1: New function is bigger than last and gradient w.r.t. SD -ve
-%   ...interpolate.
-        how='inter';
-        [stepsize]=cubici1(f,FIRSTF,gdnew,GDOLD,OPTIONS(18));
-        if stepsize<0|isnan(stepsize), stepsize=OPTIONS(18)/2; how='C1f '; end
-        if OPTIONS(18)<0.1&OPTIONS(6)==0 
-            if stepsize*norm(SD)<eps
-                stepsize=exp(rand(1,1)-1)-0.1;
-                how='RANDOM STEPLENGTH';
-                status=0;
-            else        
-                stepsize=stepsize/2;
-            end   
-        end      
-        OPTIONS(18)=stepsize;
-        XOUT=OLDX;
-    elseif f<FIRSTF
-        [newstep,fbest] =cubici3(f,FIRSTF,gdnew,GDOLD,OPTIONS(18));
-        sk=(XOUT-OLDX)'*(GRAD-OLDG);
-        if sk>1e-20
-% Case 2: New function less than old fun. and OK for updating HESS
-%         .... update and calculate new direction.
-        how='';   
-            if gdnew<0
-                how='incstep';
-                if newstep<OPTIONS(18),  newstep=2*OPTIONS(18)+1e-5; how=[how,' IF']; end
-                OPTIONS(18)=min([max([2,1.5*OPTIONS(18)]),1+sk+abs(gdnew)+max([0,OPTIONS(18)-1]), (1.2+0.3*(~OPTIONS(7)))*abs(newstep)]);
-            else % gdnew>0
-                if OPTIONS(18)>0.9
-                    how='int_st';
-                    OPTIONS(18)=min([1,abs(newstep)]);
-                end
-            end %if gdnew
-            [HESS,SD]=updhess(XOUT,OLDX,GRAD,OLDG,HESS,OPTIONS);
-            gdnew=GRAD'*SD;
-            OLDX=XOUT;
-            status=4;
-% Save Variables for next update
-            FIRSTF=f;
-            OLDG=GRAD;
-            GDOLD=gdnew;
-% If mixed interpolation set PCNT
-            if OPTIONS(7)==0, PCNT=1; MATX=zeros(3,1);  MATL(1)=f; end
-    elseif gdnew>0 %sk<=0 
-% Case 3: No good for updating HESSIAN .. interpolate or halve step length.
-            how='inter_st'; 
-            if OPTIONS(18)>0.01
-                OPTIONS(18)=0.9*newstep;
-                XOUT=OLDX;
-            end
-            if OPTIONS(18)>1, OPTIONS(18)=1; end
-        else  
-% Increase step, replace starting point
-            OPTIONS(18)=max([min([newstep-OPTIONS(18),3]),0.5*OPTIONS(18)]);
-            how='incst2';
-            OLDX=XOUT;
-            FIRSTF=f;
-            OLDG=GRAD;
-            GDOLD=GRAD'*SD;
-                OLDX=XOUT;
-        end % if sk>
-% Case 4: New function bigger than old but gradient in on
-%         ...reduce step length.
-    else %gdnew<0 & F>FIRSTF
-        if gdnew<0&f>FIRSTF
-            how='red_step';  
-            if norm(GRAD-OLDG)<1e-10; HESS=eye(nvars); end
-            if abs(OPTIONS(18))<eps
-                SD=norm(nvars,1)*(rand(nvars,1)-0.5);
-                OPTIONS(18)=abs(rand(1,1)-0.5)*1e-6;
-                        how='RANDOM SD';
-                    else
-                        OPTIONS(18)=-OPTIONS(18)/2;
-            end
-            XOUT=OLDX;
-        end %gdnew>0    
-    end % if (gdnew>0 & F>FIRSTF)|~finite(F)
-    XOUT=XOUT+OPTIONS(18)*SD;
-    if isinf(OPTIONS(1)) 
-       disp([num,how])
-    elseif OPTIONS(1)>0 
-       disp(num)
-    end
-end %----------End of Direction Update-------------------
+else  % 详解: 条件判断：else 分支
+    gdnew=GRAD'*SD;  % 赋值：设置变量 gdnew  % 详解: 赋值：计算表达式并保存到 gdnew  % 详解: 赋值：计算表达式并保存到 gdnew
+    if OPTIONS(1)>0,  % 详解: 条件判断：if (OPTIONS(1)>0,)
+        num=[sprintf('%5.0f %12.6g %12.6g ',OPTIONS(10),f,OPTIONS(18)),sprintf('%12.3g  ',gdnew)];  % 详解: 赋值：计算表达式并保存到 num
+    end  % 详解: 执行语句
+    if (gdnew>0 & f>FIRSTF)|~finite(f)  % 详解: 条件判断：if ((gdnew>0 & f>FIRSTF)|~finite(f))
+        how='inter';  % 详解: 赋值：计算表达式并保存到 how
+        [stepsize]=cubici1(f,FIRSTF,gdnew,GDOLD,OPTIONS(18));  % 详解: 执行语句
+        if stepsize<0|isnan(stepsize), stepsize=OPTIONS(18)/2; how='C1f '; end  % 详解: 条件判断：if (stepsize<0|isnan(stepsize), stepsize=OPTIONS(18)/2; how='C1f '; end)
+        if OPTIONS(18)<0.1&OPTIONS(6)==0  % 详解: 条件判断：if (OPTIONS(18)<0.1&OPTIONS(6)==0)
+            if stepsize*norm(SD)<eps  % 详解: 条件判断：if (stepsize*norm(SD)<eps)
+                stepsize=exp(rand(1,1)-1)-0.1;  % 详解: 赋值：将 exp(...) 的结果保存到 stepsize
+                how='RANDOM STEPLENGTH';  % 详解: 赋值：计算表达式并保存到 how
+                status=0;  % 详解: 赋值：计算表达式并保存到 status
+            else  % 详解: 条件判断：else 分支
+                stepsize=stepsize/2;  % 详解: 赋值：计算表达式并保存到 stepsize
+            end  % 详解: 执行语句
+        end  % 详解: 执行语句
+        OPTIONS(18)=stepsize;  % 详解: 执行语句
+        XOUT=OLDX;  % 详解: 赋值：计算表达式并保存到 XOUT
+    elseif f<FIRSTF  % 详解: 条件判断：elseif (f<FIRSTF)
+        [newstep,fbest] =cubici3(f,FIRSTF,gdnew,GDOLD,OPTIONS(18));  % 详解: 执行语句
+        sk=(XOUT-OLDX)'*(GRAD-OLDG);  % 赋值：设置变量 sk  % 详解: 赋值：计算表达式并保存到 sk  % 详解: 赋值：计算表达式并保存到 sk
+        if sk>1e-20  % 详解: 条件判断：if (sk>1e-20)
+        how='';  % 详解: 赋值：计算表达式并保存到 how
+            if gdnew<0  % 详解: 条件判断：if (gdnew<0)
+                how='incstep';  % 详解: 赋值：计算表达式并保存到 how
+                if newstep<OPTIONS(18),  newstep=2*OPTIONS(18)+1e-5; how=[how,' IF']; end  % 详解: 条件判断：if (newstep<OPTIONS(18),  newstep=2*OPTIONS(18)+1e-5; how=[how,' IF']; end)
+                OPTIONS(18)=min([max([2,1.5*OPTIONS(18)]),1+sk+abs(gdnew)+max([0,OPTIONS(18)-1]), (1.2+0.3*(~OPTIONS(7)))*abs(newstep)]);  % 详解: 调用函数：OPTIONS(18)=min([max([2,1.5*OPTIONS(18)]),1+sk+abs(gdnew)+max([0,OPTIONS(18)-1]), (1.2+0.3*(~OPTIONS(7)))*abs(newstep)])
+            else  % 详解: 条件判断：else 分支
+                if OPTIONS(18)>0.9  % 详解: 条件判断：if (OPTIONS(18)>0.9)
+                    how='int_st';  % 详解: 赋值：计算表达式并保存到 how
+                    OPTIONS(18)=min([1,abs(newstep)]);  % 详解: 调用函数：OPTIONS(18)=min([1,abs(newstep)])
+                end  % 详解: 执行语句
+            end  % 详解: 执行语句
+            [HESS,SD]=updhess(XOUT,OLDX,GRAD,OLDG,HESS,OPTIONS);  % 详解: 执行语句
+            gdnew=GRAD'*SD;  % 赋值：设置变量 gdnew  % 详解: 赋值：计算表达式并保存到 gdnew  % 详解: 赋值：计算表达式并保存到 gdnew
+            OLDX=XOUT;  % 详解: 赋值：计算表达式并保存到 OLDX
+            status=4;  % 详解: 赋值：计算表达式并保存到 status
+            FIRSTF=f;  % 详解: 赋值：计算表达式并保存到 FIRSTF
+            OLDG=GRAD;  % 详解: 赋值：计算表达式并保存到 OLDG
+            GDOLD=gdnew;  % 详解: 赋值：计算表达式并保存到 GDOLD
+            if OPTIONS(7)==0, PCNT=1; MATX=zeros(3,1);  MATL(1)=f; end  % 详解: 条件判断：if (OPTIONS(7)==0, PCNT=1; MATX=zeros(3,1);  MATL(1)=f; end)
+    elseif gdnew>0  % 详解: 条件判断：elseif (gdnew>0)
+            how='inter_st';  % 详解: 赋值：计算表达式并保存到 how
+            if OPTIONS(18)>0.01  % 详解: 条件判断：if (OPTIONS(18)>0.01)
+                OPTIONS(18)=0.9*newstep;  % 详解: 执行语句
+                XOUT=OLDX;  % 详解: 赋值：计算表达式并保存到 XOUT
+            end  % 详解: 执行语句
+            if OPTIONS(18)>1, OPTIONS(18)=1; end  % 详解: 条件判断：if (OPTIONS(18)>1, OPTIONS(18)=1; end)
+        else  % 详解: 条件判断：else 分支
+            OPTIONS(18)=max([min([newstep-OPTIONS(18),3]),0.5*OPTIONS(18)]);  % 详解: 调用函数：OPTIONS(18)=max([min([newstep-OPTIONS(18),3]),0.5*OPTIONS(18)])
+            how='incst2';  % 详解: 赋值：计算表达式并保存到 how
+            OLDX=XOUT;  % 详解: 赋值：计算表达式并保存到 OLDX
+            FIRSTF=f;  % 详解: 赋值：计算表达式并保存到 FIRSTF
+            OLDG=GRAD;  % 详解: 赋值：计算表达式并保存到 OLDG
+            GDOLD=GRAD'*SD;  % 赋值：设置变量 GDOLD  % 详解: 赋值：计算表达式并保存到 GDOLD  % 详解: 赋值：计算表达式并保存到 GDOLD
+                OLDX=XOUT;  % 详解: 赋值：计算表达式并保存到 OLDX
+        end  % 详解: 执行语句
+    else  % 详解: 条件判断：else 分支
+        if gdnew<0&f>FIRSTF  % 详解: 条件判断：if (gdnew<0&f>FIRSTF)
+            how='red_step';  % 详解: 赋值：计算表达式并保存到 how
+            if norm(GRAD-OLDG)<1e-10; HESS=eye(nvars); end  % 详解: 条件判断：if (norm(GRAD-OLDG)<1e-10; HESS=eye(nvars); end)
+            if abs(OPTIONS(18))<eps  % 详解: 条件判断：if (abs(OPTIONS(18))<eps)
+                SD=norm(nvars,1)*(rand(nvars,1)-0.5);  % 详解: 赋值：将 norm(...) 的结果保存到 SD
+                OPTIONS(18)=abs(rand(1,1)-0.5)*1e-6;  % 详解: 生成随机数/矩阵
+                        how='RANDOM SD';  % 详解: 赋值：计算表达式并保存到 how
+                    else  % 详解: 条件判断：else 分支
+                        OPTIONS(18)=-OPTIONS(18)/2;  % 详解: 执行语句
+            end  % 详解: 执行语句
+            XOUT=OLDX;  % 详解: 赋值：计算表达式并保存到 XOUT
+        end  % 详解: 执行语句
+    end  % 详解: 执行语句
+    XOUT=XOUT+OPTIONS(18)*SD;  % 详解: 赋值：计算表达式并保存到 XOUT
+    if isinf(OPTIONS(1))  % 详解: 条件判断：if (isinf(OPTIONS(1)))
+       disp([num,how])  % 详解: 调用函数：disp([num,how])
+    elseif OPTIONS(1)>0  % 详解: 条件判断：elseif (OPTIONS(1)>0)
+       disp(num)  % 详解: 调用函数：disp(num)
+    end  % 详解: 执行语句
+end  % 详解: 执行语句
 
-% Check Termination 
-    if max(abs(SD))<2*OPTIONS(2) & (-GRAD'*SD) < 2*OPTIONS(3)
-        if OPTIONS(1) > 0
-           disp('Optimization Terminated Successfully')
-           disp(' Search direction less than 2*options(2)')     
-           disp(' Gradient in the search direction less than 2*options(3)')     
-           disp([' NUMBER OF FUNCTION EVALUATIONS=', int2str(OPTIONS(10))]);
-        end
-        status=1; 
-    elseif OPTIONS(10)>OPTIONS(14) 
-            if OPTIONS(1) >= 0
-                  disp('Maximum number of function evaluations exceeded;')
-                  disp('   increase options(14).')
-            end              
-            status=1;
-    else
+    if max(abs(SD))<2*OPTIONS(2) & (-GRAD'*SD) < 2*OPTIONS(3)  % 条件判断：if 分支开始  % 详解: 条件判断：if (max(abs(SD))<2*OPTIONS(2) & (-GRAD'*SD) < 2*OPTIONS(3))  % 详解: 条件判断：if (max(abs(SD))<2*OPTIONS(2) & (-GRAD'*SD) < 2*OPTIONS(3)  % 条件判断：if 分支开始  % 详解: 条件判断：if (max(abs(SD))<2*OPTIONS(2) & (-GRAD'*SD) < 2*OPTIONS(3)))
+        if OPTIONS(1) > 0  % 详解: 条件判断：if (OPTIONS(1) > 0)
+           disp('Optimization Terminated Successfully')  % 详解: 调用函数：disp('Optimization Terminated Successfully')
+           disp(' Search direction less than 2*options(2)')  % 详解: 调用函数：disp(' Search direction less than 2*options(2)')
+           disp(' Gradient in the search direction less than 2*options(3)')  % 详解: 调用函数：disp(' Gradient in the search direction less than 2*options(3)')
+           disp([' NUMBER OF FUNCTION EVALUATIONS=', int2str(OPTIONS(10))]);  % 详解: 调用函数：disp([' NUMBER OF FUNCTION EVALUATIONS=', int2str(OPTIONS(10))])
+        end  % 详解: 执行语句
+        status=1;  % 详解: 赋值：计算表达式并保存到 status
+    elseif OPTIONS(10)>OPTIONS(14)  % 详解: 条件判断：elseif (OPTIONS(10)>OPTIONS(14))
+            if OPTIONS(1) >= 0  % 详解: 条件判断：if (OPTIONS(1) >= 0)
+                  disp('Maximum number of function evaluations exceeded;')  % 详解: 调用函数：disp('Maximum number of function evaluations exceeded;')
+                  disp('   increase options(14).')  % 详解: 调用函数：disp(' increase options(14).')
+            end  % 详解: 执行语句
+            status=1;  % 详解: 赋值：计算表达式并保存到 status
+    else  % 详解: 条件判断：else 分支
 
-% Line search using mixed polynomial interpolation and extrapolation.
-        if PCNT~=0 
-            while PCNT > 0 & OPTIONS(10) <= OPTIONS(14)
-                x(:) = XOUT;
-                f = feval(funfcn,x,varargin{:}); 
-                OPTIONS(10)=OPTIONS(10)+1;
-                [PCNT,MATL,MATX,steplen,f, how]=searchq(PCNT,f,OLDX,MATL,MATX,SD,GDOLD,OPTIONS(18), how);
-                OPTIONS(18)=steplen;
-                XOUT=OLDX+steplen*SD;
-            end
-            if OPTIONS(10)>OPTIONS(14) 
-              if OPTIONS(1) >= 0
-                  disp('Maximum number of function evaluations exceeded;')
-                  disp('   increase options(14).')
-              end              
-              status=1; 
-            end
-        else
-            x(:)=XOUT; 
-            f = feval(funfcn,x,varargin{:}); 
-            OPTIONS(10)=OPTIONS(10)+1;
-        end
-    end
-end
+        if PCNT~=0  % 详解: 条件判断：if (PCNT~=0)
+            while PCNT > 0 & OPTIONS(10) <= OPTIONS(14)  % 详解: while 循环：当 (PCNT > 0 & OPTIONS(10) <= OPTIONS(14)) 为真时迭代
+                x(:) = XOUT;  % 详解: 执行语句
+                f = feval(funfcn,x,varargin{:});  % 详解: 赋值：将 feval(...) 的结果保存到 f
+                OPTIONS(10)=OPTIONS(10)+1;  % 详解: 执行语句
+                [PCNT,MATL,MATX,steplen,f, how]=searchq(PCNT,f,OLDX,MATL,MATX,SD,GDOLD,OPTIONS(18), how);  % 详解: 执行语句
+                OPTIONS(18)=steplen;  % 详解: 执行语句
+                XOUT=OLDX+steplen*SD;  % 详解: 赋值：计算表达式并保存到 XOUT
+            end  % 详解: 执行语句
+            if OPTIONS(10)>OPTIONS(14)  % 详解: 条件判断：if (OPTIONS(10)>OPTIONS(14))
+              if OPTIONS(1) >= 0  % 详解: 条件判断：if (OPTIONS(1) >= 0)
+                  disp('Maximum number of function evaluations exceeded;')  % 详解: 调用函数：disp('Maximum number of function evaluations exceeded;')
+                  disp('   increase options(14).')  % 详解: 调用函数：disp(' increase options(14).')
+              end  % 详解: 执行语句
+              status=1;  % 详解: 赋值：计算表达式并保存到 status
+            end  % 详解: 执行语句
+        else  % 详解: 条件判断：else 分支
+            x(:)=XOUT;  % 详解: 执行语句
+            f = feval(funfcn,x,varargin{:});  % 详解: 赋值：将 feval(...) 的结果保存到 f
+            OPTIONS(10)=OPTIONS(10)+1;  % 详解: 执行语句
+        end  % 详解: 执行语句
+    end  % 详解: 执行语句
+end  % 详解: 执行语句
 
-x(:)=XOUT;
-f = feval(funfcn,x,varargin{:}); 
-if f > FIRSTF
-    OPTIONS(8) = FIRSTF; 
-    x(:)=OLDX;
-else
-    OPTIONS(8) = f; 
-end
+x(:)=XOUT;  % 详解: 执行语句
+f = feval(funfcn,x,varargin{:});  % 详解: 赋值：将 feval(...) 的结果保存到 f
+if f > FIRSTF  % 详解: 条件判断：if (f > FIRSTF)
+    OPTIONS(8) = FIRSTF;  % 详解: 执行语句
+    x(:)=OLDX;  % 详解: 执行语句
+else  % 详解: 条件判断：else 分支
+    OPTIONS(8) = f;  % 详解: 执行语句
+end  % 详解: 执行语句
+
+
+
+

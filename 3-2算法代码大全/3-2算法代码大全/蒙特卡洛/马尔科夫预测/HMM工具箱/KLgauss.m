@@ -1,9 +1,14 @@
-function kl = KLgauss(P, Q)
-%The following computes D(P||Q), the KL divergence between two zero-mean
-%Gaussians with covariance P and Q:
-%  klDiv = -0.5*(log(det(P*inv(Q))) + trace(eye(N)-P*inv(Q)));
+﻿% 文件: KLgauss.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-R = P*inv(Q);
-kl = -0.5*(log(det(R))) + trace(eye(length(P))-R);
+function kl = KLgauss(P, Q)  % 详解: 执行语句
 
-%To get MI, just set P=cov(X,Y) and Q=blockdiag(cov(X),cov(Y)).  
+R = P*inv(Q);  % 详解: 赋值：计算表达式并保存到 R
+kl = -0.5*(log(det(R))) + trace(eye(length(P))-R);  % 详解: 赋值：计算表达式并保存到 kl
+
+
+
+
+

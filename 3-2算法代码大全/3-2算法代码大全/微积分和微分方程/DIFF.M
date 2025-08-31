@@ -1,43 +1,11 @@
-function X = diff(X,order,dim)
-%1.ÊıÖµ²î·Ö
-%     ¶ÔÏòÁ¿nÎ¬X,diff(X)·µ»Ø[X(2)-X(1)  X(3)-X(2) ... X(n)-X(n-1)]
-%  Àı     x=[1 3 8];diff(x)
-%
-%2.·ûºÅµ¼º¯Êı
-%    diff(s)·ûºÅ±í´ïÊ½sµÄµ¼Êı.  
-%    diff(s,v)·ûºÅ±í´ïÊ½s¹ØÓÚ±äÁ¿vµÄµ¼Êı.
-%    diff(s,n)·ûºÅ±í´ïÊ½sµÄn½×µ¼Êı.
-%    diff(s,v,n),·ûºÅ±í´ïÊ½s¹ØÓÚ±äÁ¿vµÄn½×µ¼Êı.
-% Àı     syms x y;
-%       s=exp(x^2)*sin(x+y);
-%       diff(s,x,2)
-%
-%DIFF Difference and approximate derivative.
-%   DIFF(X), for a vector X, is [X(2)-X(1)  X(3)-X(2) ... X(n)-X(n-1)].
-%   DIFF(X), for a matrix X, is the matrix of column differences,
-%      [X(2:n,:) - X(1:n-1,:)].
-%   DIFF(X), for an N-D array X, is the difference along the first
-%      non-singleton dimension of X.
-%   DIFF(X,N) is the N-th order difference along the first non-singleton 
-%      dimension (denote it by DIM). If N >= size(X,DIM), DIFF takes 
-%      successive differences along the next non-singleton dimension.
-%   DIFF(X,N,DIM) is the Nth difference function along dimension DIM. 
-%      If N >= size(X,DIM), DIFF returns an empty array.
-%
-%   Examples:
-%      h = .001; x = 0:h:pi;
-%      diff(sin(x.^2))/h is an approximation to 2*cos(x.^2).*x
-%      diff((1:10).^2) is 3:2:19
-%
-%      If X = [3 7 5
-%              0 9 2]
-%      then diff(X,1,1) is [-3 2 -3], diff(X,1,2) is [4 -2
-%                                                     9 -7],
-%      diff(X,2,2) is the 2nd order difference along the dimension 2, and
-%      diff(X,3,2) is the empty matrix.
-%
-%   See also GRADIENT, SUM, PROD.
+ï»¿% æ–‡ä»¶: DIFF.M
+% è¯´æ˜: è‡ªåŠ¨æ·»åŠ çš„æ³¨é‡Šå ä½ï¼Œè¯·æ ¹æ®éœ€è¦è¡¥å……ã€‚
+% ç”Ÿæˆ: 2025-08-31 23:06
+% æ³¨é‡Š: æœ¬æ–‡ä»¶å¤´ç”±è„šæœ¬è‡ªåŠ¨æ·»åŠ 
 
-%   Copyright (c) 1984-98 by The MathWorks, Inc.
-%   $Revision: 5.20 $  $Date: 1997/11/21 23:23:41 $
-%   Built-in function.
+function X = diff(X,order,dim)  % è¯¦è§£: æ‰§è¡Œè¯­å¥
+
+
+
+
+

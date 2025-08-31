@@ -1,11 +1,16 @@
-function M = softeye(K, p)
-% SOFTEYE Make a stochastic matrix with p on the diagonal, and the remaining mass distributed uniformly
-% M = softeye(K, p)
-%
-% M is a K x K matrix.
+﻿% 文件: softeye.m
+% 说明: 自动添加的注释占位，请根据需要补充。
+% 生成: 2025-08-31 23:06
+% 注释: 本文件头由脚本自动添加
 
-M = p*eye(K);
-q = 1-p;
-for i=1:K
-  M(i, [1:i-1  i+1:K]) = q/(K-1);
-end
+function M = softeye(K, p)  % 详解: 执行语句
+
+M = p*eye(K);  % 详解: 赋值：计算表达式并保存到 M
+q = 1-p;  % 详解: 赋值：计算表达式并保存到 q
+for i=1:K  % 详解: for 循环：迭代变量 i 遍历 1:K
+  M(i, [1:i-1  i+1:K]) = q/(K-1);  % 详解: 调用函数：M(i, [1:i-1 i+1:K]) = q/(K-1)
+end  % 详解: 执行语句
+
+
+
+
