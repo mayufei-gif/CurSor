@@ -1,0 +1,245 @@
+# Development Tools Dockerfile
+# Provides a complete development environment with all necessary tools
+
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    DEBIAN_FRONTEND=noninteractive
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    # Build tools
+    build-essential \
+    gcc \
+    g++ \
+    cmake \
+    pkg-config \
+    # Development tools
+    git \
+    curl \
+    wget \
+    unzip \
+    vim \
+    nano \
+    htop \
+    tree \
+    jq \
+    # Docker tools
+    docker.io \
+    docker-compose \
+    # Network tools
+    net-tools \
+    iputils-ping \
+    telnet \
+    # PDF processing dependencies
+    ghostscript \
+    poppler-utils \
+    # OCR dependencies
+    tesseract-ocr \
+    tesseract-ocr-eng \
+    # Image processing
+    libjpeg62-turbo \
+    libpng16-16 \
+    libtiff5 \
+    # Java for Tabula
+    default-jre-headless \
+    # Node.js for frontend tools
+    nodejs \
+    npm \
+    # Database clients
+    postgresql-client \
+    redis-tools \
+    # SSL tools
+    openssl \
+    ca-certificates \
+    # Cleanup
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Install Python development tools
+RUN pip install --upgrade pip setuptools wheel && \
+    pip install \
+    # Core development tools
+    black \
+    isort \
+    flake8 \
+    mypy \
+    pylint \
+    bandit \
+    safety \
+    # Testing tools
+    pytest \
+    pytest-asyncio \
+    pytest-cov \
+    pytest-mock \
+    pytest-xdist \
+    # Documentation tools
+    sphinx \
+    sphinx-rtd-theme \
+    mkdocs \
+    mkdocs-material \
+    # Debugging tools
+    debugpy \
+    ipdb \
+    pdb++ \
+    # Performance tools
+    py-spy \
+    memory-profiler \
+    line-profiler \
+    # API tools
+    httpie \
+    requests \
+    # Jupyter tools
+    jupyter \
+    jupyterlab \
+    notebook \
+    # Data analysis
+    pandas \
+    numpy \
+    matplotlib \
+    seaborn \
+    plotly \
+    # Development utilities
+    pre-commit \
+    tox \
+    cookiecutter \
+    # Docker tools
+    docker-compose \
+    # Monitoring tools
+    psutil \
+    # File tools
+    watchdog \
+    # Network tools
+    aiohttp \
+    websockets
+
+# Install additional development tools
+RUN npm install -g \
+    # API documentation
+    @apidevtools/swagger-cli \
+    # Code quality
+    eslint \
+    prettier \
+    # Build tools
+    webpack \
+    webpack-cli
+
+# Install Docker Compose (latest version)
+RUN curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && \
+    chmod +x /usr/local/bin/docker-compose
+
+# Install kubectl for Kubernetes development
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && \
+    install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+# Install Helm
+RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+# Create development user
+RUN groupadd -r devuser && useradd -r -g devuser devuser
+RUN mkdir -p /home/devuser && chown devuser:devuser /home/devuser
+
+# Create workspace directory
+RUN mkdir -p /workspace && chown devuser:devuser /workspace
+
+# Install development configuration files
+COPY --chown=devuser:devuser config/dev-tools/ /home/devuser/.config/
+
+# Set up Git configuration template
+RUN echo '[user]' > /home/devuser/.gitconfig.template && \
+    echo '    name = Developer' >> /home/devuser/.gitconfig.template && \
+    echo '    email = dev@example.com' >> /home/devuser/.gitconfig.template && \
+    echo '[core]' >> /home/devuser/.gitconfig.template && \
+    echo '    editor = vim' >> /home/devuser/.gitconfig.template && \
+    echo '[push]' >> /home/devuser/.gitconfig.template && \
+    echo '    default = simple' >> /home/devuser/.gitconfig.template && \
+    chown devuser:devuser /home/devuser/.gitconfig.template
+
+# Set up shell configuration
+RUN echo 'alias ll="ls -la"' >> /home/devuser/.bashrc && \
+    echo 'alias la="ls -A"' >> /home/devuser/.bashrc && \
+    echo 'alias l="ls -CF"' >> /home/devuser/.bashrc && \
+    echo 'alias grep="grep --color=auto"' >> /home/devuser/.bashrc && \
+    echo 'alias fgrep="fgrep --color=auto"' >> /home/devuser/.bashrc && \
+    echo 'alias egrep="egrep --color=auto"' >> /home/devuser/.bashrc && \
+    echo 'export PS1="\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "' >> /home/devuser/.bashrc && \
+    echo 'export PYTHONPATH="/workspace/src:$PYTHONPATH"' >> /home/devuser/.bashrc && \
+    chown devuser:devuser /home/devuser/.bashrc
+
+# Create useful development scripts
+RUN mkdir -p /usr/local/bin/dev-scripts
+
+# Script to run tests
+RUN echo '#!/bin/bash' > /usr/local/bin/dev-scripts/run-tests.sh && \
+    echo 'cd /workspace' >> /usr/local/bin/dev-scripts/run-tests.sh && \
+    echo 'python -m pytest tests/ -v --cov=src --cov-report=html --cov-report=term' >> /usr/local/bin/dev-scripts/run-tests.sh && \
+    chmod +x /usr/local/bin/dev-scripts/run-tests.sh
+
+# Script to run linting
+RUN echo '#!/bin/bash' > /usr/local/bin/dev-scripts/run-lint.sh && \
+    echo 'cd /workspace' >> /usr/local/bin/dev-scripts/run-lint.sh && \
+    echo 'echo "Running Black..."' >> /usr/local/bin/dev-scripts/run-lint.sh && \
+    echo 'black src/ tests/ --check' >> /usr/local/bin/dev-scripts/run-lint.sh && \
+    echo 'echo "Running isort..."' >> /usr/local/bin/dev-scripts/run-lint.sh && \
+    echo 'isort src/ tests/ --check-only' >> /usr/local/bin/dev-scripts/run-lint.sh && \
+    echo 'echo "Running flake8..."' >> /usr/local/bin/dev-scripts/run-lint.sh && \
+    echo 'flake8 src/ tests/' >> /usr/local/bin/dev-scripts/run-lint.sh && \
+    echo 'echo "Running mypy..."' >> /usr/local/bin/dev-scripts/run-lint.sh && \
+    echo 'mypy src/' >> /usr/local/bin/dev-scripts/run-lint.sh && \
+    chmod +x /usr/local/bin/dev-scripts/run-lint.sh
+
+# Script to format code
+RUN echo '#!/bin/bash' > /usr/local/bin/dev-scripts/format-code.sh && \
+    echo 'cd /workspace' >> /usr/local/bin/dev-scripts/format-code.sh && \
+    echo 'echo "Formatting with Black..."' >> /usr/local/bin/dev-scripts/format-code.sh && \
+    echo 'black src/ tests/' >> /usr/local/bin/dev-scripts/format-code.sh && \
+    echo 'echo "Sorting imports with isort..."' >> /usr/local/bin/dev-scripts/format-code.sh && \
+    echo 'isort src/ tests/' >> /usr/local/bin/dev-scripts/format-code.sh && \
+    chmod +x /usr/local/bin/dev-scripts/format-code.sh
+
+# Script to run security checks
+RUN echo '#!/bin/bash' > /usr/local/bin/dev-scripts/security-check.sh && \
+    echo 'cd /workspace' >> /usr/local/bin/dev-scripts/security-check.sh && \
+    echo 'echo "Running Bandit security check..."' >> /usr/local/bin/dev-scripts/security-check.sh && \
+    echo 'bandit -r src/' >> /usr/local/bin/dev-scripts/security-check.sh && \
+    echo 'echo "Running Safety check..."' >> /usr/local/bin/dev-scripts/security-check.sh && \
+    echo 'safety check' >> /usr/local/bin/dev-scripts/security-check.sh && \
+    chmod +x /usr/local/bin/dev-scripts/security-check.sh
+
+# Script to build documentation
+RUN echo '#!/bin/bash' > /usr/local/bin/dev-scripts/build-docs.sh && \
+    echo 'cd /workspace' >> /usr/local/bin/dev-scripts/build-docs.sh && \
+    echo 'if [ -f "docs/conf.py" ]; then' >> /usr/local/bin/dev-scripts/build-docs.sh && \
+    echo '    echo "Building Sphinx documentation..."' >> /usr/local/bin/dev-scripts/build-docs.sh && \
+    echo '    cd docs && make html' >> /usr/local/bin/dev-scripts/build-docs.sh && \
+    echo 'elif [ -f "mkdocs.yml" ]; then' >> /usr/local/bin/dev-scripts/build-docs.sh && \
+    echo '    echo "Building MkDocs documentation..."' >> /usr/local/bin/dev-scripts/build-docs.sh && \
+    echo '    mkdocs build' >> /usr/local/bin/dev-scripts/build-docs.sh && \
+    echo 'else' >> /usr/local/bin/dev-scripts/build-docs.sh && \
+    echo '    echo "No documentation configuration found"' >> /usr/local/bin/dev-scripts/build-docs.sh && \
+    echo 'fi' >> /usr/local/bin/dev-scripts/build-docs.sh && \
+    chmod +x /usr/local/bin/dev-scripts/build-docs.sh
+
+# Add scripts to PATH
+RUN echo 'export PATH="/usr/local/bin/dev-scripts:$PATH"' >> /home/devuser/.bashrc
+
+# Switch to development user
+USER devuser
+
+# Set working directory
+WORKDIR /workspace
+
+# Default command
+CMD ["/bin/bash"]
+
+# Labels
+LABEL maintainer="PDF-MCP Team" \
+      version="1.0.0" \
+      description="PDF-MCP Development Tools Container" \
+      org.opencontainers.image.title="PDF-MCP Dev Tools" \
+      org.opencontainers.image.description="Complete development environment for PDF-MCP Server" \
+      org.opencontainers.image.version="1.0.0" \
+      org.opencontainers.image.vendor="PDF-MCP Team"

@@ -22,5 +22,6 @@
     "dotnet.completion.showCompletionItemsFromUnimportedNamespaces": true,
     "omnisharp.enableEditorConfigSupport": true,
     "omnisharp.enableImportCompletion": true,
-    "chatgpt.openOnStartup": true
+    "chatgpt.openOnStartup": true,
+    "Codegeex.RepoIndex": true
 }

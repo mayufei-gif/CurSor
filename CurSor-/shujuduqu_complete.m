@@ -1,5 +1,28 @@
+%======生成5组时间-风速Excel数据======
+N = 360; % 样本数（分钟）
+t = (0:N-1)'; % 时间（分钟）
+
+% 生成5组不同的风速序列
+base = [3.5, 4.2, 2.8, 3.9, 3.1]; % 每组基础风速
+amplitude = [2.0, 2.5, 1.8, 2.2, 1.9]; % 日变化幅度
+trend_rate = [0.002, 0.0015, 0.0025, 0.0018, 0.0022]; % 趋势系数
+noise_level = [0.5, 0.6, 0.4, 0.55, 0.45]; % 噪声强度
+
+% 生成5组风速数据
+v1 = max(0, base(1) + amplitude(1)*sin(2*pi*(t/(60*24))) + trend_rate(1)*t + noise_level(1)*randn(N,1));
+v2 = max(0, base(2) + amplitude(2)*sin(2*pi*(t/(60*24))) + trend_rate(2)*t + noise_level(2)*randn(N,1));
+v3 = max(0, base(3) + amplitude(3)*sin(2*pi*(t/(60*24))) + trend_rate(3)*t + noise_level(3)*randn(N,1));
+v4 = max(0, base(4) + amplitude(4)*sin(2*pi*(t/(60*24))) + trend_rate(4)*t + noise_level(4)*randn(N,1));
+v5 = max(0, base(5) + amplitude(5)*sin(2*pi*(t/(60*24))) + trend_rate(5)*t + noise_level(5)*randn(N,1));
+
+% 构建10列数据矩阵：x1,y1,x2,y2,x3,y3,x4,y4,x5,y5
+excel_data = [t, v1, t, v2, t, v3, t, v4, t, v5];
+excel_path = 'g:\E盘\工作项目文件\AI_Agent\Trae_Abroad\CurSor-\风速时间数据.xlsx';
+writematrix(excel_data, excel_path);
+fprintf('已生成5组Excel数据: %s, 行数=%d, 列数=%d\n', excel_path, N, size(excel_data,2));
+
 %======读取数据======
-file='F:\数学建模\授课内容\数据创立结果.xlsx';%文件路径
+file=excel_path;%文件路径
 M  = readmatrix(file);          % 读取excel文件
 odd  = M(:,1:2:end);                   % 奇列
 even = M(:,2:2:end);                   % 偶列

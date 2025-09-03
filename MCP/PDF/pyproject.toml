@@ -1,0 +1,124 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pdf-mcp-server"
+version = "0.1.0"
+description = "A comprehensive PDF processing MCP server with text extraction, table recognition, OCR, and formula detection"
+authors = [{name = "PDF-MCP Team", email = "team@pdf-mcp.com"}]
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Text Processing :: Markup :: LaTeX",
+]
+keywords = ["pdf", "mcp", "ocr", "table-extraction", "latex", "formula-recognition"]
+dependencies = [
+    "mcp>=1.0.0",
+    "fastapi>=0.104.0",
+    "uvicorn>=0.24.0",
+    "pydantic>=2.5.0",
+    "PyMuPDF>=1.23.0",
+    "pdfplumber>=0.10.0",
+    "camelot-py[cv]>=0.11.0",
+    "tabula-py>=2.8.0",
+    "pandas>=2.0.0",
+    "ocrmypdf>=16.0.0",
+    "pytesseract>=0.3.10",
+    "Pillow>=10.0.0",
+    "torch>=2.0.0",
+    "torchvision>=0.15.0",
+    "transformers>=4.35.0",
+    "numpy>=1.24.0",
+    "opencv-python>=4.8.0",
+    "requests>=2.31.0",
+    "aiofiles>=23.0.0",
+    "python-multipart>=0.0.6",
+    "python-docx>=0.8.11",
+    "redis>=5.0.0",
+    "rq>=1.15.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.7.0",
+]
+gpu = [
+    "torch-audio>=2.0.0",
+    "accelerate>=0.24.0",
+]
+grobid = [
+    "grobid-client>=0.8.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/pdf-mcp/pdf-mcp-server"
+Repository = "https://github.com/pdf-mcp/pdf-mcp-server.git"
+Issues = "https://github.com/pdf-mcp/pdf-mcp-server/issues"
+Documentation = "https://pdf-mcp.readthedocs.io"
+
+[project.scripts]
+pdf-mcp-server = "pdf_mcp_server.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+include = '\.pyi?$'
+extend-exclude = '''
+(
+  /(
+      \.eggs
+    | \.git
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+  )/
+)
+'''
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers"
+testpaths = [
+    "tests",
+]
+python_files = [
+    "test_*.py",
+    "*_test.py",
+]
+python_classes = [
+    "Test*",
+]
+python_functions = [
+    "test_*",
+]

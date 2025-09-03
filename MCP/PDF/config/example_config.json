@@ -1,0 +1,76 @@
+{
+  "server": {
+    "name": "pdf-mcp-server",
+    "version": "1.0.0",
+    "description": "PDF processing server with MCP protocol",
+    "max_concurrent_requests": 10,
+    "request_timeout": 300,
+    "temp_dir": "./temp",
+    "cleanup_interval": 3600
+  },
+  "logging": {
+    "level": "INFO",
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    "file": "pdf_mcp_server.log"
+  },
+  "tools": {
+    "text_extraction": {
+      "enabled": true,
+      "default_method": "pymupdf",
+      "preserve_layout": true,
+      "include_annotations": true,
+      "extract_images": false,
+      "extract_fonts": true
+    },
+    "table_extraction": {
+      "enabled": true,
+      "default_method": "camelot",
+      "fallback_methods": ["tabula", "pdfplumber"],
+      "table_areas": null,
+      "columns": null,
+      "flavor": "lattice",
+      "edge_tol": 50,
+      "row_tol": 2,
+      "column_tol": 0
+    },
+    "ocr": {
+      "enabled": true,
+      "default_engine": "tesseract",
+      "languages": ["eng", "chi_sim"],
+      "confidence_threshold": 60,
+      "preprocess_image": true,
+      "deskew": true,
+      "remove_noise": true,
+      "preserve_interword_spaces": true
+    },
+    "formula_recognition": {
+      "enabled": true,
+      "default_model": "pix2tex",
+      "confidence_threshold": 0.8,
+      "temperature": 0.25,
+      "max_tokens": 512,
+      "output_format": "latex"
+    },
+    "analysis": {
+      "enabled": true,
+      "auto_detect_type": true,
+      "generate_recommendations": true,
+      "analyze_structure": true,
+      "detect_language": true,
+      "quality_assessment": true
+    }
+  },
+  "performance": {
+    "max_file_size_mb": 100,
+    "max_pages_per_request": 50,
+    "parallel_processing": true,
+    "cache_results": false,
+    "memory_limit_mb": 1024
+  },
+  "security": {
+    "allowed_file_types": [".pdf"],
+    "scan_uploads": false,
+    "max_upload_size_mb": 50,
+    "temp_file_retention_hours": 1
+  }
+}

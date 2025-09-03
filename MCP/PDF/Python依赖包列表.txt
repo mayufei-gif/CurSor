@@ -1,0 +1,48 @@
+# PDF-MCP Server Dependencies
+
+# Core MCP framework
+mcp>=1.0.0
+fastapi>=0.104.0
+uvicorn>=0.24.0
+pydantic>=2.5.0
+
+# PDF processing core
+PyMuPDF>=1.23.0
+pdfplumber>=0.10.0
+pypdf>=3.0.0
+
+# Table extraction
+camelot-py[cv]>=0.11.0
+tabula-py>=2.8.0
+pandas>=2.0.0
+
+# OCR capabilities
+ocrmypdf>=16.0.0
+pytesseract>=0.3.10
+Pillow>=10.0.0
+
+# Formula recognition (LaTeX-OCR)
+torch>=2.0.0
+torchvision>=0.15.0
+transformers>=4.35.0
+pix2tex>=0.1.2
+
+# Scientific document parsing
+grobid-client>=0.8.0
+
+# Utilities
+numpy>=1.24.0
+opencv-python>=4.8.0
+requests>=2.31.0
+aiofiles>=23.0.0
+python-multipart>=0.0.6
+
+# Development and testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+black>=23.0.0
+flake8>=6.0.0
+
+# Optional GPU acceleration
+# torch-audio>=2.0.0  # Uncomment if needed
+# accelerate>=0.24.0   # Uncomment for faster inference

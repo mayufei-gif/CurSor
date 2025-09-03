@@ -1,0 +1,184 @@
+# Docker Compose Override for Development
+# This file is automatically loaded by docker-compose for development configurations
+
+version: '3.8'
+
+services:
+  # Development overrides for PDF-MCP Server
+  pdf-mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder  # Use builder stage for development
+      args:
+        INSTALL_GROBID: "true"   # Enable GROBID in development
+        INSTALL_FORMULA_MODELS: "true"  # Enable formula models in development
+    environment:
+      # Development-specific settings
+      - PDF_MCP_LOG_LEVEL=DEBUG
+      - PDF_MCP_RELOAD=true
+      - PDF_MCP_DEBUG=true
+      
+      # Enable all features for testing
+      - PDF_MCP_ENABLE_OCR=true
+      - PDF_MCP_ENABLE_FORMULAS=true
+      - PDF_MCP_ENABLE_GROBID=true
+      - PDF_MCP_ENABLE_GPU=false  # Set to true if you have GPU support
+      
+      # Development database
+      - PDF_MCP_DB_URL=postgresql://pdf_user:pdf_pass@postgres:5432/pdf_mcp_dev
+      
+      # Relaxed CORS for development
+      - PDF_MCP_CORS_ORIGINS=*
+      
+      # Development secret (not secure)
+      - PDF_MCP_SECRET_KEY=dev-secret-key-not-for-production
+    volumes:
+      # Mount source code for live reloading
+      - ./src:/app/src
+      - ./config:/app/config
+      - ./tests:/app/tests
+      
+      # Development data directories
+      - ./dev-data:/app/data
+      - ./dev-logs:/app/logs
+      - ./dev-temp:/app/temp
+      
+      # Mount examples for testing
+      - ./examples:/app/examples:ro
+    ports:
+      # Expose additional ports for debugging
+      - "8000:8000"  # Main API
+      - "8001:8001"  # Metrics
+      - "5678:5678"  # Python debugger (debugpy)
+    command: >
+      sh -c "pip install debugpy &&
+             python -m debugpy --listen 0.0.0.0:5678 --wait-for-client -m pdf_mcp_server.main --host 0.0.0.0 --port 8000 --reload"
+    deploy:
+      resources:
+        limits:
+          memory: 4G  # More memory for development
+          cpus: '2.0'
+
+  # Development database with different name
+  postgres:
+    environment:
+      - POSTGRES_DB=pdf_mcp_dev
+      - POSTGRES_USER=pdf_user
+      - POSTGRES_PASSWORD=pdf_pass  # Simple password for development
+    ports:
+      - "5433:5432"  # Different port to avoid conflicts
+    volumes:
+      # Use local directory for development data
+      - ./dev-data/postgres:/var/lib/postgresql/data
+      - ./config/init-dev.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  # Development Redis with simpler configuration
+  redis:
+    environment:
+      - REDIS_PASSWORD=  # No password for development
+    command: redis-server --appendonly yes
+    ports:
+      - "6380:6379"  # Different port to avoid conflicts
+    volumes:
+      - ./dev-data/redis:/data
+
+  # Always enable GROBID in development
+  grobid:
+    profiles: []  # Remove profile restriction
+    environment:
+      - JAVA_OPTS=-Xmx2g  # Less memory for development
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+
+  # Development tools container
+  dev-tools:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: pdf-mcp-dev-tools
+    volumes:
+      - .:/workspace
+      - /var/run/docker.sock:/var/run/docker.sock
+    working_dir: /workspace
+    command: sleep infinity
+    networks:
+      - pdf-mcp-network
+    profiles:
+      - dev-tools
+
+  # Jupyter notebook for data analysis and testing
+  jupyter:
+    image: jupyter/scipy-notebook:latest
+    container_name: pdf-mcp-jupyter
+    ports:
+      - "8888:8888"
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - JUPYTER_TOKEN=dev-token
+    volumes:
+      - ./notebooks:/home/jovyan/work
+      - ./examples:/home/jovyan/examples:ro
+      - ./src:/home/jovyan/src:ro
+    networks:
+      - pdf-mcp-network
+    profiles:
+      - jupyter
+
+  # pgAdmin for database management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pdf-mcp-pgadmin
+    ports:
+      - "5050:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@example.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+      - PGADMIN_CONFIG_SERVER_MODE=False
+    volumes:
+      - ./dev-data/pgadmin:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    networks:
+      - pdf-mcp-network
+    profiles:
+      - pgadmin
+
+  # Redis Commander for Redis management
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: pdf-mcp-redis-commander
+    ports:
+      - "8081:8081"
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    depends_on:
+      - redis
+    networks:
+      - pdf-mcp-network
+    profiles:
+      - redis-commander
+
+  # File browser for easy file management
+  filebrowser:
+    image: filebrowser/filebrowser:latest
+    container_name: pdf-mcp-filebrowser
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/srv
+      - ./config/filebrowser.json:/.filebrowser.json
+    networks:
+      - pdf-mcp-network
+    profiles:
+      - filebrowser
+
+# Development-specific volumes
+volumes:
+  dev_postgres_data:
+    driver: local
+  dev_redis_data:
+    driver: local

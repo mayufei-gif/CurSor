@@ -1,0 +1,300 @@
+# PDF-MCP Server Docker Compose Configuration
+# Provides a complete development and production environment
+
+version: '3.8'
+
+services:
+  # Main PDF-MCP Server
+  pdf-mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        INSTALL_GROBID: "false"
+        INSTALL_FORMULA_MODELS: "false"
+    container_name: pdf-mcp-server
+    restart: unless-stopped
+    ports:
+      - "8000:8000"  # Main API port
+      - "8001:8001"  # Health check port (optional)
+    environment:
+      # Server configuration
+      - PDF_MCP_HOST=0.0.0.0
+      - PDF_MCP_PORT=8000
+      - PDF_MCP_WORKERS=4
+      - PDF_MCP_LOG_LEVEL=INFO
+      
+      # Processing configuration
+      - PDF_MCP_MAX_FILE_SIZE=100MB
+      - PDF_MCP_TEMP_DIR=/app/temp
+      - PDF_MCP_MODELS_DIR=/app/models
+      
+      # Feature flags
+      - PDF_MCP_ENABLE_OCR=true
+      - PDF_MCP_ENABLE_FORMULAS=false
+      - PDF_MCP_ENABLE_GROBID=false
+      - PDF_MCP_ENABLE_GPU=false
+      
+      # Database configuration (if using)
+      - PDF_MCP_DB_URL=postgresql://pdf_user:pdf_pass@postgres:5432/pdf_mcp
+      
+      # Redis configuration (if using)
+      - PDF_MCP_REDIS_URL=redis://:redis_password_change_in_production@redis:6379/0
+      - REDIS_URL=redis://:redis_password_change_in_production@redis:6379/0
+      
+      # Security
+      - PDF_MCP_SECRET_KEY=your-secret-key-change-in-production
+      - PDF_MCP_CORS_ORIGINS=http://localhost:3000,http://localhost:8080
+      
+      # Monitoring
+      - PDF_MCP_ENABLE_METRICS=true
+      - PDF_MCP_METRICS_PORT=8001
+    volumes:
+      # Persistent data
+      - pdf_data:/app/data
+      - pdf_logs:/app/logs
+      - pdf_temp:/app/temp
+      - pdf_models:/app/models
+      
+      # Configuration
+      - ./config:/app/config:ro
+      
+      # Optional: Mount local files for development
+      # - ./src:/app/src:ro
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - pdf-mcp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+
+  # Redis for caching and session storage
+  redis:
+    image: redis:7-alpine
+    container_name: pdf-mcp-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=redis_password_change_in_production
+    volumes:
+      - redis_data:/data
+      - ./config/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    command: redis-server /usr/local/etc/redis/redis.conf --requirepass redis_password_change_in_production
+    networks:
+      - pdf-mcp-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
+
+  # PostgreSQL for metadata and job tracking
+  postgres:
+    image: postgres:15-alpine
+    container_name: pdf-mcp-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=pdf_mcp
+      - POSTGRES_USER=pdf_user
+      - POSTGRES_PASSWORD=pdf_pass_change_in_production
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./config/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - pdf-mcp-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pdf_user -d pdf_mcp"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+
+  # GROBID service (optional, for scientific document processing)
+  grobid:
+    image: lfoppiano/grobid:0.7.3
+    container_name: pdf-mcp-grobid
+    restart: unless-stopped
+    ports:
+      - "8070:8070"
+    environment:
+      - JAVA_OPTS=-Xmx4g
+    networks:
+      - pdf-mcp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8070/api/isalive"]
+      interval: 60s
+      timeout: 30s
+      retries: 3
+      start_period: 120s
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: '2.0'
+    profiles:
+      - grobid  # Only start when explicitly requested
+
+  # Nginx reverse proxy (optional)
+  nginx:
+    image: nginx:alpine
+    container_name: pdf-mcp-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./config/ssl:/etc/nginx/ssl:ro
+      - nginx_logs:/var/log/nginx
+    depends_on:
+      - pdf-mcp-server
+    networks:
+      - pdf-mcp-network
+    profiles:
+      - nginx  # Only start when explicitly requested
+
+  # Prometheus for monitoring (optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: pdf-mcp-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - pdf-mcp-network
+    profiles:
+      - monitoring
+
+  # Grafana for visualization (optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: pdf-mcp-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin_change_in_production
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./config/grafana:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+    networks:
+      - pdf-mcp-network
+    profiles:
+      - monitoring
+
+  # Jaeger for distributed tracing (optional)
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: pdf-mcp-jaeger
+    restart: unless-stopped
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "14268:14268"  # Jaeger collector
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - pdf-mcp-network
+    profiles:
+      - monitoring
+
+  # RQ worker for heavy jobs
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pdf-mcp-worker
+    restart: unless-stopped
+    environment:
+      - REDIS_URL=redis://:redis_password_change_in_production@redis:6379/0
+      - TESSERACT_CMD=/usr/bin/tesseract
+      - PDF_MCP_LOG_LEVEL=INFO
+    volumes:
+      - pdf_temp:/app/temp
+      - pdf_logs:/app/logs
+    depends_on:
+      - redis
+      - postgres
+    command: ["python", "-m", "pdf_mcp_server.worker"]
+    networks:
+      - pdf-mcp-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import redis; r=redis.Redis(host='redis', port=6379, password='redis_password_change_in_production'); r.ping()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+    profiles:
+      - worker
+
+# Named volumes for persistent data
+volumes:
+  pdf_data:
+    driver: local
+  pdf_logs:
+    driver: local
+  pdf_temp:
+    driver: local
+  pdf_models:
+    driver: local
+  redis_data:
+    driver: local
+  postgres_data:
+    driver: local
+  nginx_logs:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+# Custom network
+networks:
+  pdf-mcp-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
