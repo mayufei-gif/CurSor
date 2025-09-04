@@ -1,9 +1,8 @@
 # PDF-MCP Server
 
-一个基于 Model Context Protocol (MCP) 的强大PDF处理服务器，提供文本提取、表格识别、OCR、数学公式识别和智能文档分析功能。
-
+一个基于开源 Model Context Protocol (MCP) 的PDF处理服务器，提供文本提取、表格识别、OCR、数学公式识别和文档分析功能。
+（目前不支持排版！！！）
 ## 🚀 特性
-
 ### 核心功能
 - **文本提取**: 支持 PyMuPDF 和 pdfplumber 两种引擎
 - **表格提取**: 集成 Camelot 和 Tabula 进行精确表格识别
