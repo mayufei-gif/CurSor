@@ -14,6 +14,7 @@ from .table_extractor import TableExtractor
 from .ocr_processor import OCRProcessor
 from .formula_extractor import FormulaExtractor
 from .document_analyzer import DocumentAnalyzer
+from .layout_reconstructor import LayoutReconstructor
 
 __all__ = [
     "PDFProcessor",
@@ -22,4 +23,5 @@ __all__ = [
     "OCRProcessor",
     "FormulaExtractor",
     "DocumentAnalyzer",
+    "LayoutReconstructor",
 ]

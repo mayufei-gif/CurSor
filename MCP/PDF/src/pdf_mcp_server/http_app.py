@@ -107,6 +107,10 @@ async def extract(
     table_engine: TableEngine = Query(default=TableEngine.CAMELOT),
     formula_model: FormulaModel = Query(default=FormulaModel.LATEX_OCR),
     output_format: str = Query(default="json"),
+    reconstruct_layout: bool = Query(
+        default=False,
+        description="Reconstruct layout and return structured layout output",
+    ),
     async_mode: bool = Query(default=False, description="Queue job asynchronously and return task id"),
 ):
     if not _processor or not _config:
@@ -141,6 +145,7 @@ async def extract(
             include_grobid=include_grobid,
             table_engine=table_engine,
             formula_model=formula_model,
+            reconstruct_layout=reconstruct_layout,
         )
 
         if async_mode:
@@ -159,6 +164,7 @@ async def extract(
                         "table_engine": table_engine.value if hasattr(table_engine, "value") else str(table_engine),
                         "formula_model": formula_model.value if hasattr(formula_model, "value") else str(formula_model),
                         "output_format": output_format,
+                        "reconstruct_layout": reconstruct_layout,
                     },
                 )
                 return JSONResponse(jsonable_encoder({"task_id": job.get_id(), "status": "queued"}))

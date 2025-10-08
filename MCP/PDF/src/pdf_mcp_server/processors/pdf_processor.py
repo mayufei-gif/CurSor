@@ -43,6 +43,7 @@ from .text_extractor import TextExtractor          # 文本提取器
 from .table_extractor import TableExtractor        # 表格提取器
 from .ocr_processor import OCRProcessor            # OCR处理器
 from .formula_extractor import FormulaExtractor    # 公式提取器
+from .layout_reconstructor import LayoutReconstructor  # 版面重建器
 
 
 class PDFProcessor:
@@ -91,6 +92,7 @@ class PDFProcessor:
         self.table_extractor: Optional[TableExtractor] = None     # 表格提取器
         self.ocr_processor: Optional[OCRProcessor] = None         # OCR处理器
         self.formula_extractor: Optional[FormulaExtractor] = None # 公式提取器
+        self.layout_reconstructor: Optional[LayoutReconstructor] = None  # 版面重建器
         
         # 处理统计信息
         self.total_processed = 0  # 已处理文档总数
@@ -129,7 +131,11 @@ class PDFProcessor:
             # 初始化公式提取器
             self.formula_extractor = FormulaExtractor(self.config)
             await self.formula_extractor.initialize()
-            
+
+            # 初始化版面重建器
+            self.layout_reconstructor = LayoutReconstructor(self.config)
+            await self.layout_reconstructor.initialize()
+
             self.logger.info("PDF处理器初始化成功")
             
         except Exception as e:
@@ -151,7 +157,8 @@ class PDFProcessor:
             self.text_extractor,     # 文本提取器
             self.table_extractor,    # 表格提取器
             self.ocr_processor,      # OCR处理器
-            self.formula_extractor   # 公式提取器
+            self.formula_extractor,  # 公式提取器
+            self.layout_reconstructor  # 版面重建器
         ]
         
         # 逐个清理处理器资源
@@ -183,7 +190,8 @@ class PDFProcessor:
             "text_extractor": self.text_extractor,          # 文本提取器
             "table_extractor": self.table_extractor,        # 表格提取器
             "ocr_processor": self.ocr_processor,            # OCR处理器
-            "formula_extractor": self.formula_extractor     # 公式提取器
+            "formula_extractor": self.formula_extractor,    # 公式提取器
+            "layout_reconstructor": self.layout_reconstructor  # 版面重建器
         }
         
         # 逐个检查处理器健康状态
@@ -248,7 +256,7 @@ class PDFProcessor:
             processing_time = time.time() - start_time  # 计算处理耗时
             metadata = ProcessingMetadata(
                 processing_time=processing_time,
-                engines_used=processing_plan["engines_used"],
+                engines_used=list(dict.fromkeys(processing_plan["engines_used"])),
                 file_info=pdf_info
             )
             
@@ -365,7 +373,8 @@ class PDFProcessor:
             "extract_text": False,         # 是否提取文本
             "extract_tables": False,       # 是否提取表格
             "extract_formulas": False,     # 是否提取公式
-            "use_grobid": False           # 是否使用GROBID
+            "use_grobid": False,          # 是否使用GROBID
+            "reconstruct_layout": False   # 是否执行版面重建
         }
         
         # 判断是否需要OCR处理
@@ -375,26 +384,51 @@ class PDFProcessor:
             plan["engines_used"].append("ocrmypdf")
         
         # 根据处理模式确定处理步骤
-        if request.mode in [ProcessingMode.TEXT, ProcessingMode.FULL]:
+        if request.mode in [ProcessingMode.TEXT, ProcessingMode.FULL, ProcessingMode.LAYOUT]:
             plan["extract_text"] = True
             plan["steps"].append("text_extraction")
-            plan["engines_used"].extend(["pymupdf", "pdfplumber"])
-        
-        if request.mode in [ProcessingMode.TABLES, ProcessingMode.FULL]:
+            for engine in ["pymupdf", "pdfplumber"]:
+                if engine not in plan["engines_used"]:
+                    plan["engines_used"].append(engine)
+
+        if request.mode in [ProcessingMode.TABLES, ProcessingMode.FULL, ProcessingMode.LAYOUT]:
             plan["extract_tables"] = True
             plan["steps"].append("table_extraction")
-            plan["engines_used"].extend(["camelot", "tabula"])
-        
-        if request.mode in [ProcessingMode.FORMULAS, ProcessingMode.FULL] and request.include_formulas:
+            for engine in ["camelot", "tabula"]:
+                if engine not in plan["engines_used"]:
+                    plan["engines_used"].append(engine)
+
+        if (
+            request.mode in [ProcessingMode.FORMULAS, ProcessingMode.FULL, ProcessingMode.LAYOUT]
+            and request.include_formulas
+        ):
             plan["extract_formulas"] = True
             plan["steps"].append("formula_extraction")
-            plan["engines_used"].append(str(request.formula_model))
-        
+            engine_name = str(request.formula_model)
+            if engine_name not in plan["engines_used"]:
+                plan["engines_used"].append(engine_name)
+
         if request.include_grobid:
             plan["use_grobid"] = True
             plan["steps"].append("grobid_parsing")
-            plan["engines_used"].append("grobid")
-        
+            if "grobid" not in plan["engines_used"]:
+                plan["engines_used"].append("grobid")
+
+        if request.reconstruct_layout or request.mode == ProcessingMode.LAYOUT:
+            plan["reconstruct_layout"] = True
+            if not plan["extract_text"]:
+                plan["extract_text"] = True
+                plan["steps"].append("text_extraction")
+                for engine in ["pymupdf", "pdfplumber"]:
+                    if engine not in plan["engines_used"]:
+                        plan["engines_used"].append(engine)
+            plan["steps"].append("layout_reconstruction")
+            if "layout_reconstructor" not in plan["engines_used"]:
+                plan["engines_used"].append("layout_reconstructor")
+            if not request.include_bbox:
+                # 版面重建需要边界框信息，确保文本提取包含坐标
+                request.include_bbox = True
+
         return plan
     
     async def _execute_processing(self, file_path: Path, plan: Dict[str, Any], request: ProcessingRequest) -> ProcessingContent:
@@ -432,7 +466,14 @@ class PDFProcessor:
         if plan["extract_formulas"]:
             self.logger.info("正在提取公式")
             content.formulas = await self.formula_extractor.extract(file_path, request)
-        
+
+        # 版面重建
+        if plan.get("reconstruct_layout"):
+            if not self.layout_reconstructor:
+                raise PDFProcessingError("Layout reconstructor not initialized")
+            self.logger.info("正在执行版面重建")
+            content.layout = await self.layout_reconstructor.reconstruct(file_path, request, content)
+
         # GROBID学术文档处理
         if plan["use_grobid"]:
             self.logger.info("正在使用GROBID处理")

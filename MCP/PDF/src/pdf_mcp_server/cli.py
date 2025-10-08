@@ -395,7 +395,7 @@ def health(ctx, url: str, timeout: int):
 @cli.command()
 @click.option('--files', '-f', multiple=True, required=True, help='PDF files to process (can be specified multiple times)')
 @click.option('--mode', '-m',
-              type=click.Choice(['read_text', 'extract_tables', 'extract_formulas', 'process_ocr', 'full_pipeline']),
+              type=click.Choice(['read_text', 'extract_tables', 'extract_formulas', 'process_ocr', 'reconstruct_layout', 'full_pipeline']),
               default='full_pipeline', help='Processing mode')
 @click.option('--output-dir', '-o', help='Output directory for results')
 @click.option('--format', 'output_format',

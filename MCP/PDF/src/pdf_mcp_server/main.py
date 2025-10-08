@@ -201,6 +201,7 @@ async def upload_and_process(
     include_ocr: bool = Form(True),  # 是否包含OCR处理，默认为True
     include_formulas: bool = Form(False),  # 是否包含公式识别，默认为False
     include_grobid: bool = Form(False),  # 是否包含GROBID处理，默认为False
+    reconstruct_layout: bool = Form(False),  # 是否执行版面重建
     processor: PDFProcessor = Depends(get_pdf_processor)  # 依赖注入PDF处理器
 ):
     """Upload and process PDF file.
@@ -231,7 +232,8 @@ async def upload_and_process(
             mode=mode,  # 处理模式
             include_ocr=include_ocr,  # 是否包含OCR
             include_formulas=include_formulas,  # 是否包含公式识别
-            include_grobid=include_grobid  # 是否包含GROBID处理
+            include_grobid=include_grobid,  # 是否包含GROBID处理
+            reconstruct_layout=reconstruct_layout  # 是否执行版面重建
         )
         
         # 调用处理器执行PDF处理

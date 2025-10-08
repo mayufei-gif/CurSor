@@ -70,6 +70,7 @@ def process_job(
         "include_grobid": options.get("include_grobid", False),
         "table_engine": options.get("table_engine"),
         "formula_model": options.get("formula_model"),
+        "reconstruct_layout": options.get("reconstruct_layout", False),
     }
 
     import asyncio  # 局部导入，避免同步环境提前加载

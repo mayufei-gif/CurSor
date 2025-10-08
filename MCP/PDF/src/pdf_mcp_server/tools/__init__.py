@@ -15,6 +15,7 @@ from .ocr_processing import ProcessOCRTool, OCRWithLayoutTool
 from .formula_recognition import ExtractFormulasTool, FormulaToLatexTool
 from .pdf_analysis import AnalyzePDFTool, DetectPDFTypeTool
 from .full_pipeline import FullPipelineTool, SmartProcessingTool
+from .layout_reconstruction import ReconstructLayoutTool
 
 # Tool classes for easy import
 __all__ = [
@@ -41,7 +42,10 @@ __all__ = [
     # Pipeline tools
     "FullPipelineTool",
     "SmartProcessingTool",
-    
+
+    # Layout tools
+    "ReconstructLayoutTool",
+
     # Utility functions
     "register_all_tools",
     "get_available_tools",
@@ -55,7 +59,8 @@ TOOL_CATEGORIES = {
     "ocr": ["ProcessOCRTool", "OCRWithLayoutTool"],
     "formula": ["ExtractFormulasTool", "FormulaToLatexTool"],
     "analysis": ["AnalyzePDFTool", "DetectPDFTypeTool"],
-    "pipeline": ["FullPipelineTool", "SmartProcessingTool"]
+    "pipeline": ["FullPipelineTool", "SmartProcessingTool"],
+    "layout": ["ReconstructLayoutTool"],
 }
 
 TOOL_DESCRIPTIONS = {
@@ -70,7 +75,8 @@ TOOL_DESCRIPTIONS = {
     "AnalyzePDFTool": "Analyze PDF structure, content types, and characteristics",
     "DetectPDFTypeTool": "Detect the type and category of PDF document",
     "FullPipelineTool": "Complete PDF processing pipeline with all features",
-    "SmartProcessingTool": "Intelligent PDF processing with automatic feature detection"
+    "SmartProcessingTool": "Intelligent PDF processing with automatic feature detection",
+    "ReconstructLayoutTool": "Rebuild PDF layout using extracted content to mimic the original formatting"
 }
 
 
@@ -117,7 +123,10 @@ def create_tool_instances():
     # Pipeline tools
     tools.append(FullPipelineTool())
     tools.append(SmartProcessingTool())
-    
+
+    # Layout tools
+    tools.append(ReconstructLayoutTool())
+
     return tools
 
 
