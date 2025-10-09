@@ -39,7 +39,7 @@ def _to_dict(obj: Any) -> Dict[str, Any]:
     if hasattr(obj, "model_dump"):
         return obj.model_dump()
     if isinstance(obj, BaseModel):  # type: ignore
-        return obj.dict()
+        return obj.model_dump()
     # Last resort: best-effort
     return dict(obj)
 

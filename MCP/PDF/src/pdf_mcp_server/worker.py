@@ -70,6 +70,7 @@ def process_job(
         "include_grobid": options.get("include_grobid", False),
         "table_engine": options.get("table_engine"),
         "formula_model": options.get("formula_model"),
+        "reconstruct_layout": options.get("reconstruct_layout", False),
     }
 
     import asyncio  # 局部导入，避免同步环境提前加载
@@ -83,7 +84,7 @@ def process_job(
         return result
 
     result = asyncio.run(_run())  # 在同步上下文运行协程
-    res_dict = result.dict()  # Pydantic 模型转字典
+    res_dict = result.model_dump()  # Pydantic 模型转字典
 
     out: Dict[str, Any] = {"status": "done", "result": res_dict}  # 基础返回结构
 
