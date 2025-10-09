@@ -23,3 +23,9 @@ __all__ = [
     "FormulaExtractor",
     "DocumentAnalyzer",
 ]
+codex/locate-layout-reconstruction-code
+
+
+if LayoutReconstructor is not None:  # pragma: no cover - optional dependency
+    __all__.append("LayoutReconstructor")
+codex/locate-pdf-mcp-server-project-uq2ubf
