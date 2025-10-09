@@ -14,6 +14,10 @@ from .table_extractor import TableExtractor
 from .ocr_processor import OCRProcessor
 from .formula_extractor import FormulaExtractor
 from .document_analyzer import DocumentAnalyzer
+try:
+    from .layout_reconstructor import LayoutReconstructor
+except Exception:  # pragma: no cover - optional dependency
+    LayoutReconstructor = None  # type: ignore
 
 __all__ = [
     "PDFProcessor",
@@ -22,4 +26,8 @@ __all__ = [
     "OCRProcessor",
     "FormulaExtractor",
     "DocumentAnalyzer",
+    "LayoutReconstructor",
 ]
+
+if LayoutReconstructor is None:  # pragma: no cover - optional
+    __all__.remove("LayoutReconstructor")

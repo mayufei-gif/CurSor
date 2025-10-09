@@ -25,7 +25,10 @@ from ..models import (
     TextExtractionResult,
     PageText,
     BoundingBox,
-    OutputFormat
+    OutputFormat,
+    TextBlock,
+    TextLine,
+    TextSpan,
 )
 from ..utils.config import Config
 from ..utils.exceptions import PDFProcessingError
@@ -175,41 +178,81 @@ class TextExtractor:
         """
         # Get text with detailed information
         text_dict = page.get_text("dict")
-        
-        text_blocks = []
+
+        blocks = []
         full_text = ""
-        
+
         for block in text_dict.get("blocks", []):
-            if "lines" in block:  # Text block
-                block_text = ""
-                block_bbox = block["bbox"]
-                
-                for line in block["lines"]:
-                    line_text = ""
-                    for span in line["spans"]:
-                        line_text += span["text"]
-                    
-                    if line_text.strip():
-                        block_text += line_text + "\n"
-                
-                if block_text.strip():
-                    text_blocks.append({
-                        "text": block_text.strip(),
-                        "bbox": BoundingBox(
-                            x0=block_bbox[0],
-                            y0=block_bbox[1],
-                            x1=block_bbox[2],
-                            y1=block_bbox[3]
-                        ),
-                        "font_info": self._extract_font_info(block)
-                    })
-                    full_text += block_text
-        
-        # Map to models.PageText fields
+            if "lines" not in block:
+                continue
+
+            block_text_parts = []
+            block_lines = []
+            block_spans = []
+            for line in block.get("lines", []):
+                line_text_parts = []
+                line_spans = []
+                for span in line.get("spans", []):
+                    span_text = span.get("text", "")
+                    if not span_text:
+                        continue
+                    style = TextSpan(
+                        text=span_text,
+                        font=span.get("font"),
+                        size=span.get("size"),
+                        bold=bool(span.get("flags", 0) & 2),
+                        italic=bool(span.get("flags", 0) & 1),
+                    )
+                    line_spans.append(style)
+                    block_spans.append(style)
+                    line_text_parts.append(span_text)
+
+                line_text = "".join(line_text_parts).strip()
+                if not line_text:
+                    continue
+
+                line_bbox = line.get("bbox")
+                block_lines.append(
+                    TextLine(
+                        text=line_text,
+                        bbox=BoundingBox(
+                            x0=line_bbox[0],
+                            y0=line_bbox[1],
+                            x1=line_bbox[2],
+                            y1=line_bbox[3],
+                        ) if line_bbox else None,
+                        spans=line_spans,
+                    )
+                )
+                block_text_parts.append(line_text)
+
+            combined_text = "\n".join(block_text_parts).strip()
+            if not combined_text:
+                continue
+
+            block_bbox = block.get("bbox")
+            bbox = BoundingBox(
+                x0=block_bbox[0],
+                y0=block_bbox[1],
+                x1=block_bbox[2],
+                y1=block_bbox[3],
+            ) if block_bbox else BoundingBox(x0=0, y0=0, x1=0, y1=0)
+
+            blocks.append(
+                TextBlock(
+                    text=combined_text,
+                    bbox=bbox,
+                    lines=block_lines,
+                    spans=block_spans,
+                )
+            )
+            full_text += combined_text + "\n\n"
+
         return PageText(
             page=page_num + 1,
             text=full_text.strip(),
-            bbox=None,
+            bbox=[block.bbox for block in blocks] if blocks else None,
+            blocks=blocks,
             confidence=None,
             language=None,
         )
@@ -296,57 +339,84 @@ class TextExtractor:
         """
         # Get characters with positions
         chars = page.chars
-        
-        # Group characters into words and lines
-        text_blocks = []
+
+        blocks: List[TextBlock] = []
         full_text = ""
-        
+
         if chars:
-            # Simple grouping by proximity
-            current_line = []
+            current_line: List[Dict[str, Any]] = []
             current_y = None
-            
+            current_block_lines: List[TextLine] = []
+
+            def _flush_line() -> Optional[TextLine]:
+                nonlocal current_line
+                if not current_line:
+                    return None
+                line_text = ''.join([c['text'] for c in current_line]).strip()
+                if not line_text:
+                    current_line = []
+                    return None
+                bbox = self._get_line_bbox(current_line)
+                spans = [
+                    TextSpan(
+                        text=c.get('text', ''),
+                        font=c.get('fontname'),
+                        size=c.get('size'),
+                        bold='Bold' in (c.get('fontname') or ''),
+                        italic='Italic' in (c.get('fontname') or ''),
+                    )
+                    for c in current_line
+                    if c.get('text')
+                ]
+                line = TextLine(text=line_text, bbox=bbox, spans=spans)
+                current_line = []
+                return line
+
             for char in chars:
-                if current_y is None or abs(char['y0'] - current_y) < 5:  # Same line
+                if current_y is None or abs(char['y0'] - current_y) < 5:
                     current_line.append(char)
                     current_y = char['y0']
                 else:
-                    # Process current line
-                    if current_line:
-                        line_text = ''.join([c['text'] for c in current_line])
-                        if line_text.strip():
-                            bbox = self._get_line_bbox(current_line)
-                            text_blocks.append({
-                                "text": line_text.strip(),
-                                "bbox": bbox,
-                                "font_info": self._get_font_info_pdfplumber(current_line)
-                            })
-                            full_text += line_text.strip() + "\n"
-                    
-                    # Start new line
+                    line_model = _flush_line()
+                    if line_model:
+                        current_block_lines.append(line_model)
+                        full_text += line_model.text + "\n"
                     current_line = [char]
                     current_y = char['y0']
-            
-            # Process last line
-            if current_line:
-                line_text = ''.join([c['text'] for c in current_line])
-                if line_text.strip():
-                    bbox = self._get_line_bbox(current_line)
-                    text_blocks.append({
-                        "text": line_text.strip(),
-                        "bbox": bbox,
-                        "font_info": self._get_font_info_pdfplumber(current_line)
-                    })
-                    full_text += line_text.strip() + "\n"
-        
-        # Fallback to simple extraction if character-level fails
-        if not full_text.strip():
-            full_text = page.extract_text() or ""
-        
+
+            line_model = _flush_line()
+            if line_model:
+                current_block_lines.append(line_model)
+                full_text += line_model.text + "\n"
+
+            if current_block_lines:
+                combined_text = "\n".join(line.text for line in current_block_lines).strip()
+                bbox = self._get_line_bbox(chars)
+                blocks.append(
+                    TextBlock(
+                        text=combined_text,
+                        bbox=bbox,
+                        lines=current_block_lines,
+                        spans=[span for line in current_block_lines for span in line.spans],
+                    )
+                )
+
+        if not blocks:
+            text = (page.extract_text() or "").strip()
+            return PageText(
+                page=page_num + 1,
+                text=text,
+                bbox=None,
+                blocks=[],
+                confidence=None,
+                language=None,
+            )
+
         return PageText(
             page=page_num + 1,
-            text=full_text.strip(),
-            bbox=None,
+            text=(full_text or "").strip(),
+            bbox=[block.bbox for block in blocks],
+            blocks=blocks,
             confidence=None,
             language=None,
         )

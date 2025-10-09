@@ -34,7 +34,13 @@ src_path = Path(__file__).parent.parent
 if str(src_path) not in sys.path:
     sys.path.insert(0, str(src_path))
 
-from pdf_mcp_server.core import PDFProcessor, ProcessingRequest
+from pdf_mcp_server.models import (
+    FormulaModel,
+    ProcessingMode,
+    ProcessingRequest,
+    TableEngine,
+)
+from pdf_mcp_server.processors.pdf_processor import PDFProcessor
 from pdf_mcp_server.utils import Config, setup_logging, get_logger
 from pdf_mcp_server.main import main as server_main
 
@@ -60,7 +66,7 @@ def cli(ctx, config: Optional[str], verbose: bool, quiet: bool):
     else:
         log_level = 'INFO'
     
-    setup_logging(level=log_level)
+    setup_logging(log_level=log_level)
     
     # Load configuration
     try:
@@ -90,7 +96,8 @@ def cli(ctx, config: Optional[str], verbose: bool, quiet: bool):
 @click.option('--include-ocr/--no-ocr', default=True, help='Include OCR processing')
 @click.option('--include-formulas/--no-formulas', default=False, help='Include formula extraction')
 @click.option('--include-grobid/--no-grobid', default=False, help='Include GROBID processing')
-@click.option('--table-engine', 
+@click.option('--reconstruct-layout/--no-reconstruct-layout', default=False, help='Rebuild layout using extracted content')
+@click.option('--table-engine',
               type=click.Choice(['camelot', 'tabula', 'pdfplumber', 'auto']),
               default='auto', help='Table extraction engine')
 @click.option('--formula-model',
@@ -98,8 +105,8 @@ def cli(ctx, config: Optional[str], verbose: bool, quiet: bool):
               default='auto', help='Formula recognition model')
 @click.pass_context
 def process(ctx, file: str, mode: str, pages: Optional[str], output: Optional[str],
-           output_format: str, include_ocr: bool, include_formulas: bool, 
-           include_grobid: bool, table_engine: str, formula_model: str):
+           output_format: str, include_ocr: bool, include_formulas: bool,
+           include_grobid: bool, reconstruct_layout: bool, table_engine: str, formula_model: str):
     """Process a PDF file with specified options."""
     config = ctx.obj.get('config')
     verbose = ctx.obj.get('verbose', False)
@@ -146,21 +153,21 @@ def process(ctx, file: str, mode: str, pages: Optional[str], output: Optional[st
                         else:
                             parsed_pages = [int(pages)]
                     
-                    # Create processing request
-                    options = {
-                        'include_ocr': include_ocr,
-                        'include_formulas': include_formulas,
-                        'include_grobid': include_grobid,
-                        'table_engine': table_engine,
-                        'formula_model': formula_model
-                    }
-                    
+                    table_engine_enum = TableEngine.CAMELOT if table_engine == 'auto' else TableEngine(table_engine)
+                    formula_model_enum = FormulaModel.PIX2TEX if formula_model == 'auto' else FormulaModel(formula_model)
+                    mode_enum = ProcessingMode.FULL if mode == 'process_ocr' else ProcessingMode(mode)
+
                     request = ProcessingRequest(
                         file_path=str(file_path),
-                        mode=mode,
+                        mode=mode_enum,
                         pages=parsed_pages,
                         output_format=output_format,
-                        options=options
+                        include_ocr=include_ocr,
+                        include_formulas=include_formulas,
+                        include_grobid=include_grobid,
+                        reconstruct_layout=reconstruct_layout,
+                        table_engine=table_engine_enum,
+                        formula_model=formula_model_enum,
                     )
                     
                     # Process file
@@ -183,21 +190,21 @@ def process(ctx, file: str, mode: str, pages: Optional[str], output: Optional[st
                     else:
                         parsed_pages = [int(pages)]
                 
-                # Create processing request
-                options = {
-                    'include_ocr': include_ocr,
-                    'include_formulas': include_formulas,
-                    'include_grobid': include_grobid,
-                    'table_engine': table_engine,
-                    'formula_model': formula_model
-                }
-                
+                table_engine_enum = TableEngine.CAMELOT if table_engine == 'auto' else TableEngine(table_engine)
+                formula_model_enum = FormulaModel.PIX2TEX if formula_model == 'auto' else FormulaModel(formula_model)
+                mode_enum = ProcessingMode.FULL if mode == 'process_ocr' else ProcessingMode(mode)
+
                 request = ProcessingRequest(
                     file_path=str(file_path),
-                    mode=mode,
+                    mode=mode_enum,
                     pages=parsed_pages,
                     output_format=output_format,
-                    options=options
+                    include_ocr=include_ocr,
+                    include_formulas=include_formulas,
+                    include_grobid=include_grobid,
+                    reconstruct_layout=reconstruct_layout,
+                    table_engine=table_engine_enum,
+                    formula_model=formula_model_enum,
                 )
                 
                 result = await processor.process(request)
@@ -209,7 +216,7 @@ def process(ctx, file: str, mode: str, pages: Optional[str], output: Optional[st
                 
                 if output_format == 'json':
                     with open(output_path, 'w', encoding='utf-8') as f:
-                        json.dump(result.dict(), f, indent=2, ensure_ascii=False)
+                        json.dump(result.model_dump(), f, indent=2, ensure_ascii=False)
                 else:
                     # Handle other formats based on result content
                     with open(output_path, 'w', encoding='utf-8') as f:
@@ -220,10 +227,11 @@ def process(ctx, file: str, mode: str, pages: Optional[str], output: Optional[st
             else:
                 # Print to console
                 if output_format == 'json':
+                    dumped = result.model_dump()
                     if not quiet:
-                        console.print(Panel(JSON(json.dumps(result.dict(), indent=2)), title="Processing Results"))
+                        console.print(Panel(JSON(json.dumps(dumped, indent=2)), title="Processing Results"))
                     else:
-                        print(json.dumps(result.dict(), indent=2))
+                        print(json.dumps(dumped, indent=2))
                 else:
                     if not quiet:
                         console.print(Panel(str(result), title="Processing Results"))
@@ -403,9 +411,10 @@ def health(ctx, url: str, timeout: int):
               default='json', help='Output format')
 @click.option('--parallel/--sequential', default=True, help='Process files in parallel')
 @click.option('--max-workers', type=int, default=4, help='Maximum number of parallel workers')
+@click.option('--reconstruct-layout/--no-reconstruct-layout', default=False, help='Rebuild layout using extracted content')
 @click.pass_context
 def batch(ctx, files: List[str], mode: str, output_dir: Optional[str],
-         output_format: str, parallel: bool, max_workers: int):
+         output_format: str, parallel: bool, max_workers: int, reconstruct_layout: bool):
     """Process multiple PDF files in batch."""
     config = ctx.obj.get('config')
     quiet = ctx.obj.get('quiet', False)
@@ -456,11 +465,12 @@ def batch(ctx, files: List[str], mode: str, output_dir: Optional[str],
                         try:
                             request = ProcessingRequest(
                                 file_path=file_path,
-                                mode=mode,
-                                output_format=output_format
+                                mode=ProcessingMode.FULL if mode == 'process_ocr' else ProcessingMode(mode),
+                                output_format=output_format,
+                                reconstruct_layout=reconstruct_layout
                             )
                             result = await processor.process(request)
-                            return {'file': file_path, 'result': result, 'success': True}
+                            return {'file': file_path, 'result': result.model_dump(), 'success': True}
                         except Exception as e:
                             return {'file': file_path, 'error': str(e), 'success': False}
                 
@@ -475,11 +485,12 @@ def batch(ctx, files: List[str], mode: str, output_dir: Optional[str],
                         
                         request = ProcessingRequest(
                             file_path=file_path,
-                            mode=mode,
-                            output_format=output_format
+                            mode=ProcessingMode.FULL if mode == 'process_ocr' else ProcessingMode(mode),
+                            output_format=output_format,
+                            reconstruct_layout=reconstruct_layout
                         )
                         result = await processor.process(request)
-                        results.append({'file': file_path, 'result': result, 'success': True})
+                        results.append({'file': file_path, 'result': result.model_dump(), 'success': True})
                     except Exception as e:
                         results.append({'file': file_path, 'error': str(e), 'success': False})
             
@@ -494,7 +505,7 @@ def batch(ctx, files: List[str], mode: str, output_dir: Optional[str],
                         output_file = output_path / f"{file_name}_result.{output_format}"
                         with open(output_file, 'w', encoding='utf-8') as f:
                             if output_format == 'json':
-                                json.dump(result['result'].dict(), f, indent=2, ensure_ascii=False)
+                                json.dump(result['result'], f, indent=2, ensure_ascii=False)
                             else:
                                 f.write(str(result['result']))
                     else:

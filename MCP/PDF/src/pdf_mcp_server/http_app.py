@@ -107,6 +107,10 @@ async def extract(
     table_engine: TableEngine = Query(default=TableEngine.CAMELOT),
     formula_model: FormulaModel = Query(default=FormulaModel.LATEX_OCR),
     output_format: str = Query(default="json"),
+    reconstruct_layout: bool = Query(
+        default=False,
+        description="Reconstruct layout and return structured layout output",
+    ),
     async_mode: bool = Query(default=False, description="Queue job asynchronously and return task id"),
 ):
     if not _processor or not _config:
@@ -120,7 +124,9 @@ async def extract(
             # Save upload to a temporary file
             suffix = Path(file.filename or "uploaded.pdf").suffix or ".pdf"
             fd, tmp = tempfile.mkstemp(suffix=suffix)
-            Path(tmp).write_bytes(await file.read())
+            data = await file.read()
+            with os.fdopen(fd, 'wb') as tmp_file:
+                tmp_file.write(data)
             local_path = Path(tmp)
             tmp_path = local_path
         elif file_path:
@@ -141,6 +147,7 @@ async def extract(
             include_grobid=include_grobid,
             table_engine=table_engine,
             formula_model=formula_model,
+            reconstruct_layout=reconstruct_layout,
         )
 
         if async_mode:
@@ -159,6 +166,7 @@ async def extract(
                         "table_engine": table_engine.value if hasattr(table_engine, "value") else str(table_engine),
                         "formula_model": formula_model.value if hasattr(formula_model, "value") else str(formula_model),
                         "output_format": output_format,
+                        "reconstruct_layout": reconstruct_layout,
                     },
                 )
                 return JSONResponse(jsonable_encoder({"task_id": job.get_id(), "status": "queued"}))
@@ -170,13 +178,13 @@ async def extract(
                     try:
                         _tasks[task_id] = {"status": "running"}
                         result = await _processor.process(req)
-                        task_payload: Dict[str, Any] = {"status": "finished", "result": result.dict()}
+                        task_payload: Dict[str, Any] = {"status": "finished", "result": result.model_dump()}
                         if output_format == "docx":
                             out_dir = Path(os.getenv("PDF_MCP_DOCX_DIR", tempfile.gettempdir())) / "pdf_mcp_docx"
                             out_dir.mkdir(parents=True, exist_ok=True)
                             out_path = out_dir / f"export_{local_path.stem}.docx"
                             from .utils.docx_exporter import build_docx_from_pipeline
-                            build_docx_from_pipeline(result.dict(), out_path)
+                            build_docx_from_pipeline(result.model_dump(), out_path)
                             task_payload["docx_path"] = str(out_path)
                         _tasks[task_id] = task_payload
                     except Exception as e:  # pylint: disable=broad-except
@@ -198,7 +206,7 @@ async def extract(
             out_dir = Path(os.getenv("PDF_MCP_DOCX_DIR", tempfile.gettempdir())) / "pdf_mcp_docx"
             out_dir.mkdir(parents=True, exist_ok=True)
             out_path = out_dir / f"export_{local_path.stem}.docx"
-            build_docx_from_pipeline(result.dict(), out_path)
+            build_docx_from_pipeline(result.model_dump(), out_path)
             return FileResponse(
                 path=str(out_path),
                 media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",

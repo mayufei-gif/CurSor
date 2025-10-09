@@ -11,7 +11,7 @@ from .exceptions import (
     ModelLoadError,
     ValidationError
 )
-from .logging_config import setup_logging
+from .logging_config import setup_logging, get_logger
 from .file_utils import (
     ensure_directory,
     cleanup_temp_files,
@@ -32,6 +32,7 @@ __all__ = [
     'ModelLoadError',
     'ValidationError',
     'setup_logging',
+    'get_logger',
     'ensure_directory',
     'cleanup_temp_files',
     'get_file_hash',
