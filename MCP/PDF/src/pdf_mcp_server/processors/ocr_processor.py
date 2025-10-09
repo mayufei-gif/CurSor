@@ -210,7 +210,8 @@ class OCRProcessor:
         # Add page range if specified
         if request.pages:
             max_requested = max(request.pages)
-            page_indices = resolve_page_indices(request.pages, max_requested)
+            total_pages = max(max_requested, 1)
+            page_indices = resolve_page_indices(request.pages, total_pages)
             ocr_args['pages'] = ",".join(str(index + 1) for index in page_indices)
         
         try:
