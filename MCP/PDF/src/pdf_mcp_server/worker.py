@@ -84,7 +84,7 @@ def process_job(
         return result
 
     result = asyncio.run(_run())  # 在同步上下文运行协程
-    res_dict = result.dict()  # Pydantic 模型转字典
+    res_dict = result.model_dump()  # Pydantic 模型转字典
 
     out: Dict[str, Any] = {"status": "done", "result": res_dict}  # 基础返回结构
 

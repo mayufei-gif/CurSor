@@ -26,6 +26,7 @@ from typing import Dict, Any, Optional  # 类型注解
 import uuid     # 唯一标识符生成
 
 # 数据模型导入
+from .. import __version__
 from ..models import (
     ProcessingRequest,    # 处理请求模型
     ProcessingResponse,   # 处理响应模型
@@ -257,7 +258,8 @@ class PDFProcessor:
             metadata = ProcessingMetadata(
                 processing_time=processing_time,
                 engines_used=list(dict.fromkeys(processing_plan["engines_used"])),
-                file_info=pdf_info
+                file_info=pdf_info,
+                version=__version__,
             )
             
             # 更新统计信息
@@ -384,14 +386,14 @@ class PDFProcessor:
             plan["engines_used"].append("ocrmypdf")
         
         # 根据处理模式确定处理步骤
-        if request.mode in [ProcessingMode.TEXT, ProcessingMode.FULL, ProcessingMode.LAYOUT]:
+        if request.mode in [ProcessingMode.TEXT, ProcessingMode.FULL]:
             plan["extract_text"] = True
             plan["steps"].append("text_extraction")
             for engine in ["pymupdf", "pdfplumber"]:
                 if engine not in plan["engines_used"]:
                     plan["engines_used"].append(engine)
 
-        if request.mode in [ProcessingMode.TABLES, ProcessingMode.FULL, ProcessingMode.LAYOUT]:
+        if request.mode in [ProcessingMode.TABLES, ProcessingMode.FULL]:
             plan["extract_tables"] = True
             plan["steps"].append("table_extraction")
             for engine in ["camelot", "tabula"]:
@@ -399,7 +401,7 @@ class PDFProcessor:
                     plan["engines_used"].append(engine)
 
         if (
-            request.mode in [ProcessingMode.FORMULAS, ProcessingMode.FULL, ProcessingMode.LAYOUT]
+            request.mode in [ProcessingMode.FORMULAS, ProcessingMode.FULL]
             and request.include_formulas
         ):
             plan["extract_formulas"] = True
@@ -414,7 +416,7 @@ class PDFProcessor:
             if "grobid" not in plan["engines_used"]:
                 plan["engines_used"].append("grobid")
 
-        if request.reconstruct_layout or request.mode == ProcessingMode.LAYOUT:
+        if request.reconstruct_layout:
             plan["reconstruct_layout"] = True
             if not plan["extract_text"]:
                 plan["extract_text"] = True
@@ -426,8 +428,7 @@ class PDFProcessor:
             if "layout_reconstructor" not in plan["engines_used"]:
                 plan["engines_used"].append("layout_reconstructor")
             if not request.include_bbox:
-                # 版面重建需要边界框信息，确保文本提取包含坐标
-                request.include_bbox = True
+                plan["force_bbox"] = True
 
         return plan
     
@@ -455,7 +456,10 @@ class PDFProcessor:
         # 提取文本内容
         if plan["extract_text"]:
             self.logger.info("正在提取文本")
-            content.text = await self.text_extractor.extract(file_path, request)
+            text_request = request
+            if plan.get("force_bbox") and not request.include_bbox:
+                text_request = request.model_copy(update={"include_bbox": True})
+            content.text = await self.text_extractor.extract(file_path, text_request)
         
         # 提取表格数据
         if plan["extract_tables"]:

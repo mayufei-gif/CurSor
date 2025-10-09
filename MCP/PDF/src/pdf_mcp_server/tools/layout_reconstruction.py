@@ -173,7 +173,7 @@ class ReconstructLayoutTool(PDFTool):
         if output_mode in ("json", "all"):
             content.append(
                 create_text_content(
-                    json.dumps(layout.model_dump(mode="json"), ensure_ascii=False, indent=2)
+                    json.dumps(layout.model_dump(), ensure_ascii=False, indent=2)
                 )
             )
 

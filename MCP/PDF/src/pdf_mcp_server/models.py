@@ -31,7 +31,6 @@ class ProcessingMode(str, Enum):
     TEXT = "read_text"  # 纯文本提取模式
     TABLES = "extract_tables"  # 表格提取模式
     FORMULAS = "extract_formulas"  # 公式提取模式
-    LAYOUT = "reconstruct_layout"  # 版面重建模式
     FULL = "full_pipeline"  # 完整流水线模式（包含所有功能）
 
 
@@ -133,21 +132,51 @@ class PDFInfo(BaseModel):
     keywords: Optional[str] = Field(None, description="PDF关键词")
 
 
+class TextSpan(BaseModel):
+    """文本片段的样式信息"""
+
+    text: str = Field(..., description="片段文本内容")
+    font: Optional[str] = Field(None, description="字体名称")
+    size: Optional[float] = Field(None, description="字号（pt）")
+    bold: bool = Field(False, description="是否加粗")
+    italic: bool = Field(False, description="是否斜体")
+
+
+class TextLine(BaseModel):
+    """单行文本及其边界框"""
+
+    text: str = Field(..., description="文本内容")
+    bbox: Optional[BoundingBox] = Field(None, description="文本行的边界框")
+    spans: List[TextSpan] = Field(default_factory=list, description="行内样式片段")
+
+
+class TextBlock(BaseModel):
+    """具有定位信息的文本块"""
+
+    text: str = Field(..., description="文本块内容")
+    bbox: BoundingBox = Field(..., description="文本块边界框")
+    lines: List[TextLine] = Field(default_factory=list, description="文本块中的行列表")
+    spans: List[TextSpan] = Field(default_factory=list, description="文本块的样式片段集合")
+    alignment: Optional[str] = Field(None, description="文本块推断的对齐方式")
+
+
 class PageText(BaseModel):
     """单页文本内容模型
-    
+
     表示PDF单个页面的文本提取结果，包含文本内容和相关元数据。
-    
+
     Attributes:
         page: 页码（从1开始）
         text: 提取的文本内容
         bbox: 文本边界框列表（可选）
+        blocks: 文本块集合（可选）
         confidence: OCR置信度分数（可选）
         language: 检测到的语言（可选）
     """
     page: int = Field(..., description="页码（从1开始）")
     text: str = Field(..., description="提取的文本内容")
     bbox: Optional[List[BoundingBox]] = Field(None, description="文本边界框列表")
+    blocks: List[TextBlock] = Field(default_factory=list, description="包含定位信息的文本块列表")
     confidence: Optional[float] = Field(None, description="OCR置信度分数")
     language: Optional[str] = Field(None, description="检测到的语言")
 

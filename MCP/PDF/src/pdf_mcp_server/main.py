@@ -37,7 +37,7 @@ from .models import (
 )
 from .processors import PDFProcessor  # PDF处理器
 from .utils.config import Config  # 配置管理
-from .utils.logger import setup_logging  # 日志设置
+from .utils.logging_config import setup_logging  # 日志设置
 from .utils.exceptions import PDFProcessingError, ValidationError  # 自定义异常
 
 # 全局变量定义
@@ -136,7 +136,7 @@ async def pdf_processing_exception_handler(request, exc: PDFProcessingError):
             error_code="PDF_PROCESSING_ERROR",  # 错误代码
             message=str(exc),  # 错误消息
             details={"type": type(exc).__name__}  # 错误详情
-        ).dict()
+        ).model_dump()
     )
 
 
@@ -153,7 +153,7 @@ async def validation_exception_handler(request, exc: ValidationError):
             error_code="VALIDATION_ERROR",  # 验证错误代码
             message=str(exc),  # 错误消息
             details=exc.details if hasattr(exc, 'details') else {}  # 错误详情
-        ).dict()
+        ).model_dump()
     )
 
 

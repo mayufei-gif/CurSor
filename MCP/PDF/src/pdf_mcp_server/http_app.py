@@ -124,7 +124,9 @@ async def extract(
             # Save upload to a temporary file
             suffix = Path(file.filename or "uploaded.pdf").suffix or ".pdf"
             fd, tmp = tempfile.mkstemp(suffix=suffix)
-            Path(tmp).write_bytes(await file.read())
+            data = await file.read()
+            with os.fdopen(fd, 'wb') as tmp_file:
+                tmp_file.write(data)
             local_path = Path(tmp)
             tmp_path = local_path
         elif file_path:
@@ -176,13 +178,13 @@ async def extract(
                     try:
                         _tasks[task_id] = {"status": "running"}
                         result = await _processor.process(req)
-                        task_payload: Dict[str, Any] = {"status": "finished", "result": result.dict()}
+                        task_payload: Dict[str, Any] = {"status": "finished", "result": result.model_dump()}
                         if output_format == "docx":
                             out_dir = Path(os.getenv("PDF_MCP_DOCX_DIR", tempfile.gettempdir())) / "pdf_mcp_docx"
                             out_dir.mkdir(parents=True, exist_ok=True)
                             out_path = out_dir / f"export_{local_path.stem}.docx"
                             from .utils.docx_exporter import build_docx_from_pipeline
-                            build_docx_from_pipeline(result.dict(), out_path)
+                            build_docx_from_pipeline(result.model_dump(), out_path)
                             task_payload["docx_path"] = str(out_path)
                         _tasks[task_id] = task_payload
                     except Exception as e:  # pylint: disable=broad-except
@@ -204,7 +206,7 @@ async def extract(
             out_dir = Path(os.getenv("PDF_MCP_DOCX_DIR", tempfile.gettempdir())) / "pdf_mcp_docx"
             out_dir.mkdir(parents=True, exist_ok=True)
             out_path = out_dir / f"export_{local_path.stem}.docx"
-            build_docx_from_pipeline(result.dict(), out_path)
+            build_docx_from_pipeline(result.model_dump(), out_path)
             return FileResponse(
                 path=str(out_path),
                 media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
