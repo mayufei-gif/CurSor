@@ -224,7 +224,7 @@ class LayoutReconstructor:
             return list(range(total_pages))
         resolved: List[int] = []
         for page in pages:
-            index = max(page - 1, 0)
+            index = max(page, 0)
             if index < total_pages:
                 resolved.append(index)
         return resolved
