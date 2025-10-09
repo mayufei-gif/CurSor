@@ -124,12 +124,20 @@ class ReconstructLayoutTool(PDFTool):
         try:
             table_engine = TableEngine(table_engine_value)
         except Exception as exc:  # pragma: no cover - enum validation
+codex/locate-pdf-mcp-server-project-uq2ubf
             raise ToolExecutionException(self.name, f"Unsupported table engine: {table_engine_value}", exc) from exc
+
+            raise ToolExecutionException(f"Unsupported table engine: {table_engine_value}") from exc
+main
 
         try:
             formula_model = FormulaModel(formula_model_value)
         except Exception as exc:  # pragma: no cover - enum validation
+codex/locate-pdf-mcp-server-project-uq2ubf
             raise ToolExecutionException(self.name, f"Unsupported formula model: {formula_model_value}", exc) from exc
+
+            raise ToolExecutionException(f"Unsupported formula model: {formula_model_value}") from exc
+main
 
         config = Config.load()
         processor = PDFProcessor(config)
@@ -149,12 +157,21 @@ class ReconstructLayoutTool(PDFTool):
             result = await processor.process(request)
         except Exception as exc:
             self.logger.error("Layout reconstruction failed: %s", exc, exc_info=True)
+codex/locate-pdf-mcp-server-project-uq2ubf
+
+            await processor.cleanup()
+main
             return MCPToolResult(
                 content=[create_error_content(f"Layout reconstruction failed: {exc}")],
                 isError=True,
             )
+codex/locate-pdf-mcp-server-project-uq2ubf
         finally:
             await processor.cleanup()
+
+
+        await processor.cleanup()
+main
 
         layout = result.content.layout if result and result.content else None
         if not layout:

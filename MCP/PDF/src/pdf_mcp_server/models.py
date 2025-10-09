@@ -24,9 +24,15 @@ from datetime import datetime  # 日期时间处理
 from pydantic import BaseModel, Field, field_validator  # 数据验证和序列化框架
 
 try:
+ codex/locate-pdf-mcp-server-project-uq2ubf
     PACKAGE_VERSION = metadata.version("pdf-mcp-server")
 except metadata.PackageNotFoundError:  # pragma: no cover - fallback when running from source
     PACKAGE_VERSION = "0.1.0"
+
+    from . import __version__ as _PACKAGE_VERSION
+except ImportError:  # pragma: no cover - package metadata fallback
+    _PACKAGE_VERSION = "0.0.0"
+ main
 
 
 class ProcessingMode(str, Enum):
@@ -380,7 +386,11 @@ class ProcessingMetadata(BaseModel):
     engines_used: List[str] = Field(..., description="使用的引擎/模型列表")
     file_info: PDFInfo = Field(..., description="PDF文件信息")
     timestamp: datetime = Field(default_factory=datetime.now, description="处理时间戳")
+ codex/locate-pdf-mcp-server-project-uq2ubf
     version: str = Field(PACKAGE_VERSION, description="服务器版本")
+
+    version: str = Field(_PACKAGE_VERSION, description="服务器版本")
+ main
     errors: List[str] = Field(default_factory=list, description="遇到的非致命错误列表")
     warnings: List[str] = Field(default_factory=list, description="生成的警告列表")
 
