@@ -14,7 +14,7 @@ import time
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
 try:  # Optional dependency
     import fitz  # type: ignore
@@ -223,10 +223,12 @@ class LayoutReconstructor:
         if not pages:
             return list(range(total_pages))
         resolved: List[int] = []
+        seen: Set[int] = set()
         for page in pages:
-            index = max(page, 0)
-            if index < total_pages:
+            index = page - 1 if page > 0 else 0
+            if 0 <= index < total_pages and index not in seen:
                 resolved.append(index)
+                seen.add(index)
         return resolved
 
     def _linear_sum_assignment(
