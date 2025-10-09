@@ -106,25 +106,32 @@ class InvalidToolCallException(MCPException):
 
 class ToolExecutionException(MCPException):
     """Exception raised when tool execution fails."""
-    
+
     def __init__(
         self,
         tool_name: str,
-        execution_error: str,
+        execution_error: Optional[str] = None,
         original_exception: Optional[Exception] = None
     ):
+        # Historical call sites only provided a human readable message. To remain
+        # backwards compatible we treat the single argument form as the
+        # ``execution_error`` and fall back to an ``unknown`` tool name.
+        if execution_error is None:
+            execution_error = tool_name
+            tool_name = "unknown_tool"
+
         message = f"Tool '{tool_name}' execution failed: {execution_error}"
         details = {
             'tool_name': tool_name,
             'execution_error': execution_error
         }
-        
+
         if original_exception:
             details['original_exception'] = {
                 'type': type(original_exception).__name__,
                 'message': str(original_exception)
             }
-        
+
         super().__init__(message, 'TOOL_EXECUTION_ERROR', details)
         self.tool_name = tool_name
         self.execution_error = execution_error
