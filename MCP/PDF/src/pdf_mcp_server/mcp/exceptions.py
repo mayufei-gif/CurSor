@@ -109,20 +109,6 @@ class ToolExecutionException(MCPException):
 
     def __init__(
         self,
-codex/locate-pdf-mcp-server-project-uq2ubf
-        tool_name: str,
-        execution_error: Optional[str] = None,
-        original_exception: Optional[Exception] = None
-    ):
-        # Historical call sites only provided a human readable message. To remain
-        # backwards compatible we treat the single argument form as the
-        # ``execution_error`` and fall back to an ``unknown`` tool name.
-        if execution_error is None:
-            execution_error = tool_name
-            tool_name = "unknown_tool"
-
-        message = f"Tool '{tool_name}' execution failed: {execution_error}"
-
         tool_name_or_message: str,
         execution_error: Optional[str] = None,
         original_exception: Optional[Exception] = None,
@@ -131,50 +117,36 @@ codex/locate-pdf-mcp-server-project-uq2ubf
     ):
         """Create a tool execution error.
 
-        The historical call-site signature was ``ToolExecutionException(message)``
-        even though the class originally required both ``tool_name`` and an error
-        string.  Pylint correctly flagged these calls as missing required
-        arguments.  To remain backward compatible (and to keep the call-sites
-        simple for generic tools) we accept either ``ToolExecutionException("msg")``
-        or ``ToolExecutionException("tool", "msg")`` as well as the explicit
-        keyword form ``ToolExecutionException("msg", tool_name="tool")``.
+        Supports legacy ``ToolExecutionException(message)`` as well as the
+        explicit ``ToolExecutionException(tool_name, message)`` and keyword-only
+        ``ToolExecutionException(message, tool_name="tool")`` call patterns.
         """
 
         if execution_error is None and tool_name is None:
-            # Called with only a message. Use a generic tool name so the final
-            # message still reads naturally.
             resolved_tool_name = "generic_tool"
             resolved_error = tool_name_or_message
             final_message = f"Tool execution failed: {resolved_error}"
         else:
-            # Either the legacy two-argument form or explicit keyword usage.
             resolved_tool_name = tool_name or tool_name_or_message
             resolved_error = execution_error or tool_name_or_message
             final_message = (
                 f"Tool '{resolved_tool_name}' execution failed: {resolved_error}"
             )
 
-main
         details = {
             'tool_name': resolved_tool_name,
             'execution_error': resolved_error,
         }
 
-        if original_exception:
+        if original_exception is not None:
             details['original_exception'] = {
                 'type': type(original_exception).__name__,
-                'message': str(original_exception)
+                'message': str(original_exception),
             }
-
-codex/locate-pdf-mcp-server-project-uq2ubf
-        super().__init__(message, 'TOOL_EXECUTION_ERROR', details)
-        self.tool_name = tool_name
-        self.execution_error = execution_error
 
         super().__init__(final_message, 'TOOL_EXECUTION_ERROR', details)
         self.tool_name = resolved_tool_name
         self.execution_error = resolved_error
-main
         self.original_exception = original_exception
 
 

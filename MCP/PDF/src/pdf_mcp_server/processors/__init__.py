@@ -25,10 +25,7 @@ __all__ = [
     "OCRProcessor",
     "FormulaExtractor",
     "DocumentAnalyzer",
-codex/locate-pdf-mcp-server-project-uq2ubf
 ]
-    "LayoutReconstructor",
-]
-if LayoutReconstructor is None:  # pragma: no cover - optional
-    __all__.remove("LayoutReconstructor")
-main
+
+if LayoutReconstructor is not None:  # pragma: no cover - optional dependency
+    __all__.append("LayoutReconstructor")
