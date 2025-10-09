@@ -14,7 +14,7 @@ import time
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 try:  # Optional dependency
     import fitz  # type: ignore
@@ -35,6 +35,7 @@ from ..models import (
     TextSpan,
 )
 from ..utils.config import Config
+from ..utils.page_utils import resolve_page_indices
 from ..utils.exceptions import PDFProcessingError
 from ..utils.geometry import (
     bbox_distance,
@@ -220,16 +221,7 @@ class LayoutReconstructor:
     # Helpers
     # ------------------------------------------------------------------
     def _resolve_pages(self, pages: Optional[List[int]], total_pages: int) -> List[int]:
-        if not pages:
-            return list(range(total_pages))
-        resolved: List[int] = []
-        seen: Set[int] = set()
-        for page in pages:
-            index = page - 1 if page > 0 else 0
-            if 0 <= index < total_pages and index not in seen:
-                resolved.append(index)
-                seen.add(index)
-        return resolved
+        return resolve_page_indices(pages, total_pages)
 
     def _linear_sum_assignment(
         self, cost_matrix: List[List[float]], filler: float

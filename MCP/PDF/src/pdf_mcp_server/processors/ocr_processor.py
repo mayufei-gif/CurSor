@@ -30,6 +30,7 @@ except ImportError:
 
 from ..models import ProcessingRequest
 from ..utils.config import Config
+from ..utils.page_utils import resolve_page_indices
 from ..utils.exceptions import PDFProcessingError
 
 
@@ -208,11 +209,9 @@ class OCRProcessor:
         
         # Add page range if specified
         if request.pages:
-            # OCRmyPDF uses 1-indexed pages
-            page_ranges = []
-            for page in sorted(request.pages):
-                page_ranges.append(f"{page + 1}")
-            ocr_args['pages'] = ",".join(page_ranges)
+            max_requested = max(request.pages)
+            page_indices = resolve_page_indices(request.pages, max_requested)
+            ocr_args['pages'] = ",".join(str(index + 1) for index in page_indices)
         
         try:
             # Run OCRmyPDF
@@ -262,12 +261,9 @@ class OCRProcessor:
                 ocr_results = []
                 
                 # Determine pages to process
-                page_range = request.pages if request.pages else range(len(doc))
-                
-                for page_num in page_range:
-                    if page_num >= len(doc):
-                        continue
-                    
+                page_indices = resolve_page_indices(request.pages, len(doc))
+
+                for page_num in page_indices:
                     page = doc[page_num]
                     
                     # Convert page to image
