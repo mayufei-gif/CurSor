@@ -170,7 +170,7 @@ class MCPServer:
     
     def list_tools(self) -> List[Dict[str, Any]]:
         """List all registered tools."""
-        return [tool_info["definition"].dict() for tool_info in self.tools.values()]
+        return [tool_info["definition"].model_dump() for tool_info in self.tools.values()]
     
     def list_tool_names(self) -> List[str]:
         """List all registered tool names."""
@@ -357,7 +357,7 @@ class MCPServer:
         
         self.logger.info(f"Initialized with client: {self.client_info.name} v{self.client_info.version}")
         
-        return result.dict(exclude_none=True)
+        return result.model_dump(exclude_none=True)
     
     async def _handle_ping(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Handle ping request."""
@@ -365,7 +365,7 @@ class MCPServer:
     
     async def _handle_list_tools(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Handle list tools request."""
-        tools = [tool_info["definition"].dict() for tool_info in self.tools.values()]
+        tools = [tool_info["definition"].model_dump() for tool_info in self.tools.values()]
         return {"tools": tools}
     
     async def _handle_call_tool(self, params: Dict[str, Any]) -> Dict[str, Any]:
@@ -387,13 +387,13 @@ class MCPServer:
             
             # Ensure result is in correct format
             if isinstance(result, MCPToolResult):
-                return result.dict()
+                return result.model_dump()
             elif isinstance(result, dict) and "content" in result:
                 return result
             else:
                 # Wrap simple results
                 content = [create_text_content(str(result))]
-                return MCPToolResult(content=content).dict()
+                return MCPToolResult(content=content).model_dump()
         
         except Exception as e:
             self.logger.error(f"Tool execution error: {e}")
@@ -401,7 +401,7 @@ class MCPServer:
             
             # Return error result
             content = [create_error_content(str(e))]
-            return MCPToolResult(content=content, isError=True).dict()
+            return MCPToolResult(content=content, isError=True).model_dump()
     
     async def _handle_list_resources(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Handle list resources request."""

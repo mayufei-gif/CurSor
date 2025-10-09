@@ -20,6 +20,7 @@ from .models import (
     TextExtractionResult,
     TableExtractionResult,
     FormulaExtractionResult,
+    LayoutReconstructionResult,
     PDFInfo,
 )
 
@@ -29,5 +30,6 @@ __all__ = [
     "TextExtractionResult",
     "TableExtractionResult",
     "FormulaExtractionResult",
+    "LayoutReconstructionResult",
     "PDFInfo",
 ]

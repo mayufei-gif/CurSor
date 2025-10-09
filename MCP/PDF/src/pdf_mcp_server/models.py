@@ -22,10 +22,15 @@ from datetime import datetime  # 日期时间处理
 # 第三方库导入
 from pydantic import BaseModel, Field, field_validator  # 数据验证和序列化框架
 
+try:
+    from . import __version__ as _PACKAGE_VERSION
+except ImportError:  # pragma: no cover - package metadata fallback
+    _PACKAGE_VERSION = "0.0.0"
+
 
 class ProcessingMode(str, Enum):
     """可用的PDF处理模式枚举
-    
+
     定义了PDF处理器支持的不同处理模式，每种模式对应不同的功能组合。
     """
     TEXT = "read_text"  # 纯文本提取模式
@@ -132,21 +137,51 @@ class PDFInfo(BaseModel):
     keywords: Optional[str] = Field(None, description="PDF关键词")
 
 
+class TextSpan(BaseModel):
+    """文本片段的样式信息"""
+
+    text: str = Field(..., description="片段文本内容")
+    font: Optional[str] = Field(None, description="字体名称")
+    size: Optional[float] = Field(None, description="字号（pt）")
+    bold: bool = Field(False, description="是否加粗")
+    italic: bool = Field(False, description="是否斜体")
+
+
+class TextLine(BaseModel):
+    """单行文本及其边界框"""
+
+    text: str = Field(..., description="文本内容")
+    bbox: Optional[BoundingBox] = Field(None, description="文本行的边界框")
+    spans: List[TextSpan] = Field(default_factory=list, description="行内样式片段")
+
+
+class TextBlock(BaseModel):
+    """具有定位信息的文本块"""
+
+    text: str = Field(..., description="文本块内容")
+    bbox: BoundingBox = Field(..., description="文本块边界框")
+    lines: List[TextLine] = Field(default_factory=list, description="文本块中的行列表")
+    spans: List[TextSpan] = Field(default_factory=list, description="文本块的样式片段集合")
+    alignment: Optional[str] = Field(None, description="文本块推断的对齐方式")
+
+
 class PageText(BaseModel):
     """单页文本内容模型
-    
+
     表示PDF单个页面的文本提取结果，包含文本内容和相关元数据。
-    
+
     Attributes:
         page: 页码（从1开始）
         text: 提取的文本内容
         bbox: 文本边界框列表（可选）
+        blocks: 文本块集合（可选）
         confidence: OCR置信度分数（可选）
         language: 检测到的语言（可选）
     """
     page: int = Field(..., description="页码（从1开始）")
     text: str = Field(..., description="提取的文本内容")
     bbox: Optional[List[BoundingBox]] = Field(None, description="文本边界框列表")
+    blocks: List[TextBlock] = Field(default_factory=list, description="包含定位信息的文本块列表")
     confidence: Optional[float] = Field(None, description="OCR置信度分数")
     language: Optional[str] = Field(None, description="检测到的语言")
 
@@ -285,6 +320,47 @@ class GrobidResult(BaseModel):
     tei_xml: Optional[str] = Field(None, description="完整的TEI XML输出")
 
 
+class LayoutElementType(str, Enum):
+    """版面元素类型枚举"""
+
+    TEXT = "text"
+    TABLE = "table"
+    FORMULA = "formula"
+    IMAGE = "image"
+    OTHER = "other"
+
+
+class LayoutElement(BaseModel):
+    """单个版面元素的描述"""
+
+    element_id: str = Field(..., description="元素唯一标识符")
+    type: LayoutElementType = Field(..., description="元素类型")
+    bbox: BoundingBox = Field(..., description="元素边界框")
+    text: Optional[str] = Field(None, description="元素文本内容")
+    html: str = Field(..., description="元素对应的HTML片段")
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="额外的元信息")
+
+
+class ReconstructedPage(BaseModel):
+    """单页版面重建结果"""
+
+    page_number: int = Field(..., description="页码（从1开始）")
+    width: float = Field(..., description="页面宽度")
+    height: float = Field(..., description="页面高度")
+    elements: List[LayoutElement] = Field(default_factory=list, description="页面中的元素列表")
+    html: str = Field(..., description="用于渲染页面的HTML")
+
+
+class LayoutReconstructionResult(BaseModel):
+    """版面重建总体结果"""
+
+    method: str = Field(..., description="使用的版面重建方法")
+    processing_time: float = Field(..., description="版面重建耗时（秒）")
+    css: str = Field(..., description="渲染所需的基础CSS")
+    pages: List[ReconstructedPage] = Field(default_factory=list, description="重建后的页面集合")
+    notes: List[str] = Field(default_factory=list, description="处理过程中的提示或警告")
+
+
 class ProcessingMetadata(BaseModel):
     """处理元数据和统计信息模型
     
@@ -303,7 +379,7 @@ class ProcessingMetadata(BaseModel):
     engines_used: List[str] = Field(..., description="使用的引擎/模型列表")
     file_info: PDFInfo = Field(..., description="PDF文件信息")
     timestamp: datetime = Field(default_factory=datetime.now, description="处理时间戳")
-    version: str = Field("0.1.0", description="服务器版本")
+    version: str = Field(_PACKAGE_VERSION, description="服务器版本")
     errors: List[str] = Field(default_factory=list, description="遇到的非致命错误列表")
     warnings: List[str] = Field(default_factory=list, description="生成的警告列表")
 
@@ -318,11 +394,13 @@ class ProcessingContent(BaseModel):
         tables: 表格提取结果（可选）
         formulas: 公式提取结果（可选）
         grobid: GROBID解析结果（可选）
+        layout: 版面重建结果（可选）
     """
     text: Optional[TextExtractionResult] = Field(None, description="文本提取结果")
     tables: Optional[TableExtractionResult] = Field(None, description="表格提取结果")
     formulas: Optional[FormulaExtractionResult] = Field(None, description="公式提取结果")
     grobid: Optional[GrobidResult] = Field(None, description="GROBID解析结果")
+    layout: Optional["LayoutReconstructionResult"] = Field(None, description="版面重建结果")
 
 
 class ProcessingResponse(BaseModel):
@@ -363,6 +441,7 @@ class ProcessingRequest(BaseModel):
         formula_model: 公式识别模型
         formula_confidence_threshold: 公式的最小置信度阈值
         include_grobid: 是否使用GROBID进行学术文档解析
+        reconstruct_layout: 是否执行版面重建
         max_file_size: 最大文件大小限制
         timeout: 处理超时时间
     """
@@ -390,7 +469,10 @@ class ProcessingRequest(BaseModel):
     
     # GROBID选项
     include_grobid: bool = Field(False, description="是否使用GROBID进行学术文档解析")
-    
+
+    # 版面重建
+    reconstruct_layout: bool = Field(False, description="是否执行版面重建以还原原始排版")
+
     # 通用选项
     max_file_size: int = Field(100 * 1024 * 1024, description="最大文件大小（字节）")
     timeout: int = Field(300, description="处理超时时间（秒）")
