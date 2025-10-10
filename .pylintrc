@@ -1,0 +1,30 @@
+[MASTER]
+init-hook=import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent / "MCP/PDF/src"))
+ignore=CVS
+ignore-paths=
+    ^((?!MCP/PDF/).)*$
+
+[MESSAGES CONTROL]
+disable=
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring,
+    too-few-public-methods,
+    invalid-name
+
+[TYPECHECK]
+ignored-modules=cv2,fitz,pytesseract,paddleocr,easyocr,pdf2image,pdfplumber,camelot,tabula,fastapi,uvicorn,rich,pydantic,mcp.server,mcp.client
+
+[FORMAT]
+max-line-length=100
+
+[SIMILARITIES]
+min-similarity-lines=18
+ignore-comments=yes
+ignore-docstrings=yes
+ignore-imports=yes
+
+[REPORTS]
+output-format=text
+reports=no
+score=yes
