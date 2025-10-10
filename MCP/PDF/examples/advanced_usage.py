@@ -17,12 +17,16 @@ import tempfile
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 
-# Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Ensure the package source directory is importable when running from the repo
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+SRC_DIR = PROJECT_ROOT / "src"
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
 
-from src.pdf_mcp_server.main import PDFMCPServer
-from src.pdf_mcp_server.mcp.protocol import MCPProtocolHandler
-from src.pdf_mcp_server.core.exceptions import PDFProcessingError
+# pylint: disable=wrong-import-position
+from pdf_mcp_server.main import PDFMCPServer
+from pdf_mcp_server.mcp.protocol import MCPProtocolHandler
+from pdf_mcp_server.core.exceptions import PDFProcessingError
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')

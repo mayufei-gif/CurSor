@@ -1,0 +1,43 @@
+[MASTER]
+ignore=venv,.venv,.git,__pycache__
+init-hook=import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).parent / "MCP/PDF/src"))
+load-plugins=pylint.extensions.docparams
+
+[MESSAGES CONTROL]
+disable=
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring,
+    invalid-name,
+    too-few-public-methods
+
+[REPORTS]
+score = no
+
+[FORMAT]
+max-line-length=100
+
+[DESIGN]
+max-args=10
+max-attributes=15
+max-branches=20
+max-locals=25
+max-returns=6
+max-statements=100
+
+[SIMILARITIES]
+ignore-comments=yes
+ignore-docstrings=yes
+ignore-imports=yes
+min-similarity-lines=16
+ignore-patterns=test_.*\.py
+
+[TYPECHECK]
+ignored-modules=pdf_mcp_server
+
+[IMPORTS]
+known-third-party=fastapi,pydantic
+
+[LOGGING]
+logging-format-style=old
+
