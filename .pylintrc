@@ -1,0 +1,36 @@
+[MASTER]
+init-hook=
+    import pathlib
+    import sys
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent / "MCP/PDF/src"))
+ignore=CVS
+ignore-patterns=\.venv,CurSor\-/.*
+ignore-paths=
+    MCP/PDF/tests/test_pdf_mcp_server.py,
+    MCP/PDF/tests/test_http_docx.py,
+    MCP/PDF/examples/.*
+
+[MESSAGES CONTROL]
+disable=
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring,
+    too-few-public-methods,
+    invalid-name
+
+[TYPECHECK]
+ignored-modules=cv2,fitz,pytesseract,paddleocr,easyocr,pdf2image,pdfplumber,camelot,tabula,pydantic,uvicorn,rich,mcp.server,mcp.server.fastapi,mcp.server.stdio,fastapi,starlette,aiofiles,httpx,docx,docx.shared,python_docx,fitz,fuzzywuzzy,numpy,pandas,torch,torchvision,transformers
+
+[FORMAT]
+max-line-length=100
+
+[SIMILARITIES]
+min-similarity-lines=18
+ignore-comments=yes
+ignore-docstrings=yes
+ignore-imports=yes
+
+[REPORTS]
+output-format=text
+reports=no
+score=yes
