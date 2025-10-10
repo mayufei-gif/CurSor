@@ -1,2 +1,6 @@
 [MASTER]
+codex/review-pull-request-logs-18mrp4
 ignore-patterns = test_pdf_mcp_server\.py,test_http_docx\.py
+
+ignore-patterns = test_pdf_mcp_server\.py
+main
