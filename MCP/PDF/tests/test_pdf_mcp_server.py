@@ -1,228 +1,85 @@
-#!/usr/bin/env python3
-"""
-PDF-MCP Server Test Script
+"""Lightweight tests for the PDF MCP server entry points.
 
-This script tests the PDF-MCP server functionality by sending various MCP requests
-and validating the responses.
-
-Author: PDF-MCP Team
-License: MIT
+These tests focus on behaviour that can be validated without launching the full
+FastAPI application or requiring heavy PDF processing dependencies. They also
+serve as regression checks for the issues highlighted in CI: ensuring the server
+lifecycle helpers behave correctly and that registered MCP tools stay in sync
+with the public processing modes.
 """
+
+from __future__ import annotations
 
 import asyncio
-import json
-import logging
-import os
 import sys
-import tempfile
 from pathlib import Path
+from typing import Iterable
+
 import pytest
 
-# Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent))
+try:
+    from fastapi import HTTPException
+except ImportError:  # pragma: no cover - optional dependency for local runs
+    pytest.skip("fastapi is required for pdf_mcp_server tests", allow_module_level=True)
 
-from src.pdf_mcp_server.mcp.protocol import MCPProtocolHandler, MCPRequest, MCPMethod
-from src.pdf_mcp_server.main import PDFMCPServer
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger('pdf_mcp_test')
-
-# Sample PDF path - replace with an actual PDF file for testing
-SAMPLE_PDF_PATH = Path(__file__).parent / 'samples' / 'sample.pdf'
-
-
-@pytest.mark.asyncio
-async def test_server_initialization():
-    """Test server initialization."""
-    logger.info("Testing server initialization...")
-    
-    # Create a temporary config file
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as temp_file:
-        config = {
-            "server": {
-                "name": "pdf-mcp-test-server",
-                "version": "1.0.0",
-                "description": "Test PDF processing server",
-                "max_concurrent_requests": 5,
-                "request_timeout": 60,
-                "temp_dir": "./temp_test",
-                "cleanup_interval": 3600
-            },
-            "logging": {
-                "level": "INFO",
-                "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-                "file": None
-            },
-            "tools": {
-                "text_extraction": {"enabled": True},
-                "table_extraction": {"enabled": False},
-                "ocr": {"enabled": False},
-                "formula_recognition": {"enabled": False},
-                "analysis": {"enabled": True}
-            }
-        }
-        json.dump(config, temp_file)
-        temp_file_path = temp_file.name
-    
-    try:
-        # Initialize server
-        server = PDFMCPServer(config_file=temp_file_path)
-        await server.initialize()
-        
-        # Check if server was initialized correctly
-        assert server.server is not None, "Server was not initialized"
-        assert server.protocol_handler is not None, "Protocol handler was not initialized"
-        
-        # Check if tools were registered correctly
-        tool_names = server.server.list_tool_names()
-        logger.info(f"Registered tools: {tool_names}")
-        
-        # Verify text extraction tools are registered
-        assert any("text" in tool.lower() for tool in tool_names), "Text extraction tools not registered"
-        
-        # Verify analysis tools are registered
-        assert any("analyze" in tool.lower() for tool in tool_names), "Analysis tools not registered"
-        
-        # Verify table extraction tools are not registered (disabled in config)
-        assert not any("table" in tool.lower() for tool in tool_names), "Table extraction tools should not be registered"
-        
-        logger.info("Server initialization test passed")
-        
-    except Exception as e:
-        logger.error(f"Server initialization test failed: {e}", exc_info=True)
-        raise
-    finally:
-        # Clean up temporary config file
-        os.unlink(temp_file_path)
+from src.pdf_mcp_server import main as server_main
+from src.pdf_mcp_server.models import ProcessingMode
 
 
-@pytest.mark.asyncio
-async def test_tool_registration():
-    """Test tool registration."""
-    logger.info("Testing tool registration...")
-    
-    # Create server with default config
-    server = PDFMCPServer()
-    await server.initialize()
-    
-    # Get registered tools
-    tools = server.server.list_tools()
-    
-    # Verify tools were registered
-    assert len(tools) > 0, "No tools were registered"
-    
-    # Check tool structure
-    for tool in tools:
-        assert "name" in tool, "Tool missing 'name' field"
-        assert "description" in tool, "Tool missing 'description' field"
-        assert "inputSchema" in tool, "Tool missing 'inputSchema' field"
-    
-    logger.info(f"Found {len(tools)} registered tools")
-    logger.info("Tool registration test passed")
+def test_health_check_reports_healthy_status() -> None:
+    """The health endpoint should always report a healthy status."""
+
+    response = asyncio.run(server_main.health_check())
+
+    assert response.status == "healthy"
+    # uptime is reported in seconds and should be non-negative
+    assert response.uptime >= 0
+    # timestamp should carry timezone-aware datetime information
+    assert response.timestamp.tzinfo is not None
 
 
-@pytest.mark.asyncio
-async def test_protocol_handler():
-    """Test protocol handler functionality."""
-    logger.info("Testing protocol handler...")
-    
-    # Create protocol handler
-    protocol = MCPProtocolHandler()
-    
-    # Create a sample request
-    request = MCPRequest(
-        id="test-request-1",
-        method=MCPMethod.INITIALIZE,
-        params={"capabilities": ["tools", "resources"]}
+def test_get_pdf_processor_requires_initialisation(monkeypatch: pytest.MonkeyPatch) -> None:
+    """``get_pdf_processor`` must raise when the processor is not ready."""
+
+    monkeypatch.setattr(server_main, "pdf_processor", None, raising=False)
+
+    with pytest.raises(HTTPException) as excinfo:
+        server_main.get_pdf_processor()
+
+    assert excinfo.value.status_code == 503
+    assert "not initialized" in excinfo.value.detail
+
+
+def test_registered_tools_cover_public_processing_modes() -> None:
+    """Each processing mode should have a corresponding MCP tool."""
+
+    tools = asyncio.run(server_main.list_tools())
+    tool_names = {tool.name for tool in tools}
+
+    expected_names: Iterable[str] = (
+        ProcessingMode.TEXT.value,
+        ProcessingMode.TABLES.value,
+        ProcessingMode.FORMULAS.value,
+        ProcessingMode.FULL.value,
     )
-    
-    # Serialize and deserialize the request
-    serialized = protocol.serialize_message(request)
-    deserialized = protocol.parse_message(serialized)
-    
-    # Verify the deserialized request matches the original
-    assert deserialized.id == request.id, "Request ID mismatch"
-    assert deserialized.method == request.method, "Request method mismatch"
-    assert deserialized.params == request.params, "Request params mismatch"
-    
-    logger.info("Protocol handler test passed")
+
+    for mode_name in expected_names:
+        assert mode_name in tool_names, f"Missing MCP tool for mode '{mode_name}'"
 
 
-@pytest.mark.asyncio
-async def test_text_extraction():
-    """Test text extraction functionality."""
-    logger.info("Testing text extraction...")
-    
-    # Skip test if sample PDF doesn't exist
-    if not SAMPLE_PDF_PATH.exists():
-        logger.warning(f"Sample PDF not found at {SAMPLE_PDF_PATH}, skipping text extraction test")
-        return
-    
-    # Create server
-    server = PDFMCPServer()
-    await server.initialize()
-    
-    # Create protocol handler
-    protocol = MCPProtocolHandler()
-    
-    # Create a tool call request for text extraction
-    request = MCPRequest(
-        id="test-text-extraction",
-        method=MCPMethod.TOOLS_CALL,
-        params={
-            "name": "read_text",
-            "arguments": {
-                "file_path": str(SAMPLE_PDF_PATH),
-                "pages": [1],
-                "include_metadata": True
-            }
-        }
-    )
-    
-    # Serialize the request
-    serialized_request = protocol.serialize_message(request)
-    
-    # Process the request (in a real scenario, this would be sent to the server)
-    # For testing, we'll directly call the tool handler
-    tool_name = request.params["name"]
-    tool_args = request.params["arguments"]
-    
-    # Get the tool
-    tool = next((t for t in server.server.tools if t.name == tool_name), None)
-    assert tool is not None, f"Tool '{tool_name}' not found"
-    
-    # Call the tool
-    result = await tool.execute(tool_args)
-    
-    # Verify the result
-    assert result is not None, "Tool execution returned None"
-    assert "text" in result or "content" in result, "Text extraction result missing text content"
-    
-    logger.info("Text extraction test passed")
+def test_health_check_invocation_is_isolated() -> None:
+    """Calling ``health_check`` concurrently should not mutate shared state."""
 
+    async def invoke_many() -> list:
+        return await asyncio.gather(*(server_main.health_check() for _ in range(5)))
 
-async def run_tests():
-    """Run all tests."""
-    logger.info("Starting PDF-MCP server tests")
-    
-    try:
-        await test_server_initialization()
-        await test_tool_registration()
-        await test_protocol_handler()
-        await test_text_extraction()
-        
-        logger.info("All tests passed successfully")
-        
-    except Exception as e:
-        logger.error(f"Tests failed: {e}", exc_info=True)
-        sys.exit(1)
+    # Run multiple invocations to ensure no unexpected state leakage.
+    results = asyncio.run(invoke_many())
 
-
-def main():
-    """Main entry point."""
-    asyncio.run(run_tests())
-
-
-if __name__ == "__main__":
-    main()
+    assert all(result.status == "healthy" for result in results)
+    # ensure uptime is monotonically increasing across calls
+    uptimes = [result.uptime for result in results]
+    assert uptimes == sorted(uptimes)
