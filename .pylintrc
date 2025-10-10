@@ -1,4 +1,5 @@
 [MASTER]
+codex/review-pull-request-logs-svcm0z
 ignore=venv,.venv,.git,__pycache__
 init-hook=import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).parent / "MCP/PDF/src"))
 load-plugins=pylint.extensions.docparams
@@ -41,3 +42,6 @@ known-third-party=fastapi,pydantic
 [LOGGING]
 logging-format-style=old
 
+
+ignore-patterns = test_pdf_mcp_server\.py
+main
