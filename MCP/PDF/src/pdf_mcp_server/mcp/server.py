@@ -431,7 +431,7 @@ class MCPServer:
             return result
         except Exception as e:
             self.logger.error(f"Resource read error: {e}")
-            raise ToolExecutionException(f"Failed to read resource: {e}")
+            raise ToolExecutionException("mcp_server", f"Failed to read resource: {e}", e)
     
     async def _handle_list_prompts(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Handle list prompts request."""
@@ -461,7 +461,7 @@ class MCPServer:
             return result
         except Exception as e:
             self.logger.error(f"Prompt execution error: {e}")
-            raise ToolExecutionException(f"Failed to execute prompt: {e}")
+            raise ToolExecutionException("mcp_server", f"Failed to execute prompt: {e}", e)
     
     async def _handle_set_log_level(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Handle set log level request."""

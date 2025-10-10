@@ -40,6 +40,7 @@ from ..models import (
     OutputFormat,
 )
 from ..utils.config import Config
+from ..utils.page_utils import resolve_page_indices
 from ..utils.exceptions import PDFProcessingError
 
 
@@ -417,12 +418,9 @@ class TableExtractor:
         try:
             with pdfplumber.open(str(file_path)) as pdf:
                 # Determine pages to process
-                page_range = request.pages if request.pages else range(len(pdf.pages))
-                
-                for page_num in page_range:
-                    if page_num >= len(pdf.pages):
-                        continue
-                    
+                page_indices = resolve_page_indices(request.pages, len(pdf.pages))
+
+                for page_num in page_indices:
                     page = pdf.pages[page_num]
                     page_tables = page.extract_tables()
                     

@@ -48,6 +48,7 @@ from ..models import (
     FormulaModel
 )
 from ..utils.config import Config
+from ..utils.page_utils import resolve_page_indices
 from ..utils.exceptions import PDFProcessingError
 
 
@@ -153,12 +154,9 @@ class FormulaExtractor:
             
             try:
                 # Determine pages to process
-                page_range = request.pages if request.pages else range(len(doc))
-                
-                for page_num in page_range:
-                    if page_num >= len(doc):
-                        continue
-                    
+                page_indices = resolve_page_indices(request.pages, len(doc))
+
+                for page_num in page_indices:
                     page_formulas = await self._extract_formulas_from_page(
                         doc[page_num], page_num, request
                     )
