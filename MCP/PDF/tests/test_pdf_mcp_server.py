@@ -9,6 +9,12 @@ Author: PDF-MCP Team
 License: MIT
 """
 
+# The tests intentionally mirror production request payloads and setup logic to
+# ensure end-to-end coverage, which results in large shared blocks of code with
+# the implementation modules.  Disable Pylint's duplicate-code warning so the
+# lint step focuses on actionable issues.
+# pylint: disable=duplicate-code
+
 import asyncio
 import json
 import logging
