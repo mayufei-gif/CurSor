@@ -15,14 +15,16 @@ import logging
 import sys
 import tempfile
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
 
-# Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Ensure the package sources are importable when running from the cloned repo
+PROJECT_SRC = Path(__file__).resolve().parents[1] / "src"
+if str(PROJECT_SRC) not in sys.path:
+    sys.path.insert(0, str(PROJECT_SRC))
 
-from src.pdf_mcp_server.main import PDFMCPServer
-from src.pdf_mcp_server.mcp.protocol import MCPProtocolHandler
-from src.pdf_mcp_server.core.exceptions import PDFProcessingError
+from pdf_mcp_server.core.exceptions import PDFProcessingError
+from pdf_mcp_server.main import PDFMCPServer
+from pdf_mcp_server.mcp.protocol import MCPProtocolHandler
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
