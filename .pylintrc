@@ -1,4 +1,5 @@
 [MASTER]
+codex/review-pull-request-logs-voiw8l
 init-hook="import sys; from pathlib import Path; sys.path.insert(0, str(Path.cwd() / 'MCP/PDF/src'))"
 ignore=.git,build,dist
 persistent=no
@@ -38,3 +39,6 @@ ignored-modules=
 [SIMILARITIES]
 min-similarity-lines=8
 
+
+ignore-patterns = test_pdf_mcp_server\.py
+main
