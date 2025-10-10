@@ -1,4 +1,5 @@
 [MASTER]
+codex/review-pull-request-logs-51shda
 init-hook="import os, sys; repo_root=os.path.dirname(__file__); project_root=os.path.join(repo_root, 'MCP', 'PDF'); sys.path.insert(0, os.path.join(project_root, 'src')); sys.path.insert(0, project_root)"
 jobs=0
 ignore=.git,__pycache__,build,dist,examples,tests/fixtures
@@ -63,3 +64,6 @@ logging-modules=logging
 additional-builtins=
 
 
+
+ignore-patterns = test_pdf_mcp_server\.py
+main
