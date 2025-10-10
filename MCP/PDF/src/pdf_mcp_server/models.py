@@ -23,7 +23,7 @@ from datetime import datetime  # 日期时间处理
 from pydantic import BaseModel, Field, field_validator  # 数据验证和序列化框架
 
 try:
-    from . import __version__ as _PACKAGE_VERSION
+    from ._metadata import __version__ as _PACKAGE_VERSION
 except ImportError:  # pragma: no cover - package metadata fallback
     _PACKAGE_VERSION = "0.0.0"
 

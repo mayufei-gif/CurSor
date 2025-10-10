@@ -15,11 +15,14 @@ import logging
 import sys
 from pathlib import Path
 
-# Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Ensure the package is importable when running from a source checkout
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+SRC_ROOT = PROJECT_ROOT / "src"
+if SRC_ROOT.exists():
+    sys.path.insert(0, str(SRC_ROOT))
 
-from src.pdf_mcp_server.main import PDFMCPServer
-from src.pdf_mcp_server.mcp.protocol import MCPProtocolHandler, MCPRequest, MCPMethod
+from pdf_mcp_server.main import PDFMCPServer
+from pdf_mcp_server.mcp.protocol import MCPProtocolHandler, MCPRequest, MCPMethod
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
