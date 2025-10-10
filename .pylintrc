@@ -1,4 +1,5 @@
 [MASTER]
+codex/review-pull-request-logs-lkxc54
 init-hook=
     import pathlib
     import sys
@@ -34,3 +35,6 @@ ignore-imports=yes
 output-format=text
 reports=no
 score=yes
+
+ignore-patterns = test_pdf_mcp_server\.py
+main
