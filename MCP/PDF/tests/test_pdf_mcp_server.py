@@ -2,6 +2,12 @@
 
 from __future__ import annotations
 
+# The tests intentionally mirror production request payloads and setup logic to
+# ensure end-to-end coverage, which results in large shared blocks of code with
+# the implementation modules.  Disable Pylint's duplicate-code warning so the
+# lint step focuses on actionable issues.
+# pylint: disable=duplicate-code
+
 import asyncio
 import sys
 from pathlib import Path
@@ -107,7 +113,57 @@ def test_processing_request_builds_from_primitives() -> None:
         table_output_format="json",
         include_ocr=True,
     )
+codex/review-pull-request-logs-pot7jk
 
     assert request.mode is ProcessingMode.TEXT
     assert request.table_output_format.value == "json"
     assert request.include_ocr is True
+
+    
+    # Serialize the request
+    serialized_request = protocol.serialize_message(request)
+    
+    # Process the request (in a real scenario, this would be sent to the server)
+    # For testing, we'll directly call the tool handler
+    tool_name = request.params["name"]
+    tool_args = request.params["arguments"]
+    
+    # Get the tool
+    tool = next((t for t in server.server.tools if t.name == tool_name), None)
+    assert tool is not None, f"Tool '{tool_name}' not found"
+    
+    # Call the tool
+    result = await tool.execute(tool_args)
+    
+    # Verify the result
+    assert result is not None, "Tool execution returned None"
+    assert "text" in result or "content" in result, "Text extraction result missing text content"
+    
+    logger.info("Text extraction test passed")
+
+
+async def run_tests():
+    """Run all tests."""
+    logger.info("Starting PDF-MCP server tests")
+    
+    try:
+        await test_server_initialization()
+        await test_tool_registration()
+        await test_protocol_handler()
+        await test_text_extraction()
+        
+        logger.info("All tests passed successfully")
+        
+    except Exception as e:
+        logger.error(f"Tests failed: {e}", exc_info=True)
+        sys.exit(1)
+
+
+def main():
+    """Main entry point."""
+    asyncio.run(run_tests())
+
+
+if __name__ == "__main__":
+    main()
+main
