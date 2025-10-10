@@ -115,12 +115,16 @@ class ToolExecutionException(MCPException):
         *,
         tool_name: Optional[str] = None,
     ):
+ codex/locate-layout-reconstruction-code
+        """Create a tool execution error with backward compatible signatures."""
+
         """Create a tool execution error.
 
         Supports legacy ``ToolExecutionException(message)`` as well as the
         explicit ``ToolExecutionException(tool_name, message)`` and keyword-only
         ``ToolExecutionException(message, tool_name="tool")`` call patterns.
         """
+codex/locate-pdf-mcp-server-project-uq2ubf
 
         if execution_error is None and tool_name is None:
             resolved_tool_name = "generic_tool"
@@ -148,7 +152,6 @@ class ToolExecutionException(MCPException):
         self.tool_name = resolved_tool_name
         self.execution_error = resolved_error
         self.original_exception = original_exception
-
 
 class MCPTimeoutException(MCPException):
     """Exception raised when MCP operations timeout."""

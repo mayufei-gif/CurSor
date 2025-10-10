@@ -452,7 +452,7 @@ class ProcessingRequest(BaseModel):
     file_path: Optional[str] = Field(None, description="本地文件路径")
     file_url: Optional[str] = Field(None, description="远程文件URL")
     mode: ProcessingMode = Field(ProcessingMode.FULL, description="处理模式")
-    pages: Optional[List[int]] = Field(None, description="要处理的特定页面列表")
+    pages: Optional[List[int]] = Field(None, description="要处理的特定页面列表（从1开始）")
     
     # 文本提取选项
     include_bbox: bool = Field(False, description="是否包含边界框信息")
