@@ -20,11 +20,13 @@ from enum import Enum  # 枚举类型支持
 from datetime import datetime  # 日期时间处理
 
 # 第三方库导入
+from importlib import metadata
+
 from pydantic import BaseModel, Field, field_validator  # 数据验证和序列化框架
 
 try:
-    from . import __version__ as _PACKAGE_VERSION
-except ImportError:  # pragma: no cover - package metadata fallback
+    _PACKAGE_VERSION = metadata.version("pdf-mcp-server")
+except metadata.PackageNotFoundError:  # pragma: no cover - package metadata fallback
     _PACKAGE_VERSION = "0.0.0"
 
 

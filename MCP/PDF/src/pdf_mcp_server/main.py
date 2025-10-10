@@ -15,6 +15,7 @@ import json  # JSON数据处理
 import logging  # 日志记录
 import os  # 操作系统接口
 import time  # 时间处理
+from datetime import datetime, timezone  # 日期时间处理
 from contextlib import asynccontextmanager  # 异步上下文管理器
 from typing import Dict, Any, Optional  # 类型提示
 from pathlib import Path  # 路径处理
@@ -28,6 +29,7 @@ from mcp.types import Tool, TextContent  # MCP类型定义
 import uvicorn  # ASGI服务器
 
 # 导入项目内部模块
+from . import __version__
 from .models import (
     ProcessingRequest,  # 处理请求模型
     ProcessingResponse,  # 处理响应模型
@@ -167,8 +169,13 @@ async def health_check():
     """
     return HealthResponse(
         status="healthy",  # 服务状态为健康
+        version=__version__,
+        dependencies={
+            "config": config is not None,
+            "pdf_processor": pdf_processor is not None,
+        },
         uptime=time.time() - start_time,  # 计算服务器运行时间（当前时间减去启动时间）
-        timestamp=datetime.utcnow().isoformat()  # 获取当前UTC时间并格式化为ISO格式
+        timestamp=datetime.now(timezone.utc)  # 获取当前UTC时间并格式化为ISO格式
     )
 
 
