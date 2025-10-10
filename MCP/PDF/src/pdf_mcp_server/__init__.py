@@ -8,9 +8,12 @@ This package provides a unified interface for PDF processing including:
 - Scientific document parsing using GROBID
 """
 
-__version__ = "0.1.0"
-__author__ = "PDF-MCP Team"
-__email__ = "team@pdf-mcp.com"
+# Re-export metadata constants from a dedicated module so that other modules
+# (e.g. :mod:`pdf_mcp_server.models`) can reference the package version without
+# importing this package and triggering circular dependencies during import
+# time.  Keeping metadata in a lightweight module allows both sides to read the
+# values safely.
+from ._metadata import __version__, __author__, __email__  # noqa: F401
 
 # Note: avoid importing heavy modules at package import time to prevent side effects
 # and circular import issues. Import consumers should import submodules directly.
