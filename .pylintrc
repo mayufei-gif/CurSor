@@ -1,0 +1,2 @@
+[MASTER]
+ignore-patterns = test_pdf_mcp_server\.py,test_http_docx\.py
