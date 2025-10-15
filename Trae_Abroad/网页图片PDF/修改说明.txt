@@ -1,0 +1,420 @@
+下面按文件逐个给出「该做什么、为什么、怎么改（含关键代码片段）」的详细指导，目标是完全贴合你的实际需求：登录后可见→左/右翻页（也支持滚动懒加载）→等图加载→按统一裁剪区域截图→顺序命名→预览→合并PDF→可选OCR，输出到你指定的 Windows 路径。
+
+我已在你的包里看到这些文件：README.md / requirements.txt / config.py / cli.py / gui.py / run.py / web_screenshot_pdf.py / test_*.py / Chrome浏览器使用说明.md / 项目总结.md 等。以下建议都基于你现有代码结构，尽量少动骨架，补齐关键能力。
+
+🚩整体诊断（你现在有 vs 需要补的）
+
+✅ 已有：多引擎（Playwright/Selenium）截图、OCR（Tesseract/EasyOCR/PaddleOCR）、PDF 合成（ReportLab + PyMuPDF）、CLI/GUI/API 三种调用方式、配置系统。
+
+⛳️ 需要补强的关键点（与你需求一一对应）：
+
+“点击下一页/上一页”翻页自动化（不仅仅是 URL 列表）
+
+等待图片真正加载（naturalWidth>0 + src变化 + URL 变化兜底）
+
+页面内「鼠标框选」一次确定裁剪区域（之后全程复用）
+
+滚动懒加载防抖（滚到底/容器滚动到稳定）
+
+顺序命名、mapping.csv 溯源、断点续传
+
+合并前预览 + 合并后询问是否 OCR + 落盘到你的两条 G:\ 路径
+
+下面进入逐文件改造。
+
+1) requirements.txt（补齐依赖）
+
+做什么：把省略的 ... 补成可直接 pip install -r requirements.txt 跑通的列表，并注明 Windows 说明。
+
+怎么改（示例）：
+
+# 核心
+pillow>=10.0.0
+opencv-python>=4.8.0
+numpy>=1.24.0
+python-dotenv>=1.0.0
+click>=8.1.0
+tqdm>=4.66.0
+
+# 浏览器自动化
+playwright>=1.45.0
+selenium>=4.21.0
+webdriver-manager>=4.0.2
+
+# PDF与OCR
+reportlab>=4.0.9
+pymupdf>=1.24.4
+img2pdf>=0.5.1
+pytesseract>=0.3.10
+easyocr>=1.7.1
+paddleocr>=2.7.0
+
+# 开发
+pytest>=7.4.0
+pytest-asyncio>=0.23.0
+black>=23.0.0
+flake8>=6.0.0
+
+
+Windows 额外：Tesseract 与 Ghostscript 请单独安装（或用 WSL）；Playwright 需再执行 python -m playwright install.
+
+2) config.py（配置模型补字段）
+
+做什么：为你的使用场景加 4 类字段：
+
+翻页选择器：next_selector、prev_selector（以及备用键盘 use_arrow_keys）
+
+图像选择器：image_selector（优先元素截图；无则全页+裁剪）
+
+裁剪：crop_box（left, top, right, bottom）和 interactive_crop（是否启用鼠标框选）
+
+输出目录：把你的 *G:* 两条路径写进默认值
+
+怎么改（片段）：
+
+@dataclass
+class ScreenshotConfig:
+    full_page: bool = False
+    format: str = "PNG"
+    quality: int = 95
+    dpi: int = 300
+    # 新增：元素与翻页
+    image_selector: Optional[str] = None
+    next_selector: Optional[str] = None
+    prev_selector: Optional[str] = None
+    use_arrow_keys: bool = False  # 用键盘左右键翻页
+    # 新增：裁剪
+    interactive_crop: bool = True
+    crop_box: Optional[Tuple[int,int,int,int]] = None  # (l,t,r,b)
+    # 懒加载
+    lazy_scroll: bool = True
+    lazy_timeout: float = 3.0
+
+@dataclass
+class PDFConfig:
+    page_size: str = "A4"
+    include_ocr_text: bool = True
+    searchable: bool = True
+    # 新增：Windows 路径默认
+    output_dir: Path = Path(r"G:\E盘\工作项目文件\电子版涂书\书籍\PDF涂书")
+    ocr_output_dir: Path = Path(r"G:\E盘\工作项目文件\电子版涂书\论文\OCRmyPDF")
+
+3) web_screenshot_pdf.py（核心引擎：一次补齐 6 个能力）
+
+这是关键文件，我给出可以直接粘贴的函数块，尽量不破坏你现有结构。
+
+3.1 等待图片加载 + 懒加载滚动
+async def _wait_image_loaded_playwright(self, page, image_selector, prev_src=None, timeout=10000):
+    # 优先等待 src 变化
+    if prev_src:
+        try:
+            await page.wait_for_function(
+                """(sel, prev) => {
+                    const el = document.querySelector(sel);
+                    return el && el.src && el.src !== prev && el.complete && el.naturalWidth>10;
+                }""",
+                image_selector, prev_src, timeout=timeout
+            )
+            return
+        except:
+            pass
+    # 兜底：只要加载完成
+    await page.wait_for_function(
+        """(sel) => {
+            const el = document.querySelector(sel);
+            return el && el.complete && el.naturalWidth>10;
+        }""",
+        image_selector, timeout=timeout
+    )
+
+async def _scroll_lazy_until_stable_playwright(self, page, timeout=3000):
+    # 逐步滚动，直到 scrollHeight 连续稳定
+    end = time.time() + (timeout/1000)
+    last_h = -1; stable = 0
+    while time.time() < end:
+        h = await page.evaluate("() => document.documentElement.scrollHeight")
+        if h == last_h:
+            stable += 1
+            if stable >= 3: break
+        else:
+            stable = 0
+        last_h = h
+        await page.evaluate("() => window.scrollBy(0, window.innerHeight)")
+        await asyncio.sleep(0.3)
+
+3.2 交互式裁剪（页面内鼠标框选，一次性确定）
+PICK_BOX_JS = """() => new Promise(resolve => {
+  const overlay = document.createElement('div');
+  Object.assign(overlay.style,{position:'fixed',left:0,top:0,right:0,bottom:0,zIndex:2147483647,cursor:'crosshair'});
+  document.body.appendChild(overlay);
+  let sx=0, sy=0, rect=null;
+  overlay.addEventListener('mousedown', e=>{
+    sx=e.clientX; sy=e.clientY;
+    rect=document.createElement('div');
+    Object.assign(rect.style,{position:'fixed',border:'2px dashed red',background:'rgba(255,0,0,0.08)',left:sx+'px',top:sy+'px',zIndex:2147483648,width:'0px',height:'0px'});
+    document.body.appendChild(rect);
+    overlay.addEventListener('mousemove', onMove);
+    overlay.addEventListener('mouseup', onUp);
+  });
+  function onMove(e){
+    const x=Math.min(e.clientX,sx),y=Math.min(e.clientY,sy);
+    const w=Math.abs(e.clientX-sx),h=Math.abs(e.clientY-sy);
+    Object.assign(rect.style,{left:x+'px',top:y+'px',width:w+'px',height:h+'px'});
+  }
+  function onUp(e){
+    overlay.removeEventListener('mousemove', onMove);
+    overlay.removeEventListener('mouseup', onUp);
+    const r=rect.getBoundingClientRect();
+    const msg=document.createElement('div');
+    Object.assign(msg.style,{position:'fixed',bottom:'20px',right:'20px',padding:'6px 10px',background:'#111',color:'#fff',borderRadius:'6px',zIndex:2147483648});
+    msg.textContent='按 Enter 确认，Esc 取消';
+    document.body.appendChild(msg);
+    function cleanup(){[overlay,rect,msg].forEach(n=>n&&n.remove());}
+    function onKey(ev){
+      if(ev.key==='Enter'){ cleanup(); resolve({left:r.left,top:r.top,width:r.width,height:r.height}); }
+      else if(ev.key==='Escape'){ cleanup(); resolve(null); }
+      window.removeEventListener('keydown', onKey);
+    }
+    window.addEventListener('keydown', onKey);
+  }
+});"""
+
+async def pick_crop_box(self, page):
+    coords = await page.evaluate(PICK_BOX_JS)
+    if not coords: return None
+    dpr = await page.evaluate("() => window.devicePixelRatio") or 1
+    l = int(round(coords['left']*dpr)); t = int(round(coords['top']*dpr))
+    r = l + int(round(coords['width']*dpr)); b = t + int(round(coords['height']*dpr))
+    return (l,t,r,b)
+
+3.3 截图（元素优先；否则全页+裁剪）
+async def _shoot_playwright(self, page, out_path: Path, cfg: ScreenshotConfig):
+    if cfg.image_selector and await page.query_selector(cfg.image_selector):
+        el = await page.query_selector(cfg.image_selector)
+        await el.screenshot(path=str(out_path))
+        return out_path
+    # 全页
+    tmp = out_path.parent / f"full_{out_path.stem}.png"
+    await page.screenshot(path=str(tmp), full_page=True)
+    if cfg.crop_box:
+        im = Image.open(tmp); im = im.crop(cfg.crop_box); im.save(out_path)
+        tmp.unlink(missing_ok=True)
+    else:
+        tmp.rename(out_path)
+    return out_path
+
+3.4 翻页循环（点击 next/prev / 键盘箭头 / 等 URL 或 src 变化）
+async def capture_by_clicks(self, start_url: str, out_dir: Path, cfg: ScreenshotConfig,
+                            max_pages: int = 2000, map_csv: Optional[Path]=None):
+    out_dir.mkdir(parents=True, exist_ok=True)
+    if map_csv is None: map_csv = out_dir / "mapping.csv"
+    header = not map_csv.exists()
+    with map_csv.open("a", encoding="utf-8", newline="") as f:
+        w = csv.writer(f)
+        if header: w.writerow(["seq","page_num","filename","url","timestamp"])
+
+        page = self.playwright_page
+        await page.goto(start_url, wait_until="networkidle")
+        await asyncio.sleep(0.4)
+
+        # 裁剪交互
+        if cfg.interactive_crop and not cfg.crop_box:
+            box = await self.pick_crop_box(page)
+            if box: cfg.crop_box = box
+
+        seq = 1
+        for _ in range(max_pages):
+            # 懒加载处理
+            if cfg.lazy_scroll: await self._scroll_lazy_until_stable_playwright(page, int(cfg.lazy_timeout*1000))
+
+            # 等待图片加载
+            prev_src = None
+            if cfg.image_selector and await page.query_selector(cfg.image_selector):
+                el = await page.query_selector(cfg.image_selector)
+                prev_src = await el.get_attribute("src")
+                await self._wait_image_loaded_playwright(page, cfg.image_selector, prev_src=None, timeout=10000)
+
+            # 解析页码
+            url = page.url
+            m = re.search(r'/n(\d+)(?:/|$)', url) or re.search(r'[?&]page=(\d+)', url)
+            page_num = int(m.group(1)) if m else None
+            fname = f"{page_num:04d}.png" if page_num else f"{seq:04d}.png"
+            out_path = out_dir / fname
+
+            if not out_path.exists():
+                await self._shoot_playwright(page, out_path, cfg)
+                w.writerow([seq, page_num or "", str(out_path), url, datetime.utcnow().isoformat()])
+                self.logger.info(f"[saved] {out_path}")
+            else:
+                self.logger.info(f"[skip] {out_path} exists")
+
+            # 下一页
+            changed = False
+            try:
+                if cfg.next_selector and await page.query_selector(cfg.next_selector):
+                    prev_url = page.url
+                    prev_src2 = None
+                    if cfg.image_selector and await page.query_selector(cfg.image_selector):
+                        prev_src2 = await (await page.query_selector(cfg.image_selector)).get_attribute("src")
+                    await (await page.query_selector(cfg.next_selector)).click()
+                    try:
+                        await self._wait_image_loaded_playwright(page, cfg.image_selector, prev_src=prev_src2, timeout=10000)
+                        changed = True
+                    except:
+                        # 兜底：等 URL 改变或短暂等待
+                        try:
+                            await page.wait_for_function("old => location.href !== old", prev_url, timeout=5000)
+                            changed = True
+                        except:
+                            await asyncio.sleep(0.5)
+                elif cfg.use_arrow_keys:
+                    prev_url = page.url
+                    await page.keyboard.press("ArrowRight")
+                    try:
+                        await self._wait_image_loaded_playwright(page, cfg.image_selector, prev_src=prev_src, timeout=10000)
+                        changed = True
+                    except:
+                        try:
+                            await page.wait_for_function("old => location.href !== old", prev_url, timeout=5000)
+                            changed = True
+                        except:
+                            await asyncio.sleep(0.5)
+                else:
+                    self.logger.info("没有 next_selector 或键盘翻页，结束")
+                    break
+            except Exception as e:
+                self.logger.info(f"下一页失败/结束: {e}")
+                break
+
+            if not changed:
+                self.logger.info("未检测到页变化，可能末页。结束。")
+                break
+
+            seq += 1
+
+    return out_dir
+
+3.5 合并→预览→询问 OCR→分别落盘到 G:\
+
+你已有 PDF 合成功能。建议在流程入口增加一个「点击翻页工作流」包装器。
+
+async def process_clicks_to_pdf(self, start_url: str, screenshot_cfg: ScreenshotConfig, pdf_cfg: PDFConfig):
+    out_dir = Path(tempfile.mkdtemp(prefix="shots_"))
+    map_csv = out_dir / "mapping.csv"
+
+    await self.capture_by_clicks(start_url, out_dir, screenshot_cfg, map_csv=map_csv)
+
+    # 合并前预览（打开资源管理器）
+    os.startfile(str(out_dir))  # Windows only
+    input("请预览图片是否正确、顺序无误。按 Enter 继续合并为PDF...")
+
+    pdf_cfg.output_dir.mkdir(parents=True, exist_ok=True)
+    pdf_path = pdf_cfg.output_dir / (pdf_cfg.title or "book.pdf")
+    self.logger.info(f"合并至: {pdf_path}")
+    with open(pdf_path, "wb") as f:
+        f.write(img2pdf.convert([str(p) for p in sorted(out_dir.glob("*.png"))]))
+
+    ans = input("是否进行 OCR? (Y/N): ").strip().lower()
+    if ans == "y":
+        ocr_out = pdf_cfg.ocr_output_dir / (pdf_cfg.title or "book_ocr.pdf")
+        pdf_cfg.ocr_output_dir.mkdir(parents=True, exist_ok=True)
+        cmd = f'ocrmypdf -l chi_sim --deskew "{pdf_path}" "{ocr_out}"'
+        self.logger.info(f"执行: {cmd}")
+        try:
+            subprocess.run(cmd, shell=True, check=True)
+            self.logger.info(f"OCR 输出: {ocr_out}")
+        except Exception as e:
+            self.logger.error(f"OCR 失败: {e}")
+
+    return {"images_dir": str(out_dir), "pdf_path": str(pdf_path)}
+
+4) cli.py（加一个“点击翻页抓取”子命令）
+
+做什么：新增 capture-by-clicks 命令，接受 --start-url --next-selector --image-selector --use-arrow-keys --interactive-crop --merge-pdf 等参数，直接调用上面 process_clicks_to_pdf()。
+
+怎么改（片段）：
+
+@cli.command("capture-by-clicks")
+@click.option('--start-url', required=True)
+@click.option('--next-selector', default=None)
+@click.option('--image-selector', default=None)
+@click.option('--use-arrow-keys', is_flag=True, default=False)
+@click.option('--interactive-crop/--no-interactive-crop', default=True)
+@click.option('--merge-pdf/--no-merge-pdf', default=True)
+@click.pass_context
+def capture_by_clicks_cmd(ctx, **kw):
+    cfg = ctx.obj['config']
+    sc = ScreenshotConfig(
+        image_selector=kw['image_selector'] or cfg.screenshot.element_selector,
+        next_selector=kw['next_selector'] or None,
+        use_arrow_keys=kw['use_arrow_keys'],
+        interactive_crop=kw['interactive_crop']
+    )
+    pc = PDFConfig(
+        output_dir=cfg.pdf.output_dir,
+        # 也可以用 --pdf-name 传标题
+    )
+    asyncio.run(_run_clicks_flow(kw['start_url'], sc, pc))
+
+async def _run_clicks_flow(start_url, sc, pc):
+    async with WebScreenshotPDF(browser_engine="playwright") as p:
+        await p.process_clicks_to_pdf(start_url, sc, pc)
+
+5) gui.py（把最重要的 3 个控件补上）
+
+做什么：
+
+在 GUI 「单个URL」页面增加 3 个输入控件：图片选择器、下一页选择器、是否用左右键；
+
+增加一个按钮「框选裁剪区域」（触发一次 pick_crop_box，存回全局配置）
+
+处理完成后，弹资源管理器预览 → 合并 PDF → 弹窗询问「是否 OCR」→ 执行并提示输出位置。
+
+怎么改（要点）：
+
+你的 GUI 通过内部方法调用库类（WebScreenshotPDF），保持这个方式，只需扩展参数收集与调用对应的流程函数 process_clicks_to_pdf()。
+
+Windows 打开目录：os.startfile(out_dir)；打开 PDF：os.startfile(pdf_path)。
+
+6) run.py（菜单增加一项：点击翻页工作流）
+
+做什么：在交互菜单里加一个「**点击翻页抓取（Playwright）」选项，调用 cli capture-by-clicks 或直接 import 调用 _run_clicks_flow()；添加「打开输出目录」选项，直达 G:\...PDF涂书 与 G:\...OCRmyPDF。
+
+7) README.md（用你的真实流程更新）
+
+做什么：给出一条命令与GUI 操作两种标准手册，强调：
+
+先登录后在起始页按 Enter 开始（或启用 --manual-login 风格说明）
+
+框选裁剪区域（一次）
+
+自动翻页→预览→合并→OCR→落盘两条 G:\ 目录
+
+常见报错排查（Tesseract 路径、Playwright 浏览器未安装等）
+
+8) test_example.py / test_chrome.py（补两个针对性的单测/小样）
+
+做什么：
+
+加一个URL页码提取单元测试（匹配 /n(\d+)、?page=、#page= 等）；
+
+加一个等待图片 naturalWidth 的集成 mini-test（可用公共简页模拟；或注释成 “需要可上网环境”）。
+
+片段：
+
+def test_extract_page_num():
+    import re
+    cases = {
+        "https://x.com/page/n7/mode/1up": 7,
+        "https://x.com/book?p=42": 42,
+        "https://x.com/#page=9": 9,
+    }
+    for url, want in cases.items():
+        m = re.search(r'/n(\d+)(?:/|$)', url) or re.search(r'[?&]page=(\d+)', url) or re.search(r'#page=(\d+)')
+        assert int(m.group(1)) == want
+
+9) Chrome浏览器使用说明.md / 项目总结.md（保持即可）
+
+使用说明：再补两句「框选裁剪」「点击翻页」的新功能。
+
+项目总结：可新增“支持点击翻页和交互裁剪”的里程碑。

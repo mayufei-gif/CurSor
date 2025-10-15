@@ -1,0 +1,305 @@
+下面给你一份最小侵入改造方案，直接交给你的自动化编程助手照做即可。它专门满足你最新的 3 个要求：
+
+会翻 …/page/n7/mode/1up 里 n 的递增
+
+必须手动登录（不自动登录、不偷偷保存）
+
+你手动切到单页展示、缩放、摆正第一页 → 鼠标框选页面区域 → 之后脚本自动截图；翻页既可用URL 递增也可点 “>”/按右方向键，每页等图像稳定再截，直到全书完成；合并 PDF、可选 OCR、保存到你指定目录
+
+一、需要改/加哪些文件（最小改动清单）
+
+✅ 不动你原有的通用逻辑；我们新增一个“Internet Archive 适配器”，并在 cli.py 挂一个命令入口即可。
+
+新增：adapters/internet_archive.py（整站适配；下面给完整代码）
+
+修改：cli.py —— 加一个 ia 子命令（调用上面的适配器）
+
+修改：requirements.txt —— 补上所需依赖
+
+（可选）修改：README.md —— 加 1 段“IA 站点使用说明”
+
+二、为什么这样改（正对你的 3 条要求）
+
+用 URL 直接改 n 翻页，比找页面里的“>”按钮稳定（IA UI 经常改 class/结构）。也保留按键/点击两种方式，随时可切换。
+
+强制手动登录/借阅：脚本在首屏暂停，让你登陆+切单页+缩放+摆正；随后不保存任何登录态（完全符合你“必须手动”的要求）。
+
+首张图交互式框选一次（Tk 窗口拖拽）→ 后续批量套用同一裁剪框，保证每页干净一致；每页都做“加载稳态等待 + 去遮挡”。
+
+文件命名用 零填充的 n，生成的 PDF 页序天然与阅读顺序一致；合并前自动打开图片目录给你预览；OCR 可选，输出落到你指定路径。
+
+三、具体改法（给编程助手的直接操作步骤）
+1) 新增文件：adapters/internet_archive.py
+
+在项目根目录新建 adapters/ 文件夹，把下面整段代码保存为 adapters/internet_archive.py。
+
+# adapters/internet_archive.py
+# -*- coding: utf-8 -*-
+"""
+Internet Archive 适配器：
+- 处理 https://archive.org/details/<ITEM_ID>/page/nX/mode/1up
+- 首屏人工登录/借阅 + 切到单页 + 缩放 + 摆正
+- 首张视口截图 → Tk 鼠标框选页面区域 → 批量套用裁剪框
+- 翻页方式：url（改 n）/ arrow（右键）/ scroll（三选一）
+- 每页：等待稳定 → 去遮挡 → 视口截图 → 裁剪 → 以 n 零填充命名
+- 合并 PDF → 可选 OCR 到指定目录
+"""
+
+from __future__ import annotations
+import os, re, json, requests, subprocess, pathlib
+from dataclasses import dataclass
+from typing import Optional, Tuple, List
+from PIL import Image
+
+from playwright.sync_api import sync_playwright
+
+# 你的目标落地目录（可改为从 config 读取，这里先直连你的要求）
+IMG_ROOT = r"G:\E盘\工作项目文件\电子版涂书\书籍\原图"
+PDF_DIR  = r"G:\E盘\工作项目文件\电子版涂书\书籍\PDF涂书"
+OCR_DIR  = r"G:\E盘\工作项目文件\电子版涂书\论文\OCRmyPDF"
+
+# --- Tk 框选 ---
+try:
+    import tkinter as tk
+    from PIL import ImageTk
+except Exception:
+    tk = None
+
+@dataclass
+class CropBox:
+    left:int; top:int; right:int; bottom:int
+
+# ---------- 小工具 ----------
+def _mkdir(p:str): pathlib.Path(p).mkdir(parents=True, exist_ok=True)
+
+def parse_n(url:str)->Optional[int]:
+    m = re.search(r"/page/n(\d+)(?:/|$)", url)
+    return int(m.group(1)) if m else None
+
+def replace_n(url:str, new_n:int)->str:
+    return re.sub(r"/page/n\d+", f"/page/n{new_n}", url)
+
+def meta_imagecount(item_id:str)->Optional[int]:
+    try:
+        r = requests.get(f"https://archive.org/metadata/{item_id}", timeout=15)
+        r.raise_for_status()
+        md = r.json().get("metadata", {})
+        return int(md["imagecount"]) if "imagecount" in md else None
+    except Exception:
+        return None
+
+def hide_overlays(page):
+    css = """
+    [role="dialog"], .modal, .popup, .overlay, .ajs-message { display:none !important; }
+    header, footer, #navwrap, #nav-bar, #ia-bar, .navbar, .brand { display:none !important; }
+    """
+    try: page.add_style_tag(content=css)
+    except: pass
+    page.keyboard.press("Escape"); page.keyboard.press("Escape")
+
+def wait_stable(page):
+    page.wait_for_load_state("domcontentloaded")
+    page.wait_for_load_state("networkidle")
+    page.wait_for_timeout(500)
+
+def select_crop_box(img_path:str)->CropBox:
+    if tk is None:
+        raise RuntimeError("需要 tkinter 才能交互式框选；请确保 Python 自带 Tk。")
+    im = Image.open(img_path)
+    maxw = 1280
+    scale = min(1.0, maxw / im.width)
+    show = im if scale==1 else im.resize((int(im.width*scale), int(im.height*scale)), Image.LANCZOS)
+
+    root = tk.Tk(); root.title("拖拽框选【页面区域】，回车确认，Esc取消")
+    tkimg = ImageTk.PhotoImage(show)
+    cv = tk.Canvas(root, width=show.width, height=show.height); cv.pack()
+    cv.create_image(0,0,anchor="nw",image=tkimg)
+    sel=None; p0=[0,0]; p1=[0,0]
+    def down(e):
+        nonlocal sel,p0,p1; p0=[e.x,e.y]; p1=[e.x,e.y]
+        if sel: cv.delete(sel)
+        sel=cv.create_rectangle(p0[0],p0[1],p1[0],p1[1],outline="red",width=2)
+    def drag(e):
+        nonlocal p1; p1=[e.x,e.y]; cv.coords(sel,p0[0],p0[1],p1[0],p1[1])
+    def ok(_): root.quit()
+    def cancel(_): p0[:]=[0,0]; p1[:]=[0,0]; root.quit()
+    cv.bind("<ButtonPress-1>", down); cv.bind("<B1-Motion>", drag)
+    root.bind("<Return>", ok); root.bind("<Escape>", cancel)
+    root.mainloop(); root.destroy()
+    k = 1/scale
+    lx,ty = int(min(p0[0],p1[0])*k), int(min(p0[1],p1[1])*k)
+    rx,by = int(max(p0[0],p1[0])*k), int(max(p0[1],p1[1])*k)
+    return CropBox(lx,ty,rx,by)
+
+def merge_to_pdf(pngs:List[str], out_pdf:str):
+    imgs = [Image.open(p).convert("RGB") for p in pngs]
+    if not imgs: return
+    _mkdir(os.path.dirname(out_pdf))
+    imgs[0].save(out_pdf, save_all=True, append_images=imgs[1:])
+
+def maybe_ocr(in_pdf:str, out_pdf:str):
+    ans = input("是否运行 OCRmyPDF？(y/N)：").strip().lower()
+    if ans != "y": return
+    _mkdir(os.path.dirname(out_pdf))
+    lang = input("OCR 语言(默认 chi_sim+eng)：").strip() or "chi_sim+eng"
+    cmd = ["ocrmypdf","--skip-text","--force-ocr","--rotate-pages","--jobs","4",
+           "--language",lang,in_pdf,out_pdf]
+    print("运行："," ".join(cmd))
+    subprocess.run(cmd, check=False)
+    print("OCR 输出：", out_pdf)
+
+# ---------- 主流程 ----------
+def run_ia(
+    item_id:str,
+    start_n:int,
+    end_n:Optional[int]=None,
+    mode:str="url",               # url / arrow / scroll
+    viewport:Tuple[int,int]=(1600,1200),
+) -> None:
+    img_dir = os.path.join(IMG_ROOT, item_id)
+    tmp_dir = os.path.join(img_dir, "_tmp")
+    _mkdir(img_dir); _mkdir(tmp_dir)
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=False)  # 必须可见，便于手动登录&摆正
+        ctx = browser.new_context(viewport={"width":viewport[0], "height":viewport[1]})
+        page = ctx.new_page()
+
+        # 1) 打开起始页 —— 你手动登录/借阅 + 切 1up + 缩放 + 摆正
+        url0 = f"https://archive.org/details/{item_id}/page/n{start_n}/mode/1up"
+        page.goto(url0, wait_until="domcontentloaded")
+        input("\n请在浏览器中：登录/借阅 → 切到单页(1up) → 缩放并把第1页完整居中显示。完成后按回车继续… ")
+
+        # 2) 首张视口截图→框选裁剪区域
+        hide_overlays(page); wait_stable(page)
+        first_png = os.path.join(tmp_dir, "__first.png")
+        page.screenshot(path=first_png, full_page=False)
+        crop = select_crop_box(first_png)
+        with open(os.path.join(img_dir, "crop.json"), "w", encoding="utf-8") as f:
+            json.dump(crop.__dict__, f, ensure_ascii=False, indent=2)
+
+        # 3) 计算结束 n
+        if end_n is None:
+            cnt = meta_imagecount(item_id)
+            end_n = cnt-1 if cnt else start_n + 200  # 取不到时保守截 200 页
+
+        # 4) 翻页并截图
+        n = start_n
+        saved = []
+        while True:
+            hide_overlays(page); wait_stable(page)
+            raw = os.path.join(tmp_dir, f"__v_{n:05d}.png")
+            out = os.path.join(img_dir, f"{n:05d}.png")
+            page.screenshot(path=raw, full_page=False)
+            im = Image.open(raw)
+            l,t,r,b = max(0,crop.left), max(0,crop.top), min(im.width,crop.right), min(im.height,crop.bottom)
+            im.crop((l,t,r,b)).save(out)
+            saved.append(out)
+            print(f"[OK] n{n} -> {out}")
+
+            if n >= end_n: break
+            if mode == "url":
+                n += 1
+                page.goto(replace_n(page.url, n), wait_until="domcontentloaded")
+            elif mode == "arrow":
+                old = parse_n(page.url) or -1
+                page.keyboard.press("ArrowRight")
+                # 等 n 改变
+                for _ in range(60):
+                    cur = parse_n(page.url) or old
+                    if cur != old: n = cur; break
+                    page.wait_for_timeout(200)
+            else:  # scroll
+                old = parse_n(page.url) or -1
+                page.mouse.wheel(0, int(viewport[1]*0.85))
+                for _ in range(60):
+                    cur = parse_n(page.url) or old
+                    if cur != old: n = cur; break
+                    page.wait_for_timeout(200)
+
+        ctx.close(); browser.close()
+
+    # 5) 合并前预览 → 合并 → 可选 OCR
+    try: os.startfile(img_dir)
+    except: pass
+    input("\n已完成截图，请快速预览。回车合并为 PDF… ")
+    pdf_path = os.path.join(PDF_DIR, f"{item_id}.pdf")
+    saved.sort()
+    merge_to_pdf(saved, pdf_path)
+    print("PDF 已保存：", pdf_path)
+    ocr_pdf = os.path.join(OCR_DIR, f"{item_id}_OCR.pdf")
+    maybe_ocr(pdf_path, ocr_pdf)
+
+2) 修改 cli.py：新增一个 IA 命令
+
+在文件顶部增加导入：
+
+from adapters.internet_archive import run_ia
+
+
+在 @cli.group()（或主入口）下新增命令（按你项目的 click 结构放）：
+
+@cli.command("ia")
+@click.option("--id", "item_id", required=True, help="Internet Archive 的 identifier，如 isbn_9780965083409")
+@click.option("--start-n", default=7, show_default=True, help="起始 n（/page/nX 的 X）")
+@click.option("--end-n", default=None, type=int, help="结束 n（默认自动根据 metadata imagecount 推断）")
+@click.option("--mode", type=click.Choice(["url","arrow","scroll"]), default="url", show_default=True,
+              help="翻页方式：url=改n；arrow=发送右方向键；scroll=滚轮")
+@click.option("--viewport-w", default=1600, show_default=True)
+@click.option("--viewport-h", default=1200, show_default=True)
+def ia_cmd(item_id, start_n, end_n, mode, viewport_w, viewport_h):
+    """Internet Archive 专用：手动登录/摆正 → 框选 → 批量截图 → PDF → 可选 OCR"""
+    run_ia(item_id=item_id, start_n=start_n, end_n=end_n, mode=mode,
+           viewport=(viewport_w, viewport_h))
+
+3) 修改 requirements.txt：补依赖
+
+在“浏览器自动化”一节补上（若已存在可忽略）：
+
+playwright>=1.45.0
+requests>=2.31.0
+
+
+运行前安装浏览器内核：
+python -m playwright install chromium
+
+4)（可选）README.md 加一段用法
+### Internet Archive（/page/nX/mode/1up）适配
+1) 首次运行显示浏览器，**手动登录/借阅**，切到 **1up 单页**，缩放并把第一页完整居中。
+2) 弹出首张图，**用鼠标框选页面区域**，回车确认。
+3) 程序自动按页索引 n 递增（或按键/滚动）批量截图并裁剪；合并 PDF 后可选 OCR。
+
+示例：
+python cli.py ia --id isbn_9780965083409 --start-n 7 --mode url
+# 知道总页数（1/388）：
+python cli.py ia --id isbn_9780965083409 --start-n 7 --end-n 387 --mode arrow
+
+四、怎么运行（Win11 / PowerShell）
+pip install -r requirements.txt
+python -m playwright install chromium
+
+# 第一次（显示浏览器便于登录/借阅与摆正）
+python cli.py ia --id isbn_9780965083409 --start-n 7 --mode url
+
+# 之后可换翻页方式（按右键/滚动）
+python cli.py ia --id isbn_9780965083409 --start-n 7 --end-n 387 --mode arrow
+
+
+程序会在 G:\E盘\工作项目文件\电子版涂书\书籍\原图\<id>\ 存 00007.png…
+
+合并到：G:\E盘\工作项目文件\电子版涂书\书籍\PDF涂书\<id>.pdf
+
+OCR（若选择 y）：G:\E盘\工作项目文件\电子版涂书\论文\OCRmyPDF\<id>_OCR.pdf
+
+五、这些改动对你的目标的“直接收益”
+你的需求	本次改动	结果
+改 URL 中 n 翻页	parse_n/replace_n + mode=url	稳定、可随机跳页、易断点续跑
+必须手动登录	首屏 input() 暂停，不保存状态	合规、你完全掌控登录与借阅
+单页展示+缩放+摆正	你手动设置后固定视口	之后每页观感一致、便于裁剪
+鼠标框选裁剪	Tk 交互一次，存 crop.json	批量套用、裁剪精准抗页面改动
+翻页动作可选	mode=url/arrow/scroll	任意切换；按钮失效时仍可用 URL
+截图稳定性	wait_stable + hide_overlays	避免半渲染/遮挡，保证清晰
+顺序与合并	以 n 零填充命名	PDF 页序天然正确、易复核
+预览与 OCR	合并前 os.startfile(img_dir) + OCR 询问	一键进你的目录工作流
+
+需要我把 run_ia() 再封装到你现有的 web_screenshot_pdf.py 类里，或者把路径改成从 config.py 读取也行。但按上面的 “新增 1 个适配器 + CLI 接口” 是改动最少、立刻可跑的方案。你把这份改动单交给助手照做就行。

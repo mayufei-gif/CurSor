@@ -1,0 +1,81 @@
+{
+  "browser": {
+    "engine": "playwright",
+    "headless": true,
+    "window_width": 1920,
+    "window_height": 1080,
+    "user_agent": null,
+    "proxy": null,
+    "timeout": 30,
+    "wait_time": 3,
+    "chrome_binary_path": null,
+    "chrome_driver_path": null,
+    "firefox_binary_path": null,
+    "firefox_driver_path": null
+  },
+  "screenshot": {
+    "full_page": true,
+    "quality": 95,
+    "format": "PNG",
+    "dpi": 300,
+    "element_selector": null,
+    "hide_elements": [
+      ".advertisement",
+      ".popup",
+      "#cookie-banner",
+      ".ad-banner",
+      ".social-share",
+      ".newsletter-signup"
+    ],
+    "mobile_emulation": false,
+    "device_name": null,
+    "auto_crop": false,
+    "crop_margin": 10,
+    "resize_factor": 1.0
+  },
+  "ocr": {
+    "engine": "auto",
+    "languages": ["eng", "chi_sim"],
+    "confidence_threshold": 0.6,
+    "preprocess": true,
+    "enhance_contrast": true,
+    "enhance_sharpness": true,
+    "denoise": true,
+    "tesseract_cmd": null,
+    "tesseract_config": "--psm 1 --oem 3",
+    "easyocr_gpu": false,
+    "easyocr_model_storage_directory": null,
+    "paddleocr_use_angle_cls": true,
+    "paddleocr_use_gpu": false
+  },
+  "pdf": {
+    "page_size": "A4",
+    "margin": 50,
+    "include_ocr_text": true,
+    "searchable": true,
+    "text_layer_opacity": 0.0,
+    "compress_images": true,
+    "image_quality": 85,
+    "title": "网页截图合集",
+    "author": "Web Screenshot PDF Tool",
+    "subject": "自动生成的网页截图PDF文档",
+    "keywords": "网页截图,OCR,PDF",
+    "creator": "Web Screenshot PDF Tool",
+    "custom_width": 595.276,
+    "custom_height": 841.890
+  },
+  "processing": {
+    "max_concurrent_tasks": 3,
+    "retry_attempts": 3,
+    "retry_delay": 1.0,
+    "screenshot_timeout": 30,
+    "ocr_timeout": 60,
+    "pdf_creation_timeout": 120,
+    "temp_dir": null,
+    "cleanup_temp_files": true,
+    "keep_screenshots": false,
+    "log_level": "INFO",
+    "log_file": null,
+    "log_format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  }
+}

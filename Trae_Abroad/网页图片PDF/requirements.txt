@@ -1,0 +1,50 @@
+# 网页截图并合成PDF（含OCR）项目依赖
+# 支持点击翻页、交互式裁剪、懒加载等高级功能
+
+# 核心依赖
+asyncio-compat>=0.1.0
+python-dotenv>=1.0.0
+click>=8.1.0
+tqdm>=4.66.0
+
+# 图像处理
+Pillow>=10.0.0
+opencv-python>=4.8.0
+numpy>=1.24.0
+
+# OCR引擎
+pytesseract>=0.3.10
+easyocr>=1.7.1
+paddleocr>=2.7.0
+
+# 浏览器自动化
+playwright>=1.45.0
+selenium>=4.21.0
+webdriver-manager>=4.0.2
+
+# PDF处理
+reportlab>=4.0.9
+PyMuPDF>=1.24.4
+img2pdf>=0.5.1
+ocrmypdf>=16.0.0
+
+# 网络请求
+requests>=2.31.0
+aiohttp>=3.9.0
+
+# 开发依赖
+pytest>=7.4.0
+pytest-asyncio>=0.23.0
+black>=23.0.0
+flake8>=6.0.0
+
+# 可选依赖（GPU加速）
+# torch>=2.0.0
+# torchvision>=0.15.0
+# onnxruntime-gpu>=1.16.0
+
+# Windows 额外说明：
+# 1. Tesseract OCR: 需要单独安装 https://github.com/UB-Mannheim/tesseract/wiki
+# 2. Playwright: 安装后需执行 python -m playwright install
+# 3. OCRmyPDF: 需要 Ghostscript，可从 https://www.ghostscript.com/download/gsdnld.html 下载
+# 4. Internet Archive 适配器: 需要 tkinter（Python 内置）用于交互式裁剪框选
