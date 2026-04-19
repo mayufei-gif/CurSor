@@ -31,6 +31,7 @@ from ..models import (
     TextSpan,
 )
 from ..utils.config import Config
+from ..utils.page_utils import resolve_page_indices
 from ..utils.exceptions import PDFProcessingError
 
 
@@ -126,12 +127,9 @@ class TextExtractor:
             include_bbox = getattr(request, "include_bbox", False)
             
             # Determine pages to process
-            page_range = request.pages if request.pages else range(len(doc))
-            
-            for page_num in page_range:
-                if page_num >= len(doc):
-                    continue
-                
+            page_indices = resolve_page_indices(request.pages, len(doc))
+
+            for page_num in page_indices:
                 page = doc[page_num]
                 
                 # Extract text with different methods based on requirements
@@ -293,12 +291,9 @@ class TextExtractor:
             include_bbox = getattr(request, "include_bbox", False)
             
             # Determine pages to process
-            page_range = request.pages if request.pages else range(len(pdf.pages))
-            
-            for page_num in page_range:
-                if page_num >= len(pdf.pages):
-                    continue
-                
+            page_indices = resolve_page_indices(request.pages, len(pdf.pages))
+
+            for page_num in page_indices:
                 page = pdf.pages[page_num]
                 
                 # Extract text with different methods
