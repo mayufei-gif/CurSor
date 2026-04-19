@@ -1,2 +1,35 @@
 [MASTER]
-ignore-patterns = test_pdf_mcp_server\.py
+init-hook=import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent / "MCP/PDF/src"))
+ignore=CVS
+ignore-paths=
+    ^MCP/PDF/tests/test_pdf_mcp_server\.py$,
+    ^MCP/PDF/tests/test_http_docx\.py$,
+    ^MCP/PDF/examples/.*$,
+    ^CurSor-/.*$,
+    ^MCP_run_PDF/.*$
+
+[MESSAGES CONTROL]
+disable=
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring,
+    too-few-public-methods,
+    invalid-name
+
+[TYPECHECK]
+ignored-modules=cv2,fitz,pytesseract,paddleocr,easyocr,pdf2image,pdfplumber,camelot,tabula,pydantic,uvicorn,rich,mcp,mcp.server,mcp.types,mcp.resources,mcp.client,mcp.shared,docx,docx.shared,docx.enum,fastapi,starlette,sqlalchemy,numpy,PIL,python_docx
+extension-pkg-allow-list=cv2,fitz,pdfplumber
+
+[FORMAT]
+max-line-length=100
+
+[SIMILARITIES]
+min-similarity-lines=18
+ignore-comments=yes
+ignore-docstrings=yes
+ignore-imports=yes
+
+[REPORTS]
+output-format=text
+reports=no
+score=yes
