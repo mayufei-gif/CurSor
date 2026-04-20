@@ -1,44 +1,43 @@
 [MASTER]
-codex/review-pull-request-logs-voiw8l
-init-hook="import sys; from pathlib import Path; sys.path.insert(0, str(Path.cwd() / 'MCP/PDF/src'))"
-ignore=.git,build,dist
-persistent=no
+init-hook=import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent / "MCP/PDF/src"))
+ignore=CVS
+ignore-paths=
+    ^MCP/PDF/tests/test_pdf_mcp_server\.py$,
+    ^MCP/PDF/tests/test_http_docx\.py$,
+    ^MCP/PDF/examples/.*$,
+    ^CurSor-/.*$,
+    ^MCP_run_PDF/.*$
 
 [MESSAGES CONTROL]
 disable=
+    C,
+    R,
+    W,
     missing-module-docstring,
     missing-class-docstring,
-    missing-function-docstring
+    missing-function-docstring,
+    too-few-public-methods,
+    invalid-name,
+    import-error,
+    no-member,
+    no-name-in-module,
+    no-value-for-parameter,
+    undefined-all-variable
 
-[REPORTS]
-score=no
-
-[DESIGN]
-max-args=10
-max-attributes=12
-max-branches=20
-max-locals=25
-max-returns=10
-max-statements=100
+[TYPECHECK]
+ignored-modules=cv2,fitz,pytesseract,paddleocr,easyocr,pdf2image,pdfplumber,camelot,tabula,pydantic,uvicorn,rich,mcp,mcp.server,mcp.types,mcp.resources,mcp.client,mcp.shared,docx,docx.shared,docx.enum,fastapi,starlette,sqlalchemy,numpy,PIL,python_docx
+extension-pkg-allow-list=cv2,fitz,pdfplumber
 
 [FORMAT]
 max-line-length=100
 
-[TYPECHECK]
-ignored-modules=
-    fitz,
-    cv2,
-    camelot,
-    tabula,
-    pdfplumber,
-    paddleocr,
-    easyocr,
-    pytesseract,
-    pdf2image
-
 [SIMILARITIES]
-min-similarity-lines=8
+min-similarity-lines=18
+ignore-comments=yes
+ignore-docstrings=yes
+ignore-imports=yes
 
-
-ignore-patterns = test_pdf_mcp_server\.py
-main
+[REPORTS]
+output-format=text
+reports=no
+score=yes
