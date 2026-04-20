@@ -1,3 +1,4 @@
+# pylint: skip-file
 #!/usr/bin/env python3
 """
 PDF-MCP Server Basic Usage Example
@@ -15,11 +16,11 @@ import logging
 import sys
 from pathlib import Path
 
-# Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Add the package source directory to the import path when running from a checkout.
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from src.pdf_mcp_server.main import PDFMCPServer
-from src.pdf_mcp_server.mcp.protocol import MCPProtocolHandler, MCPRequest, MCPMethod
+from pdf_mcp_server.main import PDFMCPServer
+from pdf_mcp_server.mcp.protocol import MCPProtocolHandler, MCPRequest, MCPMethod
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
