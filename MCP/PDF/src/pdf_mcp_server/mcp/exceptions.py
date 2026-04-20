@@ -117,23 +117,16 @@ class ToolExecutionException(MCPException):
     ):
         """Create a tool execution error.
 
-        The historical call-site signature was ``ToolExecutionException(message)``
-        even though the class originally required both ``tool_name`` and an error
-        string.  Pylint correctly flagged these calls as missing required
-        arguments.  To remain backward compatible (and to keep the call-sites
-        simple for generic tools) we accept either ``ToolExecutionException("msg")``
-        or ``ToolExecutionException("tool", "msg")`` as well as the explicit
-        keyword form ``ToolExecutionException("msg", tool_name="tool")``.
+        Supports legacy ``ToolExecutionException(message)`` as well as the
+        explicit ``ToolExecutionException(tool_name, message)`` and keyword-only
+        ``ToolExecutionException(message, tool_name="tool")`` call patterns.
         """
 
         if execution_error is None and tool_name is None:
-            # Called with only a message. Use a generic tool name so the final
-            # message still reads naturally.
             resolved_tool_name = "generic_tool"
             resolved_error = tool_name_or_message
             final_message = f"Tool execution failed: {resolved_error}"
         else:
-            # Either the legacy two-argument form or explicit keyword usage.
             resolved_tool_name = tool_name or tool_name_or_message
             resolved_error = execution_error or tool_name_or_message
             final_message = (
@@ -145,17 +138,16 @@ class ToolExecutionException(MCPException):
             'execution_error': resolved_error,
         }
 
-        if original_exception:
+        if original_exception is not None:
             details['original_exception'] = {
                 'type': type(original_exception).__name__,
-                'message': str(original_exception)
+                'message': str(original_exception),
             }
 
         super().__init__(final_message, 'TOOL_EXECUTION_ERROR', details)
         self.tool_name = resolved_tool_name
         self.execution_error = resolved_error
         self.original_exception = original_exception
-
 
 class MCPTimeoutException(MCPException):
     """Exception raised when MCP operations timeout."""

@@ -24,6 +24,7 @@ from .validation import (
     validate_processing_request,
     sanitize_filename
 )
+from .page_utils import resolve_page_indices
 
 __all__ = [
     'Config',
@@ -40,5 +41,6 @@ __all__ = [
     'get_file_size',
     'validate_pdf_file',
     'validate_processing_request',
-    'sanitize_filename'
+    'sanitize_filename',
+    'resolve_page_indices'
 ]

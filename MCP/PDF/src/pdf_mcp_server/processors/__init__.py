@@ -26,8 +26,8 @@ __all__ = [
     "OCRProcessor",
     "FormulaExtractor",
     "DocumentAnalyzer",
-    "LayoutReconstructor",
 ]
 
-if LayoutReconstructor is None:  # pragma: no cover - optional
-    __all__.remove("LayoutReconstructor")
+
+if LayoutReconstructor is not None:  # pragma: no cover - optional dependency
+    __all__.append("LayoutReconstructor")

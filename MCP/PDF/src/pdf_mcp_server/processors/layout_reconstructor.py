@@ -35,6 +35,7 @@ from ..models import (
     TextSpan,
 )
 from ..utils.config import Config
+from ..utils.page_utils import resolve_page_indices
 from ..utils.exceptions import PDFProcessingError
 from ..utils.geometry import (
     bbox_distance,
@@ -220,14 +221,7 @@ class LayoutReconstructor:
     # Helpers
     # ------------------------------------------------------------------
     def _resolve_pages(self, pages: Optional[List[int]], total_pages: int) -> List[int]:
-        if not pages:
-            return list(range(total_pages))
-        resolved: List[int] = []
-        for page in pages:
-            index = max(page - 1, 0)
-            if index < total_pages:
-                resolved.append(index)
-        return resolved
+        return resolve_page_indices(pages, total_pages)
 
     def _linear_sum_assignment(
         self, cost_matrix: List[List[float]], filler: float
