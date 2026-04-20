@@ -106,30 +106,48 @@ class InvalidToolCallException(MCPException):
 
 class ToolExecutionException(MCPException):
     """Exception raised when tool execution fails."""
-    
+
     def __init__(
         self,
-        tool_name: str,
-        execution_error: str,
-        original_exception: Optional[Exception] = None
+        tool_name_or_message: str,
+        execution_error: Optional[str] = None,
+        original_exception: Optional[Exception] = None,
+        *,
+        tool_name: Optional[str] = None,
     ):
-        message = f"Tool '{tool_name}' execution failed: {execution_error}"
+        """Create a tool execution error.
+
+        Supports legacy ``ToolExecutionException(message)`` as well as the
+        explicit ``ToolExecutionException(tool_name, message)`` and keyword-only
+        ``ToolExecutionException(message, tool_name="tool")`` call patterns.
+        """
+
+        if execution_error is None and tool_name is None:
+            resolved_tool_name = "generic_tool"
+            resolved_error = tool_name_or_message
+            final_message = f"Tool execution failed: {resolved_error}"
+        else:
+            resolved_tool_name = tool_name or tool_name_or_message
+            resolved_error = execution_error or tool_name_or_message
+            final_message = (
+                f"Tool '{resolved_tool_name}' execution failed: {resolved_error}"
+            )
+
         details = {
-            'tool_name': tool_name,
-            'execution_error': execution_error
+            'tool_name': resolved_tool_name,
+            'execution_error': resolved_error,
         }
-        
-        if original_exception:
+
+        if original_exception is not None:
             details['original_exception'] = {
                 'type': type(original_exception).__name__,
-                'message': str(original_exception)
+                'message': str(original_exception),
             }
-        
-        super().__init__(message, 'TOOL_EXECUTION_ERROR', details)
-        self.tool_name = tool_name
-        self.execution_error = execution_error
-        self.original_exception = original_exception
 
+        super().__init__(final_message, 'TOOL_EXECUTION_ERROR', details)
+        self.tool_name = resolved_tool_name
+        self.execution_error = resolved_error
+        self.original_exception = original_exception
 
 class MCPTimeoutException(MCPException):
     """Exception raised when MCP operations timeout."""

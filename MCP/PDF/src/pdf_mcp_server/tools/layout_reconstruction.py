@@ -124,12 +124,20 @@ class ReconstructLayoutTool(PDFTool):
         try:
             table_engine = TableEngine(table_engine_value)
         except Exception as exc:  # pragma: no cover - enum validation
-            raise ToolExecutionException(f"Unsupported table engine: {table_engine_value}") from exc
+            raise ToolExecutionException(
+                f"Unsupported table engine: {table_engine_value}",
+                tool_name=self.name,
+                original_exception=exc,
+            ) from exc
 
         try:
             formula_model = FormulaModel(formula_model_value)
         except Exception as exc:  # pragma: no cover - enum validation
-            raise ToolExecutionException(f"Unsupported formula model: {formula_model_value}") from exc
+            raise ToolExecutionException(
+                f"Unsupported formula model: {formula_model_value}",
+                tool_name=self.name,
+                original_exception=exc,
+            ) from exc
 
         config = Config.load()
         processor = PDFProcessor(config)
@@ -147,17 +155,20 @@ class ReconstructLayoutTool(PDFTool):
                 reconstruct_layout=True,
             )
             result = await processor.process(request)
+        except ToolExecutionException:
+            raise
         except Exception as exc:
             self.logger.error("Layout reconstruction failed: %s", exc, exc_info=True)
+            raise ToolExecutionException(
+                "Layout reconstruction failed",
+                tool_name=self.name,
+                original_exception=exc,
+            ) from exc
+        finally:
             await processor.cleanup()
-            return MCPToolResult(
-                content=[create_error_content(f"Layout reconstruction failed: {exc}")],
-                isError=True,
-            )
-
-        await processor.cleanup()
 
         layout = result.content.layout if result and result.content else None
+
         if not layout:
             return MCPToolResult(
                 content=[create_error_content("Layout reconstruction returned no result")],
