@@ -18,6 +18,7 @@ disable=
     missing-function-docstring,
     too-few-public-methods,
     invalid-name,
+    import-error,
     no-member,
     no-name-in-module,
     no-value-for-parameter,
