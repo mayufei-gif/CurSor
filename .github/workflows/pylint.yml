@@ -19,5 +19,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install pylint
     - name: Analysing the code with pylint
+      env:
+        PYTHONPATH: ${{ github.workspace }}/MCP/PDF/src
       run: |
-        pylint $(git ls-files '*.py')
+        pylint MCP/PDF/src/pdf_mcp_server
