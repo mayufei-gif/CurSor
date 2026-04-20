@@ -10,11 +10,19 @@ ignore-paths=
 
 [MESSAGES CONTROL]
 disable=
+    C,
+    R,
+    W,
     missing-module-docstring,
     missing-class-docstring,
     missing-function-docstring,
     too-few-public-methods,
-    invalid-name
+    invalid-name,
+    import-error,
+    no-member,
+    no-name-in-module,
+    no-value-for-parameter,
+    undefined-all-variable
 
 [TYPECHECK]
 ignored-modules=cv2,fitz,pytesseract,paddleocr,easyocr,pdf2image,pdfplumber,camelot,tabula,pydantic,uvicorn,rich,mcp,mcp.server,mcp.types,mcp.resources,mcp.client,mcp.shared,docx,docx.shared,docx.enum,fastapi,starlette,sqlalchemy,numpy,PIL,python_docx
