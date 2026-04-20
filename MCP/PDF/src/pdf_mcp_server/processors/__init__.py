@@ -14,6 +14,10 @@ from .table_extractor import TableExtractor
 from .ocr_processor import OCRProcessor
 from .formula_extractor import FormulaExtractor
 from .document_analyzer import DocumentAnalyzer
+try:
+    from .layout_reconstructor import LayoutReconstructor
+except Exception:  # pragma: no cover - optional dependency
+    LayoutReconstructor = None  # type: ignore
 
 __all__ = [
     "PDFProcessor",
@@ -23,9 +27,7 @@ __all__ = [
     "FormulaExtractor",
     "DocumentAnalyzer",
 ]
-codex/locate-layout-reconstruction-code
 
 
 if LayoutReconstructor is not None:  # pragma: no cover - optional dependency
     __all__.append("LayoutReconstructor")
-codex/locate-pdf-mcp-server-project-uq2ubf
