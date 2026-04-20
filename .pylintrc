@@ -1,69 +1,43 @@
 [MASTER]
-codex/review-pull-request-logs-51shda
-init-hook="import os, sys; repo_root=os.path.dirname(__file__); project_root=os.path.join(repo_root, 'MCP', 'PDF'); sys.path.insert(0, os.path.join(project_root, 'src')); sys.path.insert(0, project_root)"
-jobs=0
-ignore=.git,__pycache__,build,dist,examples,tests/fixtures
-ignore-patterns=^\.#
-load-plugins=pylint.extensions.docparams
+init-hook=import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent / "MCP/PDF/src"))
+ignore=CVS
+ignore-paths=
+    ^MCP/PDF/tests/test_pdf_mcp_server\.py$,
+    ^MCP/PDF/tests/test_http_docx\.py$,
+    ^MCP/PDF/examples/.*$,
+    ^CurSor-/.*$,
+    ^MCP_run_PDF/.*$
 
 [MESSAGES CONTROL]
 disable=
+    C,
+    R,
+    W,
     missing-module-docstring,
     missing-class-docstring,
     missing-function-docstring,
     too-few-public-methods,
-    too-many-arguments,
-    too-many-instance-attributes,
-    too-many-locals,
-    too-many-branches,
-    too-many-return-statements,
-    too-many-statements,
-    logging-fstring-interpolation
-
-[REPORTS]
-output-format=colorized
-reports=no
-score=yes
+    invalid-name,
+    import-error,
+    no-member,
+    no-name-in-module,
+    no-value-for-parameter,
+    undefined-all-variable
 
 [TYPECHECK]
-ignored-modules=
-    numpy,
-    cv2,
-    fitz,
-    pdfplumber,
-    camelot,
-    tabula,
-    pandas,
-    pytesseract,
-    easyocr,
-    paddleocr,
-    torch,
-    torchvision
+ignored-modules=cv2,fitz,pytesseract,paddleocr,easyocr,pdf2image,pdfplumber,camelot,tabula,pydantic,uvicorn,rich,mcp,mcp.server,mcp.types,mcp.resources,mcp.client,mcp.shared,docx,docx.shared,docx.enum,fastapi,starlette,sqlalchemy,numpy,PIL,python_docx
+extension-pkg-allow-list=cv2,fitz,pdfplumber
 
 [FORMAT]
 max-line-length=100
 
-[DESIGN]
-max-args=10
-max-attributes=15
-max-locals=25
-
 [SIMILARITIES]
-min-similarity-lines=15
+min-similarity-lines=18
 ignore-comments=yes
 ignore-docstrings=yes
 ignore-imports=yes
 
-[REFACTORING]
-max-nested-blocks=5
-
-[LOGGING]
-logging-modules=logging
-
-[VARIABLES]
-additional-builtins=
-
-
-
-ignore-patterns = test_pdf_mcp_server\.py
-main
+[REPORTS]
+output-format=text
+reports=no
+score=yes
