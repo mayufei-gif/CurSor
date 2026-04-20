@@ -1,13 +1,6 @@
-#!/usr/bin/env python3
-"""
-PDF-MCP Server Test Script
+"""Integration-oriented tests for the PDF MCP server building blocks."""
 
-This script tests the PDF-MCP server functionality by sending various MCP requests
-and validating the responses.
-
-Author: PDF-MCP Team
-License: MIT
-"""
+from __future__ import annotations
 
 # The tests intentionally mirror production request payloads and setup logic to
 # ensure end-to-end coverage, which results in large shared blocks of code with
@@ -16,175 +9,116 @@ License: MIT
 # pylint: disable=duplicate-code
 
 import asyncio
-import json
-import logging
-import os
 import sys
-import tempfile
 from pathlib import Path
-import pytest
+from types import SimpleNamespace
 
-# Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent))
+from fastapi import FastAPI
 
-from src.pdf_mcp_server.mcp.protocol import MCPProtocolHandler, MCPRequest, MCPMethod
-from src.pdf_mcp_server.main import PDFMCPServer
+SRC_ROOT = Path(__file__).resolve().parents[1] / "src"
+if str(SRC_ROOT) not in sys.path:
+    sys.path.insert(0, str(SRC_ROOT))
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger('pdf_mcp_test')
-
-# Sample PDF path - replace with an actual PDF file for testing
-SAMPLE_PDF_PATH = Path(__file__).parent / 'samples' / 'sample.pdf'
-
-
-@pytest.mark.asyncio
-async def test_server_initialization():
-    """Test server initialization."""
-    logger.info("Testing server initialization...")
-    
-    # Create a temporary config file
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as temp_file:
-        config = {
-            "server": {
-                "name": "pdf-mcp-test-server",
-                "version": "1.0.0",
-                "description": "Test PDF processing server",
-                "max_concurrent_requests": 5,
-                "request_timeout": 60,
-                "temp_dir": "./temp_test",
-                "cleanup_interval": 3600
-            },
-            "logging": {
-                "level": "INFO",
-                "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-                "file": None
-            },
-            "tools": {
-                "text_extraction": {"enabled": True},
-                "table_extraction": {"enabled": False},
-                "ocr": {"enabled": False},
-                "formula_recognition": {"enabled": False},
-                "analysis": {"enabled": True}
-            }
-        }
-        json.dump(config, temp_file)
-        temp_file_path = temp_file.name
-    
-    try:
-        # Initialize server
-        server = PDFMCPServer(config_file=temp_file_path)
-        await server.initialize()
-        
-        # Check if server was initialized correctly
-        assert server.server is not None, "Server was not initialized"
-        assert server.protocol_handler is not None, "Protocol handler was not initialized"
-        
-        # Check if tools were registered correctly
-        tool_names = server.server.list_tool_names()
-        logger.info(f"Registered tools: {tool_names}")
-        
-        # Verify text extraction tools are registered
-        assert any("text" in tool.lower() for tool in tool_names), "Text extraction tools not registered"
-        
-        # Verify analysis tools are registered
-        assert any("analyze" in tool.lower() for tool in tool_names), "Analysis tools not registered"
-        
-        # Verify table extraction tools are not registered (disabled in config)
-        assert not any("table" in tool.lower() for tool in tool_names), "Table extraction tools should not be registered"
-        
-        logger.info("Server initialization test passed")
-        
-    except Exception as e:
-        logger.error(f"Server initialization test failed: {e}", exc_info=True)
-        raise
-    finally:
-        # Clean up temporary config file
-        os.unlink(temp_file_path)
+from pdf_mcp_server import __version__  # noqa: E402  pylint: disable=wrong-import-position
+from pdf_mcp_server.main import (  # noqa: E402  pylint: disable=wrong-import-position
+    Config,
+    lifespan,
+)
+from pdf_mcp_server.mcp.protocol import (  # noqa: E402  pylint: disable=wrong-import-position
+    MCPCapabilities,
+    MCPClientInfo,
+    MCPInitializeParams,
+    MCPMethod,
+    MCPProtocolHandler,
+)
+from pdf_mcp_server.models import (  # noqa: E402  pylint: disable=wrong-import-position
+    ProcessingMode,
+    ProcessingRequest,
+)
 
 
-@pytest.mark.asyncio
-async def test_tool_registration():
-    """Test tool registration."""
-    logger.info("Testing tool registration...")
-    
-    # Create server with default config
-    server = PDFMCPServer()
-    await server.initialize()
-    
-    # Get registered tools
-    tools = server.server.list_tools()
-    
-    # Verify tools were registered
-    assert len(tools) > 0, "No tools were registered"
-    
-    # Check tool structure
-    for tool in tools:
-        assert "name" in tool, "Tool missing 'name' field"
-        assert "description" in tool, "Tool missing 'description' field"
-        assert "inputSchema" in tool, "Tool missing 'inputSchema' field"
-    
-    logger.info(f"Found {len(tools)} registered tools")
-    logger.info("Tool registration test passed")
+def test_metadata_exposed() -> None:
+    """The package should expose a semantic version for clients."""
+    major, minor, patch = __version__.split(".")
+    assert major.isdigit()
+    assert minor.isdigit()
+    assert patch.isdigit()
 
 
-@pytest.mark.asyncio
-async def test_protocol_handler():
-    """Test protocol handler functionality."""
-    logger.info("Testing protocol handler...")
-    
-    # Create protocol handler
-    protocol = MCPProtocolHandler()
-    
-    # Create a sample request
-    request = MCPRequest(
-        id="test-request-1",
-        method=MCPMethod.INITIALIZE,
-        params={"capabilities": ["tools", "resources"]}
+def test_protocol_round_trip() -> None:
+    """Requests created by the protocol handler should survive serialization."""
+    handler = MCPProtocolHandler()
+    params = MCPInitializeParams(
+        protocolVersion="2024-11-05",
+        capabilities=MCPCapabilities(tools={"streaming": True}),
+        clientInfo=MCPClientInfo(name="pytest", version="1.0.0"),
     )
-    
-    # Serialize and deserialize the request
-    serialized = protocol.serialize_message(request)
-    deserialized = protocol.parse_message(serialized)
-    
-    # Verify the deserialized request matches the original
-    assert deserialized.id == request.id, "Request ID mismatch"
-    assert deserialized.method == request.method, "Request method mismatch"
-    assert deserialized.params == request.params, "Request params mismatch"
-    
-    logger.info("Protocol handler test passed")
+    request = handler.create_request(method=MCPMethod.INITIALIZE, params=params.model_dump())
+
+    parsed = handler.parse_message(request.model_dump())
+
+    assert parsed.id == request.id
+    assert parsed.method == request.method
+    assert parsed.params == request.params
 
 
-@pytest.mark.asyncio
-async def test_text_extraction():
-    """Test text extraction functionality."""
-    logger.info("Testing text extraction...")
-    
-    # Skip test if sample PDF doesn't exist
-    if not SAMPLE_PDF_PATH.exists():
-        logger.warning(f"Sample PDF not found at {SAMPLE_PDF_PATH}, skipping text extraction test")
-        return
-    
-    # Create server
-    server = PDFMCPServer()
-    await server.initialize()
-    
-    # Create protocol handler
-    protocol = MCPProtocolHandler()
-    
-    # Create a tool call request for text extraction
-    request = MCPRequest(
-        id="test-text-extraction",
-        method=MCPMethod.TOOLS_CALL,
-        params={
-            "name": "read_text",
-            "arguments": {
-                "file_path": str(SAMPLE_PDF_PATH),
-                "pages": [1],
-                "include_metadata": True
-            }
-        }
+def test_lifespan_initializes_processor(monkeypatch, tmp_path) -> None:
+    """The FastAPI lifespan hook should initialize and clean up the processor."""
+
+    created = SimpleNamespace(instance=None, initialized=False, cleaned=False)
+
+    async def exercise() -> None:
+        def fake_config() -> Config:
+            config = Config()
+            config.temp_dir = str(tmp_path)
+            config.log_file = None
+            return config
+
+        class DummyProcessor:
+            def __init__(self, config: Config) -> None:
+                created.instance = self
+                self.config = config
+
+            async def initialize(self) -> None:
+                created.initialized = True
+
+            async def cleanup(self) -> None:
+                created.cleaned = True
+
+        monkeypatch.setattr("pdf_mcp_server.main.Config", fake_config)
+        monkeypatch.setattr("pdf_mcp_server.main.PDFProcessor", DummyProcessor)
+        monkeypatch.setattr("pdf_mcp_server.main.setup_logging", lambda *_, **__: None)
+        monkeypatch.setattr("pdf_mcp_server.main.pdf_processor", None)
+
+        app = FastAPI()
+
+        try:
+            async with lifespan(app):
+                assert created.instance is not None
+                assert created.initialized is True
+        finally:
+            # Ensure the module-level singleton is reset for other tests.
+            monkeypatch.setattr("pdf_mcp_server.main.pdf_processor", None)
+
+    asyncio.run(exercise())
+
+    assert created.cleaned is True
+
+
+def test_processing_request_builds_from_primitives() -> None:
+    """The request model should normalise primitive payloads into enums."""
+    request = ProcessingRequest(
+        file_path="sample.pdf",
+        mode="read_text",
+        table_output_format="json",
+        include_ocr=True,
     )
+codex/review-pull-request-logs-b4vd6p
+
+    assert request.mode is ProcessingMode.TEXT
+    assert request.table_output_format.value == "json"
+    assert request.include_ocr is True
+
     
     # Serialize the request
     serialized_request = protocol.serialize_message(request)
@@ -232,3 +166,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+main
